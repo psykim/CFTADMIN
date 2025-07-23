@@ -1,0 +1,2493 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>동물 범주 언어유창성검사</title>
+    <style>
+        body {
+            font-family: 'Noto Sans KR', sans-serif;
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background-color: white;
+            border-radius: 10px;
+            padding: 30px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .page {
+            display: none;
+            animation: fadeIn 0.5s ease-in;
+        }
+        .page.active {
+            display: block;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        /* Progress Indicator */
+        .progress-container {
+            margin-bottom: 40px;
+        }
+        .progress-steps {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+        .step {
+            flex: 1;
+            text-align: center;
+            position: relative;
+        }
+        .step:not(:last-child)::after {
+            content: '';
+            position: absolute;
+            top: 20px;
+            left: 50%;
+            width: 100%;
+            height: 2px;
+            background-color: #e0e0e0;
+            z-index: -1;
+        }
+        .step.completed:not(:last-child)::after {
+            background-color: #4caf50;
+        }
+        .step-circle {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: #e0e0e0;
+            color: #666;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 10px;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+        .step.active .step-circle {
+            background-color: #2196f3;
+            color: white;
+            transform: scale(1.1);
+        }
+        .step.completed .step-circle {
+            background-color: #4caf50;
+            color: white;
+        }
+        .step-label {
+            font-size: 14px;
+            color: #666;
+        }
+        .step.active .step-label {
+            font-weight: bold;
+            color: #2196f3;
+        }
+        
+        /* Voice Guide Box */
+        .voice-guide {
+            background-color: #fff3cd;
+            border: 2px solid #ffeaa7;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+            display: none;
+        }
+        .voice-guide.active {
+            display: block;
+            animation: pulse 1.5s infinite;
+        }
+        .voice-guide-icon {
+            font-size: 24px;
+            margin-right: 10px;
+        }
+        .voice-guide-text {
+            font-size: 16px;
+            color: #856404;
+        }
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.8; }
+            100% { opacity: 1; }
+        }
+        
+        /* Setup Page Styles */
+        .setup-section {
+            margin-bottom: 30px;
+            padding: 20px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            background-color: #fafafa;
+        }
+        .setup-section h3 {
+            margin-top: 0;
+            color: #1976d2;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .check-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 15px;
+            margin: 10px 0;
+            background-color: white;
+            border-radius: 5px;
+            border: 1px solid #ddd;
+        }
+        .check-status {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .status-icon {
+            font-size: 24px;
+        }
+        .status-icon.pending { color: #666; }
+        .status-icon.checking { color: #ff9800; animation: spin 1s linear infinite; }
+        .status-icon.success { color: #4caf50; }
+        .status-icon.error { color: #f44336; }
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+        .test-btn {
+            padding: 8px 16px;
+            background-color: #2196f3;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            display: none; /* 버튼 숨기기 */
+        }
+        .test-btn:hover:not(:disabled) {
+            background-color: #1976d2;
+        }
+        .test-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+        
+        /* Audio Visualizer */
+        .audio-visualizer {
+            margin: 15px 0;
+            height: 60px;
+            background-color: #f0f0f0;
+            border-radius: 5px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0 20px;
+        }
+        .audio-bar {
+            width: 4px;
+            height: 20px;
+            background-color: #4caf50;
+            margin: 0 2px;
+            transition: height 0.1s ease;
+            border-radius: 2px;
+        }
+        
+        /* Instructions Page */
+        .instructions-content {
+            max-width: 700px;
+            margin: 0 auto;
+        }
+        .instruction-card {
+            background-color: #f8f9fa;
+            border-left: 4px solid #2196f3;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 0 8px 8px 0;
+        }
+        .instruction-card h4 {
+            margin-top: 0;
+            color: #1976d2;
+        }
+        .example-box {
+            background-color: #e3f2fd;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 10px 0;
+        }
+        .warning-box {
+            background-color: #ffebee;
+            border-left: 4px solid #f44336;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 0 5px 5px 0;
+        }
+        .warning-box h4 {
+            margin-top: 0;
+            color: #c62828;
+        }
+        
+        /* Navigation */
+        .navigation {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 2px solid #e0e0e0;
+        }
+        button {
+            padding: 12px 24px;
+            font-size: 16px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        .prev-btn {
+            background-color: #666;
+            color: white;
+        }
+        .prev-btn:hover {
+            background-color: #555;
+        }
+        .next-btn {
+            background-color: #4caf50;
+            color: white;
+        }
+        .next-btn:hover:not(:disabled) {
+            background-color: #45a049;
+        }
+        .next-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+        .voice-guide-btn {
+            background-color: #ff9800;
+            color: white;
+        }
+        .voice-guide-btn:hover {
+            background-color: #f57c00;
+        }
+        
+        /* Test Page Styles */
+        .timer-section {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .timer {
+            font-size: 48px;
+            font-weight: bold;
+            color: #2196f3;
+            margin: 20px 0;
+        }
+        .controls {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            margin-bottom: 30px;
+        }
+        .start-btn {
+            background-color: #4caf50;
+            color: white;
+        }
+        .start-btn:hover:not(:disabled) {
+            background-color: #45a049;
+        }
+        .stop-btn {
+            background-color: #f44336;
+            color: white;
+        }
+        .stop-btn:hover:not(:disabled) {
+            background-color: #da190b;
+        }
+        .reset-btn {
+            background-color: #ff9800;
+            color: white;
+        }
+        .reset-btn:hover:not(:disabled) {
+            background-color: #e68900;
+        }
+        button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+        .input-section {
+            margin-bottom: 30px;
+        }
+        .manual-input {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        #manualInput {
+            flex: 1;
+            padding: 10px;
+            font-size: 16px;
+            border: 2px solid #ddd;
+            border-radius: 5px;
+        }
+        .add-btn {
+            background-color: #2196f3;
+            color: white;
+        }
+        .add-btn:hover:not(:disabled) {
+            background-color: #0b7dda;
+        }
+        .recording-indicator {
+            display: none;
+            color: #f44336;
+            text-align: center;
+            margin: 10px 0;
+            font-weight: bold;
+        }
+        .recording-indicator.active {
+            display: block;
+            animation: pulse 1.5s infinite;
+        }
+        .results-section {
+            margin-top: 30px;
+        }
+        .animal-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin: 20px 0;
+            min-height: 100px;
+            padding: 15px;
+            border: 2px dashed #ddd;
+            border-radius: 5px;
+            background-color: #fafafa;
+        }
+        .animal-item {
+            background-color: #e3f2fd;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 14px;
+            position: relative;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .animal-item.duplicate {
+            background-color: #ffebee;
+            color: #c62828;
+        }
+        .animal-rank {
+            background-color: #1976d2;
+            color: white;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: bold;
+        }
+        .animal-interval {
+            background-color: #fff;
+            padding: 2px 6px;
+            border-radius: 10px;
+            font-size: 11px;
+            color: #666;
+            border: 1px solid #ddd;
+        }
+        .interval-stats {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+            margin: 20px 0;
+        }
+        .interval-card {
+            background-color: white;
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+            border: 2px solid #e0e0e0;
+        }
+        .interval-card h4 {
+            margin: 0 0 10px 0;
+            color: #1976d2;
+            font-size: 16px;
+        }
+        .interval-count {
+            font-size: 24px;
+            font-weight: bold;
+            color: #333;
+        }
+        .interval-time {
+            font-size: 12px;
+            color: #666;
+            margin-top: 5px;
+        }
+        .stats {
+            background-color: #f5f5f5;
+            padding: 20px;
+            border-radius: 5px;
+            margin-top: 20px;
+        }
+        .stat-item {
+            display: flex;
+            justify-content: space-between;
+            margin: 10px 0;
+            padding: 10px;
+            background-color: white;
+            border-radius: 5px;
+        }
+        .stat-label {
+            font-weight: bold;
+            color: #666;
+        }
+        .stat-value {
+            color: #2196f3;
+            font-weight: bold;
+        }
+        .download-btn {
+            background-color: #673ab7;
+            color: white;
+            margin-top: 20px;
+            width: 100%;
+        }
+        .download-btn:hover {
+            background-color: #5e35b1;
+        }
+        .voice-settings {
+            background-color: #f0f7ff;
+            padding: 20px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+        .voice-settings label {
+            margin: 0 10px;
+        }
+        .voice-settings input[type="range"] {
+            width: 100px;
+            vertical-align: middle;
+        }
+        .api-settings {
+            margin-top: 15px;
+            padding: 15px;
+            background-color: #e3f2fd;
+            border-radius: 5px;
+        }
+        .api-input-group {
+            display: flex;
+            gap: 10px;
+            margin: 10px 0;
+            align-items: center;
+        }
+        .api-input {
+            flex: 1;
+            padding: 8px;
+            border: 2px solid #90caf9;
+            border-radius: 5px;
+            font-size: 14px;
+        }
+        .api-status {
+            display: inline-block;
+            padding: 5px 10px;
+            border-radius: 5px;
+            font-size: 12px;
+            margin-left: 10px;
+        }
+        .api-status.connected {
+            background-color: #c8e6c9;
+            color: #2e7d32;
+        }
+        .api-status.error {
+            background-color: #ffcdd2;
+            color: #c62828;
+        }
+        .voice-select {
+            padding: 5px;
+            border-radius: 5px;
+            border: 1px solid #ddd;
+            margin-left: 10px;
+        }
+        .ready-box {
+            background-color: #e8f5e9;
+            color: #2e7d32;
+            padding: 25px;
+            border-radius: 8px;
+            text-align: center;
+            margin: 30px 0;
+        }
+        .ready-box h3 {
+            margin-top: 0;
+            font-size: 24px;
+        }
+        .ready-check {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            margin: 10px 0;
+            font-size: 18px;
+        }
+        .speed-control-buttons {
+            display: none;
+            gap: 10px;
+            justify-content: center;
+            margin-top: 15px;
+        }
+        .speed-btn {
+            padding: 10px 20px;
+            border: 2px solid #2196f3;
+            background: white;
+            color: #2196f3;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 16px;
+        }
+        .speed-btn:hover {
+            background: #2196f3;
+            color: white;
+        }
+        .speed-btn.active {
+            background: #2196f3;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>동물 범주 언어유창성검사</h1>
+        
+        <!-- 자동 시작 안내 -->
+        <div id="autoStartNotice" style="background-color: #e3f2fd; border: 2px solid #2196f3; border-radius: 8px; padding: 30px; margin-bottom: 20px; text-align: center; cursor: pointer;" onclick="startVoiceImmediately()">
+            <p style="margin-bottom: 15px; font-size: 18px;">
+                <strong>🔊 음성 안내를 시작하려면 이 박스를 클릭하세요</strong><br>
+                <span style="font-size: 14px; color: #1976d2;">브라우저 보안 정책으로 인해 클릭이 필요합니다</span><br>
+                <span style="font-size: 12px; color: #666;">클릭하면 마이크 권한을 요청하고 음성 안내가 시작됩니다</span>
+            </p>
+            <button onclick="startVoiceImmediately()" style="background-color: #4caf50; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; font-size: 16px;">
+                음성 안내 바로 시작
+            </button>
+            <button onclick="testSimpleVoice()" style="background-color: #2196f3; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; font-size: 16px; margin-left: 10px;">
+                음성 테스트
+            </button>
+        </div>
+        
+        <script>
+            // 간단한 음성 테스트 함수
+            function testSimpleVoice() {
+                console.log('간단한 음성 테스트 시작');
+                
+                // 음성 목록 확인
+                const voices = window.speechSynthesis.getVoices();
+                console.log('사용 가능한 음성 수:', voices.length);
+                
+                // 한국어 음성 찾기
+                const koreanVoices = voices.filter(v => v.lang.includes('ko'));
+                console.log('한국어 음성:', koreanVoices);
+                
+                // 음성 중단
+                window.speechSynthesis.cancel();
+                
+                const msg = new SpeechSynthesisUtterance('테스트 음성입니다.');
+                msg.lang = 'ko-KR';
+                msg.rate = 0.9;
+                msg.pitch = 1.0;
+                msg.volume = 1.0;
+                
+                // 한국어 음성이 있으면 설정
+                if (koreanVoices.length > 0) {
+                    msg.voice = koreanVoices[0];
+                    console.log('선택된 음성:', koreanVoices[0].name);
+                }
+                
+                msg.onstart = () => console.log('음성 시작');
+                msg.onend = () => console.log('음성 종료');
+                msg.onerror = (e) => console.error('음성 오류:', e);
+                
+                try {
+                    window.speechSynthesis.speak(msg);
+                    console.log('음성 재생 요청 완료');
+                } catch (error) {
+                    console.error('음성 재생 실패:', error);
+                    alert('음성 재생 실패: ' + error.message);
+                }
+            }
+        </script>
+        
+        <div class="progress-container">
+            <div class="progress-steps">
+                <div class="step active" id="step1">
+                    <div class="step-circle">1</div>
+                    <div class="step-label">환경 설정</div>
+                </div>
+                <div class="step" id="step2">
+                    <div class="step-circle">2</div>
+                    <div class="step-label">검사 안내</div>
+                </div>
+                <div class="step" id="step3">
+                    <div class="step-circle">3</div>
+                    <div class="step-label">검사 시행</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Voice Guide Box -->
+        <div class="voice-guide" id="voiceGuideBox">
+            <span class="voice-guide-icon">🔊</span>
+            <span class="voice-guide-text" id="voiceGuideText">음성 안내 중...</span>
+        </div>
+
+        <!-- Setup Page (Step 1) -->
+        <div class="page active" id="setupPage">
+            <h2>1단계: 검사 환경 설정</h2>
+            
+            <div class="setup-section">
+                <h3>🎤 마이크 설정</h3>
+                <div class="check-item">
+                    <div>
+                        <strong>마이크 권한</strong>
+                        <div style="font-size: 14px; color: #666;">음성인식을 위한 마이크 접근 권한</div>
+                    </div>
+                    <div class="check-status">
+                        <span class="status-icon pending" id="micPermissionIcon">⚪</span>
+                        <button class="test-btn" id="micPermissionBtn">권한 요청</button>
+                    </div>
+                </div>
+                <div class="check-item">
+                    <div>
+                        <strong>마이크 테스트</strong>
+                        <div style="font-size: 14px; color: #666;">소리를 내어 마이크가 작동하는지 확인하세요</div>
+                    </div>
+                    <div class="check-status">
+                        <span class="status-icon pending" id="micTestIcon">⚪</span>
+                        <button class="test-btn" id="micTestBtn" disabled>테스트</button>
+                    </div>
+                </div>
+                <div class="audio-visualizer" id="micVisualizer" style="display: none;">
+                    <div class="audio-bar"></div>
+                    <div class="audio-bar"></div>
+                    <div class="audio-bar"></div>
+                    <div class="audio-bar"></div>
+                    <div class="audio-bar"></div>
+                    <div class="audio-bar"></div>
+                    <div class="audio-bar"></div>
+                    <div class="audio-bar"></div>
+                    <div class="audio-bar"></div>
+                    <div class="audio-bar"></div>
+                </div>
+            </div>
+
+            <div class="setup-section">
+                <h3>🔊 스피커 설정</h3>
+                <div class="check-item">
+                    <div>
+                        <strong>스피커 테스트</strong>
+                        <div style="font-size: 14px; color: #666;">음성 안내가 들리는지 확인하세요</div>
+                    </div>
+                    <div class="check-status">
+                        <span class="status-icon pending" id="speakerTestIcon">⚪</span>
+                        <button class="test-btn" id="speakerTestBtn">테스트</button>
+                    </div>
+                </div>
+                <div class="voice-settings">
+                    <label>
+                        <input type="checkbox" id="voiceEnabled" checked> 음성 안내 사용
+                    </label>
+                    <label>
+                        속도 <span style="font-size: 12px; color: #666;">(브라우저 음성만)</span>: 
+                        <input type="range" id="voiceSpeed" min="0.5" max="1.5" step="0.1" value="0.9">
+                        <span id="speedValue">0.9</span>
+                    </label>
+                    
+                    <div class="api-settings">
+                        <h4 style="margin-top: 0;">🔊 ElevenLabs 음성 설정</h4>
+                        <input type="hidden" id="elevenLabsApiKey" value="">
+                        <button id="testApiBtn" style="display: none;"></button>
+                        <div style="margin-top: 10px;">
+                            <label>
+                                음성 선택:
+                                <select class="voice-select" id="voiceSelect">
+                                    <option value="">음성을 선택하세요</option>
+                                </select>
+                            </label>
+                            <span class="api-status" id="apiStatus" style="display: none;"></span>
+                            <button id="voiceGenderToggle" style="margin-left: 10px; padding: 5px 15px; background-color: #2196F3; color: white; border: none; border-radius: 5px; cursor: pointer;">
+                                🎭 남성 목소리로 변경
+                            </button>
+                        </div>
+                        <div style="margin-top: 15px; padding: 10px; background-color: #f0f7ff; border-radius: 5px;">
+                            <h5 style="margin: 0 0 10px 0;">음성 설정</h5>
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; font-size: 14px;">
+                                <label>
+                                    안정성: <input type="range" id="stabilitySlider" min="0" max="1" step="0.05" value="0.75" style="width: 80px;">
+                                    <span id="stabilityValue">0.75</span>
+                                </label>
+                                <label>
+                                    유사성: <input type="range" id="similaritySlider" min="0" max="1" step="0.05" value="0.75" style="width: 80px;">
+                                    <span id="similarityValue">0.75</span>
+                                </label>
+                                <label>
+                                    스타일: <input type="range" id="styleSlider" min="0" max="1" step="0.05" value="0.5" style="width: 80px;">
+                                    <span id="styleValue">0.5</span>
+                                </label>
+                                <label>
+                                    <input type="checkbox" id="speakerBoost" checked> 스피커 부스트
+                                </label>
+                            </div>
+                        </div>
+                        <div style="font-size: 12px; color: #666; margin-top: 10px;">
+                            * ElevenLabs 음성이 자동으로 연결됩니다<br>
+                            * 한국어 음성을 선택하면 더 자연스러운 발음을 들을 수 있습니다<br>
+                            * 음성 설정값을 조정하여 원하는 톤으로 변경할 수 있습니다
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="setup-section">
+                <h3>⚙️ 환경 확인</h3>
+                <div class="check-item">
+                    <div>
+                        <strong>HTTPS 연결</strong>
+                        <div style="font-size: 14px; color: #666;">음성인식을 위한 보안 연결</div>
+                    </div>
+                    <div class="check-status">
+                        <span class="status-icon" id="httpsIcon">⚪</span>
+                        <span id="httpsStatus" style="font-size: 14px;"></span>
+                    </div>
+                </div>
+                <div class="check-item">
+                    <div>
+                        <strong>브라우저 호환성</strong>
+                        <div style="font-size: 14px; color: #666;">음성인식 지원 여부</div>
+                    </div>
+                    <div class="check-status">
+                        <span class="status-icon" id="browserIcon">⚪</span>
+                        <span id="browserStatus" style="font-size: 14px;"></span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="navigation">
+                <button class="voice-guide-btn" id="setupVoiceGuideBtn">🔊 음성 안내 끄기</button>
+                <button class="next-btn" id="setupNextBtn">다음 단계</button>
+            </div>
+        </div>
+
+        <!-- Instructions Page (Step 2) -->
+        <div class="page" id="instructionsPage">
+            <h2>2단계: 검사 안내</h2>
+            
+            <div class="instructions-content">
+                <div class="instruction-card">
+                    <h4>🕐 검사 시간</h4>
+                    <p><strong>1분 (60초)</strong> 동안 진행됩니다.</p>
+                    <p>시간이 종료되면 자동으로 검사가 끝납니다.</p>
+                </div>
+
+                <div class="instruction-card">
+                    <h4>📋 검사 방법</h4>
+                    <p>제가 "시작"이라고 말씀드리면, <strong>생각나는 동물 이름을 최대한 많이</strong> 말씀해 주세요.</p>
+                    <p>음성인식 또는 키보드 입력 모두 가능합니다.</p>
+                </div>
+
+                <div class="instruction-card">
+                    <h4>✅ 포함 가능한 동물</h4>
+                    <div class="example-box">
+                        <ul style="margin: 5px 0; padding-left: 20px;">
+                            <li>포유류 (예: 개, 고양이, 사자, 코끼리)</li>
+                            <li>조류 (예: 참새, 독수리, 펭귄)</li>
+                            <li>어류 (예: 금붕어, 상어, 고등어)</li>
+                            <li>파충류 (예: 뱀, 거북이, 악어)</li>
+                            <li>양서류 (예: 개구리, 도롱뇽)</li>
+                            <li>곤충 (예: 나비, 개미, 벌)</li>
+                            <li>멸종 동물 (예: 공룡, 매머드)</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="warning-box">
+                    <h4>⚠️ 주의사항</h4>
+                    <ul style="margin: 5px 0; padding-left: 20px;">
+                        <li><strong>같은 동물을 반복하지 마세요</strong> (중복은 자동으로 표시됩니다)</li>
+                        <li><strong>애완동물 이름은 제외</strong> (예: 바둑이, 나비 ✗)</li>
+                        <li><strong>가상의 동물은 제외</strong> (예: 용, 유니콘, 포켓몬 ✗)</li>
+                        <li><strong>동물 종류만 말씀하세요</strong> (예: "큰 사자" ✗ → "사자" ✓)</li>
+                    </ul>
+                </div>
+
+                <div class="instruction-card">
+                    <h4>💡 도움말</h4>
+                    <p>• 편안한 마음으로 생각나는 대로 말씀하세요</p>
+                    <p>• 카테고리별로 생각하면 도움이 됩니다</p>
+                    <p>• 막히면 다른 종류의 동물로 넘어가세요</p>
+                </div>
+            </div>
+
+            <div class="navigation">
+                <button class="prev-btn" id="instructionsPrevBtn">이전 단계</button>
+                <div>
+                    <button class="voice-guide-btn" id="instructionsVoiceGuideBtn">🔊 음성 안내 끄기</button>
+                    <button class="next-btn" id="instructionsNextBtn">다음 단계</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Test Page (Step 3) -->
+        <div class="page" id="testPage">
+            <h2>3단계: 검사 시행</h2>
+            
+            <div class="ready-box">
+                <h3>✅ 검사 준비 완료!</h3>
+                <div class="ready-check">
+                    <span>🎤 마이크 준비 완료</span>
+                </div>
+                <div class="ready-check">
+                    <span>🔊 스피커 준비 완료</span>
+                </div>
+                <p style="margin-top: 20px; font-size: 16px;">
+                    아래 <strong>"검사 시작"</strong> 버튼을 누르면 음성 안내 후 검사가 시작됩니다.
+                </p>
+            </div>
+            
+            <div class="timer-section">
+                <div class="timer" id="timer">01:00</div>
+                <div class="controls">
+                    <button class="start-btn" id="startBtn">검사 시작</button>
+                    <button class="stop-btn" id="stopBtn" disabled>검사 종료</button>
+                    <button class="reset-btn" id="resetBtn">초기화</button>
+                </div>
+                <div class="recording-indicator" id="recordingIndicator">
+                    🎤 음성 인식 중...
+                </div>
+            </div>
+
+            <div class="input-section">
+                <h3>수동 입력</h3>
+                <div class="manual-input">
+                    <input type="text" id="manualInput" placeholder="동물 이름을 입력하세요" disabled>
+                    <button class="add-btn" id="addBtn" disabled>추가</button>
+                </div>
+            </div>
+
+            <div class="results-section">
+                <h3>입력된 동물 목록</h3>
+                <div class="animal-list" id="animalList"></div>
+                
+                <div class="stats" id="stats" style="display: none;">
+                    <h3>검사 결과</h3>
+                    
+                    <div class="interval-stats" id="intervalStats"></div>
+                    
+                    <div class="stat-item">
+                        <span class="stat-label">총 응답 수:</span>
+                        <span class="stat-value" id="totalCount">0</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">유효 응답 수 (중복 제외):</span>
+                        <span class="stat-value" id="uniqueCount">0</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">중복 응답 수:</span>
+                        <span class="stat-value" id="duplicateCount">0</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">소요 시간:</span>
+                        <span class="stat-value" id="elapsedTime">0초</span>
+                    </div>
+                    <button class="download-btn" id="downloadBtn">결과 다운로드</button>
+                </div>
+            </div>
+
+            <div class="navigation">
+                <button class="prev-btn" id="testPrevBtn">이전 단계</button>
+                <div></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 전역 변수
+        let animals = [];
+        let uniqueAnimals = new Set();
+        let startTime = null;
+        let endTime = null;
+        let timerInterval = null;
+        let timeRemaining = 60;
+        let recognition = null;
+        let isRecognizing = false;
+        let speechSynthesis = window.speechSynthesis;
+        let voiceReady = false;
+        let currentStep = 1;
+        let micStream = null;
+        let audioContext = null;
+        let analyser = null;
+        let dataArray = null;
+        let animationId = null;
+        
+        // 음성 안내 활성화 상태
+        let setupVoiceGuideActive = true;
+        let instructionsVoiceGuideActive = true;
+
+        // ElevenLabs 설정
+        const DEFAULT_ELEVENLABS_API_KEY = 'sk_9fb990dd7b9fe7e82a96c1a730b27af151829cb0b407579b';
+        let elevenLabsApiKey = DEFAULT_ELEVENLABS_API_KEY;
+        let elevenLabsVoiceId = null;
+        let elevenLabsConnected = false;
+        let audioQueue = [];
+        let isPlaying = false;
+        let userInteracted = false; // 전역 변수로 선언
+        let autoStartAttempted = false; // 전역 변수로 선언
+        let voiceGuideStarted = false; // 중복 호출 방지
+        let selectedVoiceSettings = {
+            stability: 0.75,
+            similarity_boost: 0.75,
+            style: 0.5,
+            use_speaker_boost: true
+        };
+
+        // 설정 상태
+        let setupStatus = {
+            micPermission: false,
+            micTest: false,
+            speakerTest: false,
+            https: false,
+            browser: false,
+            elevenLabs: false
+        };
+
+        // DOM 요소
+        const pages = {
+            setup: document.getElementById('setupPage'),
+            instructions: document.getElementById('instructionsPage'),
+            test: document.getElementById('testPage')
+        };
+        
+        const steps = {
+            1: document.getElementById('step1'),
+            2: document.getElementById('step2'),
+            3: document.getElementById('step3')
+        };
+
+        const voiceGuideBox = document.getElementById('voiceGuideBox');
+        const voiceGuideText = document.getElementById('voiceGuideText');
+
+        // Navigation buttons
+        const setupNextBtn = document.getElementById('setupNextBtn');
+        const setupVoiceGuideBtn = document.getElementById('setupVoiceGuideBtn');
+        const instructionsPrevBtn = document.getElementById('instructionsPrevBtn');
+        const instructionsNextBtn = document.getElementById('instructionsNextBtn');
+        const instructionsVoiceGuideBtn = document.getElementById('instructionsVoiceGuideBtn');
+        const testPrevBtn = document.getElementById('testPrevBtn');
+        
+        // Setup DOM
+        const micPermissionBtn = document.getElementById('micPermissionBtn');
+        const micPermissionIcon = document.getElementById('micPermissionIcon');
+        const micTestBtn = document.getElementById('micTestBtn');
+        const micTestIcon = document.getElementById('micTestIcon');
+        const micVisualizer = document.getElementById('micVisualizer');
+        const speakerTestBtn = document.getElementById('speakerTestBtn');
+        const speakerTestIcon = document.getElementById('speakerTestIcon');
+        const httpsIcon = document.getElementById('httpsIcon');
+        const httpsStatus = document.getElementById('httpsStatus');
+        const browserIcon = document.getElementById('browserIcon');
+        const browserStatus = document.getElementById('browserStatus');
+        
+        // Test DOM
+        const timer = document.getElementById('timer');
+        const startBtn = document.getElementById('startBtn');
+        const stopBtn = document.getElementById('stopBtn');
+        const resetBtn = document.getElementById('resetBtn');
+        const manualInput = document.getElementById('manualInput');
+        const addBtn = document.getElementById('addBtn');
+        const animalList = document.getElementById('animalList');
+        const stats = document.getElementById('stats');
+        const recordingIndicator = document.getElementById('recordingIndicator');
+        const downloadBtn = document.getElementById('downloadBtn');
+        const voiceEnabled = document.getElementById('voiceEnabled');
+        const voiceSpeed = document.getElementById('voiceSpeed');
+        const speedValue = document.getElementById('speedValue');
+        
+        // ElevenLabs DOM
+        const elevenLabsApiKeyInput = document.getElementById('elevenLabsApiKey');
+        const testApiBtn = document.getElementById('testApiBtn');
+        const apiStatus = document.getElementById('apiStatus');
+        const voiceSelect = document.getElementById('voiceSelect');
+        const stabilitySlider = document.getElementById('stabilitySlider');
+        const stabilityValue = document.getElementById('stabilityValue');
+        const similaritySlider = document.getElementById('similaritySlider');
+        const similarityValue = document.getElementById('similarityValue');
+        const styleSlider = document.getElementById('styleSlider');
+        const styleValue = document.getElementById('styleValue');
+        const speakerBoost = document.getElementById('speakerBoost');
+        const autoStartNotice = document.getElementById('autoStartNotice');
+
+        // 음성 안내 즉시 시작 (전역 함수로 노출)
+        window.startVoiceImmediately = function() {
+            console.log('음성 안내 시작 버튼 클릭됨');
+            const notice = document.getElementById('autoStartNotice');
+            if (notice) notice.style.display = 'none';
+            
+            // 사용자 상호작용 플래그 설정
+            userInteracted = true;
+            
+            // 무음 오디오 재생으로 오디오 컨텍스트 활성화
+            const silentAudio = new Audio('data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEAESsAACJWAAACABAAZGF0YQAAAAA=');
+            silentAudio.play().catch(() => {});
+            
+            try {
+                // 음성 합성 가능 여부 확인
+                if (!window.speechSynthesis) {
+                    alert('이 브라우저는 음성 합성을 지원하지 않습니다.');
+                    return;
+                }
+                
+                // 기존 음성 중단
+                window.speechSynthesis.cancel();
+                
+                // ElevenLabs가 연결되었으면 바로 setupVoiceGuide 호출
+                if (elevenLabsConnected && elevenLabsApiKey && elevenLabsVoiceId) {
+                    console.log('ElevenLabs로 음성 안내 시작');
+                    setupVoiceGuide();
+                } else {
+                    // ElevenLabs가 없으면 브라우저 TTS 사용
+                    console.log('브라우저 TTS로 음성 안내 시작');
+                    const msg = new SpeechSynthesisUtterance();
+                    msg.text = "안녕하세요. 동물 범주 언어유창성검사를 시작합니다. 지금부터 환경 설정을 진행하겠습니다.";
+                    msg.lang = 'ko-KR';
+                    msg.rate = 0.9;
+                    msg.volume = 1.0;
+                    
+                    msg.onstart = () => {
+                        console.log('브라우저 음성 시작됨');
+                        showVoiceGuide("안녕하세요. 동물 범주 언어유창성검사를 시작합니다.");
+                    };
+                    
+                    msg.onend = () => {
+                        console.log('브라우저 음성 종료');
+                        hideVoiceGuide();
+                        setTimeout(() => {
+                            setupVoiceGuide();
+                        }, 1000);
+                    };
+                    
+                    msg.onerror = (event) => {
+                        console.error('브라우저 음성 오류:', event.error);
+                        hideVoiceGuide();
+                        alert('음성 재생 오류가 발생했습니다.\n\n가능한 해결 방법:\n1. Chrome 브라우저 사용을 권장합니다\n2. 브라우저 설정에서 음성 합성을 허용해주세요\n3. 다른 탭에서 음성이 재생 중이면 중지해주세요');
+                    };
+                    
+                    window.speechSynthesis.speak(msg);
+                }
+                console.log('음성 재생 요청됨');
+                
+            } catch (error) {
+                console.error('음성 시작 오류:', error);
+                alert('음성 시작 중 오류가 발생했습니다: ' + error.message);
+            }
+        }
+
+        // 페이지 전환
+        function showStep(stepNumber) {
+            currentStep = stepNumber;
+            
+            // 모든 페이지 숨기기
+            Object.values(pages).forEach(page => page.classList.remove('active'));
+            
+            // 진행 상태 업데이트
+            Object.keys(steps).forEach(num => {
+                const step = steps[num];
+                step.classList.remove('active', 'completed');
+                if (parseInt(num) < stepNumber) {
+                    step.classList.add('completed');
+                } else if (parseInt(num) === stepNumber) {
+                    step.classList.add('active');
+                }
+            });
+            
+            // 해당 페이지 표시
+            switch(stepNumber) {
+                case 1:
+                    pages.setup.classList.add('active');
+                    break;
+                case 2:
+                    pages.instructions.classList.add('active');
+                    // 2단계 진입 시 자동으로 음성 안내 시작
+                    setTimeout(() => {
+                        if (voiceEnabled.checked && instructionsVoiceGuideActive) {
+                            instructionsVoiceGuide();
+                        }
+                    }, 500);
+                    break;
+                case 3:
+                    pages.test.classList.add('active');
+                    break;
+            }
+        }
+
+        // 설정 상태 확인
+        function checkSetupComplete() {
+            // 모든 필수 항목 체크
+            const allComplete = setupStatus.micPermission && setupStatus.micTest && 
+                               setupStatus.speakerTest && setupStatus.https && 
+                               setupStatus.browser;
+            setupNextBtn.disabled = !allComplete;
+            
+            console.log('Setup Status:', setupStatus);
+            console.log('All Complete:', allComplete);
+        }
+
+        // 음성 안내 표시
+        function showVoiceGuide(text) {
+            voiceGuideText.textContent = text;
+            voiceGuideBox.classList.add('active');
+        }
+
+        function hideVoiceGuide() {
+            voiceGuideBox.classList.remove('active');
+        }
+
+        // ElevenLabs API 테스트
+        async function testElevenLabsAPI() {
+            const apiKey = elevenLabsApiKeyInput.value.trim() || DEFAULT_ELEVENLABS_API_KEY;
+            if (!apiKey) {
+                showApiStatus('API Key를 입력해주세요', 'error');
+                return;
+            }
+
+            testApiBtn.disabled = true;
+            showApiStatus('연결 중...', '');
+
+            try {
+                // 음성 목록 가져오기
+                const response = await fetch('https://api.elevenlabs.io/v1/voices', {
+                    headers: {
+                        'xi-api-key': apiKey
+                    }
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    elevenLabsApiKey = apiKey;
+                    elevenLabsConnected = true;
+                    
+                    // 음성 목록 업데이트
+                    voiceSelect.innerHTML = '<option value="">음성을 선택하세요</option>';
+                    
+                    // 한국어 음성을 먼저 표시
+                    const koreanVoices = data.voices.filter(v => 
+                        (v.labels && v.labels.language === 'ko') || 
+                        v.name.toLowerCase().includes('korean') || 
+                        v.name.toLowerCase().includes('ko-kr')
+                    );
+                    
+                    const otherVoices = data.voices.filter(v => 
+                        !((v.labels && v.labels.language === 'ko') || 
+                        v.name.toLowerCase().includes('korean') || 
+                        v.name.toLowerCase().includes('ko-kr'))
+                    );
+                    
+                    if (koreanVoices.length > 0) {
+                        const optgroup = document.createElement('optgroup');
+                        optgroup.label = '한국어 음성';
+                        koreanVoices.forEach(voice => {
+                            const option = document.createElement('option');
+                            option.value = voice.voice_id;
+                            option.textContent = voice.name;
+                            optgroup.appendChild(option);
+                        });
+                        voiceSelect.appendChild(optgroup);
+                    }
+                    
+                    if (otherVoices.length > 0) {
+                        const optgroup = document.createElement('optgroup');
+                        optgroup.label = '기타 음성';
+                        otherVoices.forEach(voice => {
+                            const option = document.createElement('option');
+                            option.value = voice.voice_id;
+                            option.textContent = voice.name;
+                            optgroup.appendChild(option);
+                        });
+                        voiceSelect.appendChild(optgroup);
+                    }
+                    
+                    // 한국어 음성 자동 선택
+                    if (koreanVoices.length > 0) {
+                        voiceSelect.value = koreanVoices[0].voice_id;
+                        elevenLabsVoiceId = koreanVoices[0].voice_id;
+                    }
+                    
+                    voiceSelect.disabled = false;
+                    showApiStatus('연결 성공!', 'connected');
+                    
+                    // API 키를 로컬 스토리지에 저장
+                    localStorage.setItem('elevenLabsApiKey', apiKey);
+                    
+                    // Matilda 음성을 찾아서 자동 선택
+                    if (voiceSelect.options.length > 1 && !elevenLabsVoiceId) {
+                        let matildaFound = false;
+                        for (let i = 0; i < voiceSelect.options.length; i++) {
+                            if (voiceSelect.options[i].text === 'Matilda') {
+                                voiceSelect.selectedIndex = i;
+                                elevenLabsVoiceId = voiceSelect.options[i].value;
+                                console.log('Matilda 음성 자동 선택:', elevenLabsVoiceId);
+                                matildaFound = true;
+                                break;
+                            }
+                        }
+                        // Matilda를 찾지 못하면 첫 번째 음성 선택
+                        if (!matildaFound) {
+                            voiceSelect.selectedIndex = 1;
+                            elevenLabsVoiceId = voiceSelect.value;
+                            console.log('기본 음성 선택:', elevenLabsVoiceId);
+                        }
+                    }
+                    
+                    // 설정 상태 업데이트
+                    checkSetupComplete();
+                    
+                    console.log('ElevenLabs 연결 성공!');
+                    
+                    // 연결 성공 시 음성 테스트 제거 (사용자 상호작용 전에는 재생 불가)
+                } else {
+                    throw new Error('API 연결 실패');
+                }
+            } catch (error) {
+                elevenLabsConnected = false;
+                elevenLabsApiKey = null;
+                elevenLabsVoiceId = null;
+                showApiStatus('연결 실패: API Key를 확인해주세요', 'error');
+                console.error('ElevenLabs API 오류:', error);
+                checkSetupComplete();
+            } finally {
+                testApiBtn.disabled = false;
+            }
+        }
+
+        // API 상태 표시
+        function showApiStatus(message, type) {
+            apiStatus.textContent = message;
+            apiStatus.className = 'api-status ' + type;
+            apiStatus.style.display = 'inline-block';
+            
+            if (type === 'connected') {
+                setTimeout(() => {
+                    apiStatus.style.display = 'none';
+                }, 3000);
+            }
+        }
+
+        // 오디오 재생 큐 처리
+        async function processAudioQueue() {
+            if (isPlaying || audioQueue.length === 0) return;
+            
+            isPlaying = true;
+            const { audioBlob, callback } = audioQueue.shift();
+            
+            const audio = new Audio();
+            const audioUrl = URL.createObjectURL(audioBlob);
+            audio.src = audioUrl;
+            audio.playbackRate = 1.0; // 재생 속도 고정
+            
+            audio.onended = () => {
+                URL.revokeObjectURL(audioUrl);
+                isPlaying = false;
+                if (callback) callback();
+                processAudioQueue();
+            };
+            
+            audio.onerror = () => {
+                console.error('오디오 재생 오류');
+                URL.revokeObjectURL(audioUrl);
+                isPlaying = false;
+                if (callback) callback();
+                processAudioQueue();
+            };
+            
+            try {
+                await audio.play();
+            } catch (error) {
+                console.error('오디오 재생 실패:', error);
+                // 자동 재생 정책으로 인한 실패 시 사용자 상호작용 후 재시도
+                if (error.name === 'NotAllowedError') {
+                    console.log('자동 재생이 차단되었습니다. 사용자 상호작용 후 재생됩니다.');
+                }
+                URL.revokeObjectURL(audioUrl);
+                isPlaying = false;
+                if (callback) callback();
+                processAudioQueue();
+            }
+        }
+
+        // ElevenLabs TTS
+        async function elevenLabsTTS(text, callback) {
+            if (!elevenLabsConnected || !elevenLabsApiKey) {
+                // ElevenLabs를 사용할 수 없으면 기본 TTS 사용
+                defaultTTS(text, callback);
+                return;
+            }
+
+            const voiceId = voiceSelect.value || elevenLabsVoiceId;
+            if (!voiceId) {
+                defaultTTS(text, callback);
+                return;
+            }
+
+            try {
+                const response = await fetch(`https://api.elevenlabs.io/v1/text-to-speech/${voiceId}`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'xi-api-key': elevenLabsApiKey
+                    },
+                    body: JSON.stringify({
+                        text: text,
+                        model_id: 'eleven_multilingual_v2',
+                        voice_settings: selectedVoiceSettings
+                    })
+                });
+
+                if (response.ok) {
+                    const audioBlob = await response.blob();
+                    audioQueue.push({ audioBlob, callback });
+                    processAudioQueue();
+                } else {
+                    console.error('ElevenLabs TTS 오류:', response.status);
+                    defaultTTS(text, callback);
+                }
+            } catch (error) {
+                console.error('ElevenLabs TTS 실패:', error);
+                defaultTTS(text, callback);
+            }
+        }
+
+        // 기본 브라우저 TTS
+        function defaultTTS(text, callback) {
+            if (!speechSynthesis) {
+                if (callback) callback();
+                return;
+            }
+
+            speechSynthesis.cancel();
+
+            const utterance = new SpeechSynthesisUtterance(text);
+            utterance.lang = 'ko-KR';
+            utterance.rate = parseFloat(voiceSpeed.value);
+            utterance.pitch = 1;
+            utterance.volume = 1;
+
+            const voices = speechSynthesis.getVoices();
+            const koreanVoice = voices.find(voice => voice.lang.includes('ko'));
+            if (koreanVoice) {
+                utterance.voice = koreanVoice;
+            }
+
+            utterance.onend = () => {
+                hideVoiceGuide();
+                if (callback) callback();
+            };
+            utterance.onerror = () => {
+                hideVoiceGuide();
+                if (callback) callback();
+            };
+
+            speechSynthesis.speak(utterance);
+        }
+
+        // 음성 합성 (통합 함수)
+        function speak(text, callback) {
+            if (!voiceEnabled.checked) {
+                if (callback) callback();
+                return;
+            }
+
+            console.log('Speak called:', text, {
+                elevenLabsConnected,
+                elevenLabsApiKey: !!elevenLabsApiKey,
+                elevenLabsVoiceId
+            });
+
+            showVoiceGuide(text);
+
+            // ElevenLabs를 우선적으로 사용
+            if (elevenLabsConnected && elevenLabsApiKey && elevenLabsVoiceId) {
+                elevenLabsTTS(text, () => {
+                    hideVoiceGuide();
+                    if (callback) callback();
+                });
+            } else {
+                // ElevenLabs가 연결되지 않은 경우 기본 TTS 사용
+                console.log('Using default TTS');
+                defaultTTS(text, callback);
+            }
+        }
+
+        // 환경 설정 음성 가이드
+        function setupVoiceGuide() {
+            if (!voiceEnabled.checked || !setupVoiceGuideActive || voiceGuideStarted) {
+                console.log('음성 안내 건너뜀 또는 이미 시작됨');
+                return;
+            }
+            
+            voiceGuideStarted = true;
+            console.log('setupVoiceGuide 호출됨');
+            
+            // 먼저 테스트 음성
+            speak("안녕하세요? 검사를 시작하기 전에 스피커와 마이크가 잘 작동하는지 먼저 확인하겠습니다.", () => {
+                setTimeout(() => {
+                    // 마이크 권한이 이미 허용되었는지 확인
+                    if (!setupStatus.micPermission && !micStream) {
+                        speak("화면에 보이는 마이크 사용 권한을 허용해 주세요.", () => {
+                            // 마이크 권한 자동 요청 (한 번만)
+                            if (!window.micPermissionRequested) {
+                                window.micPermissionRequested = true;
+                                setTimeout(() => {
+                                    requestMicPermission();
+                                }, 500);
+                            }
+                        });
+                    } else {
+                        // 이미 권한이 있으면 다음 단계로
+                        speak("지금부터 마이크 테스트를 시작합니다.", () => {
+                            setTimeout(() => {
+                                speak("잠시 후 테스트를 진행할 예정이니, 삐 소리가 나면 아 하고 소리를 내주세요.", () => {
+                                    setTimeout(() => {
+                                        testMicrophone();
+                                    }, 1500);
+                                });
+                            }, 1000);
+                        });
+                    }
+
+                    // guides 배열 제거 - 더 이상 필요없음
+                }, 1000);
+            });
+        }
+
+        // 검사 안내 음성 가이드
+        function instructionsVoiceGuide() {
+            const guides = [
+                "검사 안내를 시작하겠습니다.",
+                "이 검사는 1분 동안 진행됩니다.",
+                "시작 신호가 나면 생각나는 동물 이름을 최대한 많이 말씀해 주세요.",
+                "포유류, 조류, 어류, 파충류, 양서류, 곤충 등 모든 종류의 동물이 가능합니다.",
+                "멸종된 동물도 포함할 수 있습니다.",
+                "단, 애완동물의 이름이나 가상의 동물은 제외됩니다.",
+                "같은 동물을 반복하지 않도록 주의해 주세요.",
+                "음성인식이 어려운 경우 키보드로 입력하실 수도 있습니다.",
+                "준비가 되셨으면 다음 단계로 진행해 주세요."
+            ];
+
+            let index = 0;
+            function speakNext() {
+                if (index < guides.length) {
+                    speak(guides[index], () => {
+                        index++;
+                        if (index < guides.length) {
+                            setTimeout(speakNext, 800);
+                        }
+                    });
+                }
+            }
+            speakNext();
+        }
+
+        // HTTPS 및 브라우저 확인
+        function checkEnvironment() {
+            // HTTPS 확인
+            if (location.protocol === 'https:' || location.hostname === 'localhost') {
+                setupStatus.https = true;
+                httpsIcon.className = 'status-icon success';
+                httpsIcon.textContent = '✅';
+                httpsStatus.textContent = '보안 연결 확인';
+            } else {
+                setupStatus.https = false;
+                httpsIcon.className = 'status-icon error';
+                httpsIcon.textContent = '❌';
+                httpsStatus.textContent = 'HTTPS 필요';
+            }
+
+            // 브라우저 확인
+            if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
+                setupStatus.browser = true;
+                browserIcon.className = 'status-icon success';
+                browserIcon.textContent = '✅';
+                browserStatus.textContent = '음성인식 지원';
+            } else {
+                setupStatus.browser = false;
+                browserIcon.className = 'status-icon error';
+                browserIcon.textContent = '❌';
+                browserStatus.textContent = '미지원 브라우저';
+            }
+
+            checkSetupComplete();
+        }
+
+        // 마이크 권한 요청
+        async function requestMicPermission() {
+            micPermissionIcon.className = 'status-icon checking';
+            micPermissionIcon.textContent = '🔄';
+            
+            try {
+                micStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                setupStatus.micPermission = true;
+                micPermissionIcon.className = 'status-icon success';
+                micPermissionIcon.textContent = '✅';
+                micTestBtn.disabled = false;
+                initializeSpeechRecognition();
+                
+                // 권한 허용 시 사용자 상호작용으로 간주
+                userInteracted = true;
+                
+                // 자동 시작 안내 숨기기
+                const notice = document.getElementById('autoStartNotice');
+                if (notice) notice.style.display = 'none';
+                
+                // 무음 오디오로 오디오 컨텍스트 활성화
+                const silentAudio = new Audio('data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEAESsAACJWAAACABAAZGF0YQAAAAA=');
+                await silentAudio.play().catch(() => {});
+                
+                // 마이크 권한 허용 후 자동으로 테스트 진행
+                speak("마이크 권한이 허용되었습니다. 지금부터 마이크 테스트를 시작합니다.", () => {
+                    setTimeout(() => {
+                        testMicrophone();
+                    }, 500);
+                });
+            } catch (error) {
+                setupStatus.micPermission = false;
+                micPermissionIcon.className = 'status-icon error';
+                micPermissionIcon.textContent = '❌';
+                
+                // 권한 거부 시에도 안내 메시지 업데이트
+                const notice = document.getElementById('autoStartNotice');
+                if (notice) {
+                    notice.innerHTML = `
+                        <p style="margin-bottom: 15px; font-size: 16px;">
+                            <strong>⚠️ 마이크 권한이 거부되었습니다</strong><br>
+                            <span style="font-size: 14px; color: #856404;">브라우저 설정에서 마이크 권한을 허용하거나<br>아래 버튼을 클릭하여 음성 안내를 시작하세요</span>
+                        </p>
+                        <button onclick="startVoiceImmediately()" style="background-color: #4caf50; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; font-size: 16px;">
+                            음성 안내 시작
+                        </button>
+                    `;
+                }
+                
+                console.error('마이크 권한 오류:', error);
+            }
+            
+            checkSetupComplete();
+        }
+
+        // 마이크 테스트
+        function testMicrophone() {
+            if (!micStream) return;
+
+            micTestIcon.className = 'status-icon checking';
+            micTestIcon.textContent = '🔄';
+            micVisualizer.style.display = 'flex';
+
+            // 오디오 컨텍스트 설정
+            audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            analyser = audioContext.createAnalyser();
+            const source = audioContext.createMediaStreamSource(micStream);
+            source.connect(analyser);
+            analyser.fftSize = 256;
+            const bufferLength = analyser.frequencyBinCount;
+            dataArray = new Uint8Array(bufferLength);
+
+            // 오디오 시각화
+            const bars = micVisualizer.querySelectorAll('.audio-bar');
+            let detected = false;
+            
+            function animate() {
+                animationId = requestAnimationFrame(animate);
+                analyser.getByteFrequencyData(dataArray);
+                
+                let sum = 0;
+                for (let i = 0; i < bufferLength; i++) {
+                    sum += dataArray[i];
+                }
+                const average = sum / bufferLength;
+                
+                bars.forEach((bar, index) => {
+                    const height = Math.min(50, (average + Math.random() * 20) * (index % 2 === 0 ? 1 : 0.8));
+                    bar.style.height = `${height}px`;
+                });
+
+                if (average > 30 && !detected) {
+                    detected = true;
+                    setupStatus.micTest = true;
+                    micTestIcon.className = 'status-icon success';
+                    micTestIcon.textContent = '✅';
+                    speak("소리가 제게도 잘 들리네요. 감사합니다.", () => {
+                        // 마이크 테스트 완료 후 자동으로 스피커 테스트 시작
+                        setTimeout(() => {
+                            testSpeaker();
+                        }, 1000);
+                    });
+                }
+            }
+
+            // 먼저 안내 메시지를 말하고, 그 다음에 삐 소리를 재생
+            speak("삐 소리가 나면 아무 말씀이나 해보세요.", () => {
+                setTimeout(() => {
+                    // 간단한 삐 소리 생성
+                    const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                    const oscillator = audioContext.createOscillator();
+                    const gainNode = audioContext.createGain();
+                    
+                    oscillator.connect(gainNode);
+                    gainNode.connect(audioContext.destination);
+                    
+                    oscillator.frequency.value = 1000; // 1kHz
+                    gainNode.gain.value = 0.3; // 볼륨
+                    
+                    oscillator.start();
+                    oscillator.stop(audioContext.currentTime + 0.5); // 0.5초 동안 재생
+                    
+                    // 삐 소리 재생 후 애니메이션 시작
+                    setTimeout(() => {
+                        animate();
+                    }, 600);
+                }, 1000); // 1초 간격
+            });
+
+            // 10초 후 테스트 종료
+            setTimeout(() => {
+                if (animationId) {
+                    cancelAnimationFrame(animationId);
+                }
+                micVisualizer.style.display = 'none';
+                if (!setupStatus.micTest) {
+                    micTestIcon.className = 'status-icon error';
+                    micTestIcon.textContent = '❌';
+                    speak("마이크에서 소리가 감지되지 않았습니다. 마이크 연결을 확인해 주세요.");
+                }
+                checkSetupComplete();
+            }, 10000);
+        }
+
+        // 스피커 테스트
+        function testSpeaker() {
+            speakerTestIcon.className = 'status-icon checking';
+            speakerTestIcon.textContent = '🔄';
+            
+            // 퀴즈로 스피커 테스트
+            speak("이제 스피커 테스트를 하겠습니다. 제가 내는 문제에 답을 해보세요.", () => {
+                setTimeout(() => {
+                    speak("낮에는 해가 뜨죠. 그럼 밤에는 무엇이 뜰까요?", () => {
+                        // 잠시 대답을 기다림
+                        let answered = false;
+                        
+                        // 임시 음성인식 리스너
+                        const tempRecognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+                        tempRecognition.lang = 'ko-KR';
+                        tempRecognition.continuous = false;
+                        tempRecognition.interimResults = false;
+                        
+                        tempRecognition.onresult = (event) => {
+                            const result = event.results[0][0].transcript.toLowerCase();
+                            console.log('스피커 테스트 응답:', result);
+                            
+                            if (result.includes('달') || result.includes('별') || result.includes('moon') || result.includes('star')) {
+                                answered = true;
+                                setupStatus.speakerTest = true;
+                                speakerTestIcon.className = 'status-icon success';
+                                speakerTestIcon.textContent = '✅';
+                                checkSetupComplete();
+                                
+                                speak("네, 스피커가 잘 작동하는 것이 확인되었습니다. 감사합니다.", () => {
+                                    setTimeout(() => {
+                                        voiceCustomizationGuide();
+                                    }, 1000);
+                                });
+                            }
+                        };
+                        
+                        tempRecognition.onerror = (event) => {
+                            console.log('스피커 테스트 음성인식 오류:', event.error);
+                            // 오류 시에도 테스트 통과
+                            if (!answered) {
+                                answered = true;
+                                setupStatus.speakerTest = true;
+                                speakerTestIcon.className = 'status-icon success';
+                                speakerTestIcon.textContent = '✅';
+                                checkSetupComplete();
+                                
+                                speak("스피커 테스트가 완료되었습니다.", () => {
+                                    setTimeout(() => {
+                                        voiceCustomizationGuide();
+                                    }, 1000);
+                                });
+                            }
+                        };
+                        
+                        tempRecognition.onend = () => {
+                            if (!answered) {
+                                // 5초 동안 대답이 없으면 자동으로 통과
+                                answered = true;
+                                setupStatus.speakerTest = true;
+                                speakerTestIcon.className = 'status-icon success';
+                                speakerTestIcon.textContent = '✅';
+                                checkSetupComplete();
+                                
+                                speak("스피커 테스트가 완료되었습니다.", () => {
+                                    setTimeout(() => {
+                                        voiceCustomizationGuide();
+                                    }, 1000);
+                                });
+                            }
+                        };
+                        
+                        try {
+                            tempRecognition.start();
+                            
+                            // 5초 후 자동 종료
+                            setTimeout(() => {
+                                tempRecognition.stop();
+                            }, 5000);
+                        } catch (e) {
+                            // 음성인식 시작 실패 시 바로 통과
+                            if (!answered) {
+                                answered = true;
+                                setupStatus.speakerTest = true;
+                                speakerTestIcon.className = 'status-icon success';
+                                speakerTestIcon.textContent = '✅';
+                                checkSetupComplete();
+                                
+                                speak("스피커 테스트가 완료되었습니다.", () => {
+                                    setTimeout(() => {
+                                        voiceCustomizationGuide();
+                                    }, 1000);
+                                });
+                            }
+                        }
+                    });
+                }, 1500);
+            });
+        }
+        
+        // 음성 커스터마이징 안내
+        function voiceCustomizationGuide() {
+            speak("이제 제 목소리나 말하는 속도를 편하게 맞춰 보시면 좋겠습니다.", () => {
+                // 성별 전환 버튼 표시
+                const voiceGenderToggle = document.getElementById('voiceGenderToggle');
+                if (voiceGenderToggle) {
+                    voiceGenderToggle.style.display = 'inline-block';
+                }
+                
+                speak("남성 목소리로 바꾸고 싶으시면 남성 버튼을 눌러 주세요.", () => {
+                    // 1초 대기 후 성별 변경 여부 확인
+                    setTimeout(() => {
+                        if (isFemalevoice) {
+                            speak("그럼 계속 제가 검사를 진행하겠습니다.", () => {
+                                setTimeout(() => {
+                                    speedAdjustmentGuide();
+                                }, 500);
+                            });
+                        } else {
+                            // 남성으로 변경된 경우
+                            setTimeout(() => {
+                                speedAdjustmentGuide();
+                            }, 500);
+                        }
+                    }, 1000);
+                });
+            });
+        }
+        
+        // 속도 조절 안내
+        function speedAdjustmentGuide() {
+            // 속도 조절 버튼 표시
+            showSpeedControlButtons();
+            
+            speak("제 말이 너무 빠르지는 않으신가요? 너무 빠르면 좀 더 느리게, 혹은 너무 느리면 좀 더 빠르게 버튼을 눌러 주세요.", () => {
+                // 3초 대기 후 다음 단계로
+                setTimeout(() => {
+                    speak("모든 설정이 완료되었습니다. 이제 검사를 시작할 수 있습니다.", () => {
+                        // 다음 단계 버튼이 활성화되었는지 확인하고 자동으로 클릭
+                        if (setupNextBtn.disabled === false) {
+                            setTimeout(() => {
+                                setupNextBtn.click();
+                            }, 1000);
+                        }
+                    });
+                }, 3000);
+            });
+        }
+        
+        // 속도 조절 버튼 표시 함수
+        function showSpeedControlButtons() {
+            // 속도 조절 버튼 컨테이너가 없으면 생성
+            let speedControlDiv = document.getElementById('speedControlButtons');
+            if (!speedControlDiv) {
+                speedControlDiv = document.createElement('div');
+                speedControlDiv.id = 'speedControlButtons';
+                speedControlDiv.className = 'speed-control-buttons';
+                speedControlDiv.innerHTML = `
+                    <button class="speed-btn" onclick="adjustSpeed(0.8)">좀 더 느리게</button>
+                    <button class="speed-btn active" onclick="adjustSpeed(1.0)">그대로</button>
+                    <button class="speed-btn" onclick="adjustSpeed(1.2)">좀 더 빠르게</button>
+                `;
+                
+                // 음성 속도 슬라이더 다음에 추가
+                const voiceSpeedContainer = document.querySelector('.control-group');
+                if (voiceSpeedContainer) {
+                    voiceSpeedContainer.appendChild(speedControlDiv);
+                }
+            }
+            
+            speedControlDiv.style.display = 'flex';
+        }
+        
+        // 속도 조절 함수
+        function adjustSpeed(speed) {
+            const voiceSpeed = document.getElementById('voiceSpeed');
+            if (voiceSpeed) {
+                voiceSpeed.value = speed;
+                const speedValue = document.getElementById('speedValue');
+                if (speedValue) {
+                    speedValue.textContent = speed;
+                }
+                
+                // 모든 버튼에서 active 클래스 제거
+                document.querySelectorAll('.speed-btn').forEach(btn => {
+                    btn.classList.remove('active');
+                });
+                
+                // 클릭한 버튼에 active 클래스 추가
+                event.target.classList.add('active');
+                
+                // 확인 메시지
+                speak("속도가 조절되었습니다.");
+            }
+        }
+
+        // 음성인식 초기화
+        function initializeSpeechRecognition() {
+            if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
+                const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+                recognition = new SpeechRecognition();
+                recognition.lang = 'ko-KR';
+                recognition.continuous = true;
+                recognition.interimResults = true;
+                recognition.maxAlternatives = 1;
+
+                recognition.onstart = () => {
+                    console.log('음성인식 시작됨');
+                };
+
+                recognition.onresult = (event) => {
+                    for (let i = event.resultIndex; i < event.results.length; i++) {
+                        if (event.results[i].isFinal) {
+                            const transcript = event.results[i][0].transcript.trim();
+                            console.log('인식된 텍스트:', transcript);
+                            const words = transcript.split(/[\s,，、]+/).filter(word => word.length > 0);
+                            words.forEach(word => {
+                                if (word.length > 0) {
+                                    addAnimal(word);
+                                }
+                            });
+                        }
+                    }
+                };
+
+                recognition.onerror = (event) => {
+                    console.error('음성인식 오류:', event.error);
+                    if (event.error === 'no-speech' && isRecognizing) {
+                        setTimeout(() => {
+                            try {
+                                recognition.start();
+                            } catch (e) {}
+                        }, 100);
+                    }
+                };
+
+                recognition.onend = () => {
+                    console.log('음성인식 종료됨');
+                    if (isRecognizing && timeRemaining > 0) {
+                        setTimeout(() => {
+                            try {
+                                recognition.start();
+                                console.log('음성인식 재시작됨');
+                            } catch (e) {
+                                console.error('음성인식 재시작 오류:', e);
+                            }
+                        }, 100);
+                    }
+                };
+            }
+        }
+
+        // 검사 시작 음성 안내
+        function startTestVoiceInstructions(callback) {
+            const instructions = [
+                "지금부터 동물 범주 언어유창성검사를 시작하겠습니다.",
+                "이 검사는 1분 동안 진행됩니다.",
+                "제가 시작이라고 말씀드리면, 생각나는 동물 이름을 가능한 한 많이 말씀해 주세요.",
+                "준비되셨나요?",
+                "3... 2... 1... 시작!"
+            ];
+
+            let index = 0;
+            function speakNext() {
+                if (index < instructions.length) {
+                    speak(instructions[index], () => {
+                        index++;
+                        if (index < instructions.length) {
+                            setTimeout(speakNext, 500);
+                        } else {
+                            if (callback) callback();
+                        }
+                    });
+                }
+            }
+
+            speakNext();
+        }
+
+        // 동물 추가
+        function addAnimal(animal) {
+            if (!animal || animal.trim() === '') return;
+            
+            const trimmedAnimal = animal.trim();
+            const timestamp = Date.now() - startTime;
+            
+            animals.push({
+                name: trimmedAnimal,
+                timestamp: timestamp,
+                isDuplicate: uniqueAnimals.has(trimmedAnimal.toLowerCase())
+            });
+            
+            uniqueAnimals.add(trimmedAnimal.toLowerCase());
+            updateAnimalList();
+        }
+
+        // 동물 목록 업데이트
+        function updateAnimalList() {
+            animalList.innerHTML = '';
+            animals.forEach((animal, index) => {
+                const div = document.createElement('div');
+                div.className = 'animal-item' + (animal.isDuplicate ? ' duplicate' : '');
+                
+                const rankSpan = document.createElement('span');
+                rankSpan.className = 'animal-rank';
+                rankSpan.textContent = index + 1;
+                
+                const nameSpan = document.createElement('span');
+                nameSpan.textContent = animal.name;
+                
+                const intervalSpan = document.createElement('span');
+                intervalSpan.className = 'animal-interval';
+                const interval = Math.floor(animal.timestamp / 15000) + 1;
+                intervalSpan.textContent = `${interval}구간`;
+                
+                const timeSpan = document.createElement('span');
+                timeSpan.style.fontSize = '12px';
+                timeSpan.style.color = '#666';
+                timeSpan.textContent = `(${(animal.timestamp / 1000).toFixed(1)}초)`;
+                
+                div.appendChild(rankSpan);
+                div.appendChild(nameSpan);
+                div.appendChild(intervalSpan);
+                div.appendChild(timeSpan);
+                
+                animalList.appendChild(div);
+            });
+        }
+
+        // 타이머 업데이트
+        function updateTimer() {
+            const minutes = Math.floor(timeRemaining / 60);
+            const seconds = timeRemaining % 60;
+            timer.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+            
+            if (voiceEnabled.checked && (timeRemaining === 30 || timeRemaining === 10)) {
+                speak(`${timeRemaining}초 남았습니다`);
+            }
+        }
+
+        // 실제 검사 시작
+        function actuallyStartTest() {
+            startTime = Date.now();
+            timeRemaining = 60;
+            
+            startBtn.disabled = true;
+            stopBtn.disabled = false;
+            manualInput.disabled = false;
+            addBtn.disabled = false;
+            
+            if (recognition) {
+                try {
+                    isRecognizing = true;
+                    recognition.start();
+                    recordingIndicator.classList.add('active');
+                } catch (e) {
+                    console.error('음성인식 시작 오류:', e);
+                }
+            }
+            
+            timerInterval = setInterval(() => {
+                timeRemaining--;
+                updateTimer();
+                
+                if (timeRemaining <= 0) {
+                    stopTest();
+                }
+            }, 1000);
+        }
+
+        // 검사 시작
+        function startTest() {
+            resetTest();
+            
+            if (voiceEnabled.checked) {
+                startTestVoiceInstructions(() => {
+                    actuallyStartTest();
+                });
+            } else {
+                actuallyStartTest();
+            }
+        }
+
+        // 검사 종료
+        function stopTest() {
+            endTime = Date.now();
+            
+            if (timerInterval) {
+                clearInterval(timerInterval);
+                timerInterval = null;
+            }
+            
+            if (recognition && isRecognizing) {
+                isRecognizing = false;
+                recognition.stop();
+                recordingIndicator.classList.remove('active');
+            }
+            
+            startBtn.disabled = false;
+            stopBtn.disabled = true;
+            manualInput.disabled = true;
+            addBtn.disabled = true;
+            
+            if (voiceEnabled.checked) {
+                const uniqueCount = uniqueAnimals.size;
+                speak(`검사가 종료되었습니다. 총 ${uniqueCount}개의 서로 다른 동물을 말씀하셨습니다.`);
+            }
+            
+            showResults();
+        }
+
+        // 결과 표시
+        function showResults() {
+            const totalCount = animals.length;
+            const uniqueCount = uniqueAnimals.size;
+            const duplicateCount = animals.filter(a => a.isDuplicate).length;
+            const elapsedSeconds = Math.round((endTime - startTime) / 1000);
+            
+            const intervalCounts = [0, 0, 0, 0];
+            const intervalUniqueCounts = [new Set(), new Set(), new Set(), new Set()];
+            
+            animals.forEach(animal => {
+                const interval = Math.min(Math.floor(animal.timestamp / 15000), 3);
+                intervalCounts[interval]++;
+                if (!animal.isDuplicate) {
+                    intervalUniqueCounts[interval].add(animal.name.toLowerCase());
+                }
+            });
+            
+            const intervalStats = document.getElementById('intervalStats');
+            intervalStats.innerHTML = '';
+            
+            for (let i = 0; i < 4; i++) {
+                const card = document.createElement('div');
+                card.className = 'interval-card';
+                card.innerHTML = `
+                    <h4>${i + 1}구간</h4>
+                    <div class="interval-count">${intervalCounts[i]}</div>
+                    <div class="interval-time">${i * 15}-${(i + 1) * 15}초</div>
+                    <div style="font-size: 12px; color: #666; margin-top: 5px;">
+                        유효: ${intervalUniqueCounts[i].size}개
+                    </div>
+                `;
+                intervalStats.appendChild(card);
+            }
+            
+            document.getElementById('totalCount').textContent = totalCount;
+            document.getElementById('uniqueCount').textContent = uniqueCount;
+            document.getElementById('duplicateCount').textContent = duplicateCount;
+            document.getElementById('elapsedTime').textContent = `${elapsedSeconds}초`;
+            
+            stats.style.display = 'block';
+        }
+
+        // 검사 초기화
+        function resetTest() {
+            if (timerInterval) {
+                clearInterval(timerInterval);
+                timerInterval = null;
+            }
+            
+            if (recognition && isRecognizing) {
+                isRecognizing = false;
+                recognition.stop();
+                recordingIndicator.classList.remove('active');
+            }
+            
+            if (speechSynthesis) {
+                speechSynthesis.cancel();
+            }
+            
+            // 오디오 큐 초기화
+            audioQueue = [];
+            isPlaying = false;
+            
+            animals = [];
+            uniqueAnimals.clear();
+            startTime = null;
+            endTime = null;
+            timeRemaining = 60;
+            
+            updateTimer();
+            animalList.innerHTML = '';
+            stats.style.display = 'none';
+            
+            startBtn.disabled = false;
+            stopBtn.disabled = true;
+            manualInput.disabled = true;
+            addBtn.disabled = true;
+            manualInput.value = '';
+        }
+
+        // 결과 다운로드
+        function downloadResults() {
+            const date = new Date().toLocaleDateString('ko-KR');
+            const time = new Date().toLocaleTimeString('ko-KR');
+            
+            const intervalCounts = [0, 0, 0, 0];
+            const intervalUniqueCounts = [new Set(), new Set(), new Set(), new Set()];
+            const intervalAnimals = [[], [], [], []];
+            
+            animals.forEach((animal, index) => {
+                const interval = Math.min(Math.floor(animal.timestamp / 15000), 3);
+                intervalCounts[interval]++;
+                intervalAnimals[interval].push({
+                    ...animal,
+                    rank: index + 1
+                });
+                if (!animal.isDuplicate) {
+                    intervalUniqueCounts[interval].add(animal.name.toLowerCase());
+                }
+            });
+            
+            let content = `동물 범주 언어유창성검사 결과\n`;
+            content += `검사 일시: ${date} ${time}\n`;
+            content += `소요 시간: ${Math.round((endTime - startTime) / 1000)}초\n\n`;
+            
+            content += `[검사 결과 요약]\n`;
+            content += `총 응답 수: ${animals.length}\n`;
+            content += `유효 응답 수 (중복 제외): ${uniqueAnimals.size}\n`;
+            content += `중복 응답 수: ${animals.filter(a => a.isDuplicate).length}\n\n`;
+            
+            content += `[구간별 분석]\n`;
+            for (let i = 0; i < 4; i++) {
+                content += `${i + 1}구간 (${i * 15}-${(i + 1) * 15}초): `;
+                content += `총 ${intervalCounts[i]}개, 유효 ${intervalUniqueCounts[i].size}개\n`;
+            }
+            content += `\n`;
+            
+            content += `[상세 응답 목록]\n`;
+            content += `순위\t동물명\t시간(초)\t구간\t중복여부\n`;
+            content += `${'─'.repeat(50)}\n`;
+            
+            animals.forEach((animal, index) => {
+                const timeStr = (animal.timestamp / 1000).toFixed(1);
+                const interval = Math.min(Math.floor(animal.timestamp / 15000), 3) + 1;
+                const dupStr = animal.isDuplicate ? '중복' : '-';
+                content += `${index + 1}\t${animal.name}\t${timeStr}\t${interval}구간\t${dupStr}\n`;
+            });
+            
+            content += `\n[구간별 상세 분석]\n`;
+            for (let i = 0; i < 4; i++) {
+                content += `\n■ ${i + 1}구간 (${i * 15}-${(i + 1) * 15}초)\n`;
+                content += `응답 수: ${intervalCounts[i]}개\n`;
+                content += `유효 응답: ${intervalUniqueCounts[i].size}개\n`;
+                if (intervalAnimals[i].length > 0) {
+                    content += `응답 목록:\n`;
+                    intervalAnimals[i].forEach(animal => {
+                        content += `  - ${animal.name} (순위: ${animal.rank}, ${(animal.timestamp / 1000).toFixed(1)}초)`;
+                        if (animal.isDuplicate) content += ' [중복]';
+                        content += '\n';
+                    });
+                }
+            }
+            
+            content += `\n[유효 동물 목록 (중복 제외)]\n`;
+            Array.from(uniqueAnimals).forEach((animal, index) => {
+                content += `${index + 1}. ${animal}\n`;
+            });
+            
+            const blob = new Blob([content], { type: 'text/plain;charset=utf-8' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `언어유창성검사_${date.replace(/\./g, '')}.txt`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }
+
+        // 음성 속도 업데이트
+        voiceSpeed.addEventListener('input', () => {
+            speedValue.textContent = voiceSpeed.value;
+        });
+
+        // ElevenLabs 이벤트 리스너
+        testApiBtn.addEventListener('click', testElevenLabsAPI);
+        voiceSelect.addEventListener('change', (e) => {
+            elevenLabsVoiceId = e.target.value;
+            if (elevenLabsVoiceId && elevenLabsConnected) {
+                // 음성 선택 시 짧은 테스트 메시지 재생
+                speak('음성이 변경되었습니다.');
+            }
+        });
+
+        // 성별 전환 버튼 이벤트 리스너
+        const voiceGenderToggle = document.getElementById('voiceGenderToggle');
+        let isFemalevoice = true; // 기본은 여성 음성 (Matilda)
+        
+        voiceGenderToggle.addEventListener('click', () => {
+            if (!elevenLabsConnected || voiceSelect.options.length <= 1) {
+                alert('ElevenLabs가 연결되지 않았습니다.');
+                return;
+            }
+            
+            if (isFemalevoice) {
+                // Charlie (남성) 음성으로 변경
+                let charlieFound = false;
+                for (let i = 0; i < voiceSelect.options.length; i++) {
+                    if (voiceSelect.options[i].text === 'Charlie') {
+                        voiceSelect.selectedIndex = i;
+                        elevenLabsVoiceId = voiceSelect.options[i].value;
+                        voiceGenderToggle.innerHTML = '🎭 여성 목소리로 변경';
+                        isFemalevoice = false;
+                        charlieFound = true;
+                        speak('남성 음성으로 변경되었습니다.');
+                        break;
+                    }
+                }
+                if (!charlieFound) {
+                    alert('Charlie 음성을 찾을 수 없습니다.');
+                }
+            } else {
+                // Matilda (여성) 음성으로 변경
+                let matildaFound = false;
+                for (let i = 0; i < voiceSelect.options.length; i++) {
+                    if (voiceSelect.options[i].text === 'Matilda') {
+                        voiceSelect.selectedIndex = i;
+                        elevenLabsVoiceId = voiceSelect.options[i].value;
+                        voiceGenderToggle.innerHTML = '🎭 남성 목소리로 변경';
+                        isFemalevoice = true;
+                        matildaFound = true;
+                        speak('여성 음성으로 변경되었습니다.');
+                        break;
+                    }
+                }
+                if (!matildaFound) {
+                    alert('Matilda 음성을 찾을 수 없습니다.');
+                }
+            }
+        });
+        
+        // 음성 설정 슬라이더 이벤트 리스너
+        stabilitySlider.addEventListener('input', () => {
+            stabilityValue.textContent = stabilitySlider.value;
+            selectedVoiceSettings.stability = parseFloat(stabilitySlider.value);
+        });
+        
+        similaritySlider.addEventListener('input', () => {
+            similarityValue.textContent = similaritySlider.value;
+            selectedVoiceSettings.similarity_boost = parseFloat(similaritySlider.value);
+        });
+        
+        styleSlider.addEventListener('input', () => {
+            styleValue.textContent = styleSlider.value;
+            selectedVoiceSettings.style = parseFloat(styleSlider.value);
+        });
+        
+        speakerBoost.addEventListener('change', () => {
+            selectedVoiceSettings.use_speaker_boost = speakerBoost.checked;
+        });
+
+        // 이벤트 리스너
+        setupNextBtn.addEventListener('click', () => showStep(2));
+        setupVoiceGuideBtn.addEventListener('click', () => {
+            setupVoiceGuideActive = !setupVoiceGuideActive;
+            if (setupVoiceGuideActive) {
+                setupVoiceGuideBtn.textContent = '🔊 음성 안내 끄기';
+                setupVoiceGuide();
+            } else {
+                setupVoiceGuideBtn.textContent = '🔊 음성 안내 켜기';
+                if (speechSynthesis) speechSynthesis.cancel();
+                hideVoiceGuide();
+            }
+        });
+        instructionsPrevBtn.addEventListener('click', () => showStep(1));
+        instructionsNextBtn.addEventListener('click', () => showStep(3));
+        instructionsVoiceGuideBtn.addEventListener('click', () => {
+            instructionsVoiceGuideActive = !instructionsVoiceGuideActive;
+            if (instructionsVoiceGuideActive) {
+                instructionsVoiceGuideBtn.textContent = '🔊 음성 안내 끄기';
+                instructionsVoiceGuide();
+            } else {
+                instructionsVoiceGuideBtn.textContent = '🔊 음성 안내 켜기';
+                if (speechSynthesis) speechSynthesis.cancel();
+                hideVoiceGuide();
+            }
+        });
+        testPrevBtn.addEventListener('click', () => showStep(2));
+        
+        micPermissionBtn.addEventListener('click', requestMicPermission);
+        micTestBtn.addEventListener('click', testMicrophone);
+        speakerTestBtn.addEventListener('click', testSpeaker);
+        
+        startBtn.addEventListener('click', startTest);
+        stopBtn.addEventListener('click', stopTest);
+        resetBtn.addEventListener('click', resetTest);
+        downloadBtn.addEventListener('click', downloadResults);
+
+        addBtn.addEventListener('click', () => {
+            if (manualInput.value.trim()) {
+                addAnimal(manualInput.value);
+                manualInput.value = '';
+                manualInput.focus();
+            }
+        });
+
+        manualInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter' && manualInput.value.trim()) {
+                addAnimal(manualInput.value);
+                manualInput.value = '';
+            }
+        });
+
+        // 페이지 로드 시 초기화
+        window.addEventListener('load', () => {
+            checkEnvironment();
+            
+            if (speechSynthesis) {
+                speechSynthesis.getVoices();
+                speechSynthesis.onvoiceschanged = () => {
+                    voiceReady = true;
+                };
+            }
+            
+            // 기본 API 키로 자동 연결
+            elevenLabsApiKeyInput.value = DEFAULT_ELEVENLABS_API_KEY;
+            testElevenLabsAPI();
+            
+            // ElevenLabs 연결 대기 후 자동 시작
+            
+            // 사용자 상호작용 감지
+            const enableAudioContext = () => {
+                if (!userInteracted) {
+                    userInteracted = true;
+                    console.log('사용자 상호작용 감지됨');
+                    
+                    // 무음 오디오 재생으로 오디오 컨텍스트 활성화
+                    const silentAudio = new Audio('data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEAESsAACJWAAACABAAZGF0YQAAAAA=');
+                    silentAudio.play().catch(() => {});
+                    
+                    // 자동 시작 시도
+                    if (elevenLabsConnected && !autoStartAttempted) {
+                        checkAndAutoStart();
+                    }
+                }
+            };
+            
+            // ElevenLabs 연결을 기다린 후 안내 메시지 업데이트
+            let connectionCheckCount = 0;
+            const checkConnectionAndStart = setInterval(() => {
+                connectionCheckCount++;
+                console.log(`ElevenLabs 연결 확인 중... (${connectionCheckCount}회)`);
+                
+                if (elevenLabsConnected && elevenLabsVoiceId) {
+                    clearInterval(checkConnectionAndStart);
+                    console.log('ElevenLabs 연결 및 Matilda 음성 선택 완료');
+                    
+                    // 안내 박스에 펄스 애니메이션 추가
+                    const notice = document.getElementById('autoStartNotice');
+                    if (notice) {
+                        notice.style.animation = 'pulse 2s infinite';
+                        // 준비 완료 메시지 표시
+                        const strongTag = notice.querySelector('strong');
+                        if (strongTag) {
+                            strongTag.innerHTML = '✅ 준비 완료! 이 박스를 클릭하여 시작하세요';
+                        }
+                    }
+                } else if (connectionCheckCount > 10) {
+                    // 5초 이상 기다려도 연결 안되면 그대로 진행
+                    clearInterval(checkConnectionAndStart);
+                    console.log('ElevenLabs 연결 타임아웃');
+                }
+            }, 500);
+            
+            // 펄스 애니메이션 CSS 추가
+            const style = document.createElement('style');
+            style.textContent = `
+                @keyframes pulse {
+                    0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(33, 150, 243, 0.7); }
+                    50% { transform: scale(1.02); box-shadow: 0 0 0 10px rgba(33, 150, 243, 0); }
+                    100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(33, 150, 243, 0); }
+                }
+            `;
+            document.head.appendChild(style);
+            
+            // 페이지 어디든 클릭하면 오디오 활성화
+            document.addEventListener('click', enableAudioContext, { once: true });
+            document.addEventListener('touchstart', enableAudioContext, { once: true });
+            
+            const checkAndAutoStart = () => {
+                if (!autoStartAttempted && userInteracted) {
+                    console.log('자동 시작 체크 - ElevenLabs 연결:', elevenLabsConnected, '사용자 상호작용:', userInteracted);
+                    
+                    if (elevenLabsConnected) {
+                        autoStartAttempted = true;
+                        console.log('ElevenLabs 연결 확인, 음성 안내 시작');
+                        const notice = document.getElementById('autoStartNotice');
+                        if (notice) notice.style.display = 'none';
+                        
+                        // ElevenLabs로 바로 시작
+                        setTimeout(() => {
+                            setupVoiceGuide();
+                        }, 1000);
+                    }
+                }
+            };
+            
+            // 1초마다 ElevenLabs 연결 확인
+            const checkInterval = setInterval(checkAndAutoStart, 1000);
+        });
+
+        // 페이지 언로드 시 정리
+        window.addEventListener('beforeunload', () => {
+            if (micStream) {
+                micStream.getTracks().forEach(track => track.stop());
+            }
+            if (audioContext) {
+                audioContext.close();
+            }
+            if (animationId) {
+                cancelAnimationFrame(animationId);
+            }
+            // 오디오 큐 정리
+            audioQueue = [];
+            isPlaying = false;
+        });
+    </script>
+</body>
+</html>

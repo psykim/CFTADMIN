@@ -788,6 +788,8 @@
         
         // 시작 버튼 클릭 처리
         async function handleStartClick() {
+            console.log('=== handleStartClick 함수 호출됨 ===');
+            
             // 버튼 숨기기
             document.getElementById('manualStartBtn').style.display = 'none';
             const readyCheck = document.querySelector('.ready-check p');
@@ -850,6 +852,8 @@
         
         // 음성 안내 시작 함수
         function startVoiceIntroduction() {
+            console.log('=== startVoiceIntroduction 함수 호출됨 ===');
+            
             // 이미 시작된 경우 중복 실행 방지
             if (voiceIntroStarted) {
                 console.log('음성 안내가 이미 시작되었습니다.');

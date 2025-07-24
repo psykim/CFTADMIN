@@ -1781,76 +1781,40 @@
             const testDate = new Date();
             const intervalStats = calculateIntervalStats();
             
-            // CSV 데이터 준비
-            const csvData = {
-                id: testDate.toISOString().slice(0,10).replace(/-/g,'') + '_' + 
+            // CSV 형식의 데이터 준비
+            const csvHeader = 'ID,Gender,Age,Education,0-15s,15-30s,30-45s,45-60s';
+            const csvData = [
+                testDate.toISOString().slice(0,10).replace(/-/g,'') + '_' + 
                     testDate.getHours().toString().padStart(2,'0') + 
                     testDate.getMinutes().toString().padStart(2,'0'),
-                gender: '미입력',
-                age: '미입력',
-                education: '미입력',
-                intervals: intervalStats
-            };
+                '미입력',
+                '미입력', 
+                '미입력',
+                intervalStats['0-15초'].length,
+                intervalStats['15-30초'].length,
+                intervalStats['30-45초'].length,
+                intervalStats['45-60초'].length
+            ].join(',');
             
-            // 새 창에서 CFTSCORING 직접 열기
+            const fullCsvData = csvHeader + '\n' + csvData;
+            
+            // CSV 데이터를 클립보드에 복사
+            navigator.clipboard.writeText(fullCsvData).then(() => {
+                console.log('CSV 데이터가 클립보드에 복사되었습니다.');
+                alert('검사 결과가 클립보드에 복사되었습니다.\n\nCFTSCORING 페이지가 열리면:\n1. CSV 데이터 입력란에 붙여넣기(Ctrl+V)\n2. "분석 시작" 버튼 클릭');
+            }).catch(err => {
+                console.error('클립보드 복사 실패:', err);
+            });
+            
+            // 새 창에서 CFTSCORING 열기
             const newWindow = window.open('https://psykim.github.io/CFTSCORING/index.html', '_blank', 'width=1200,height=800');
             if (!newWindow) {
                 alert('팝업이 차단되었습니다. 팝업 차단을 해제해주세요.');
                 return;
             }
             
-            // 페이지가 로드되면 데이터 전달
-            let checkInterval = setInterval(() => {
-                try {
-                    // CFTSCORING 페이지가 완전히 로드되었는지 확인
-                    if (newWindow.processExternalData && typeof newWindow.processExternalData === 'function') {
-                        clearInterval(checkInterval);
-                        console.log('CFTSCORING 페이지 로드 완료, processExternalData 함수 호출');
-                        
-                        // 데이터 전달
-                        newWindow.processExternalData(csvData);
-                        
-                        // 결과 가져오기
-                        setTimeout(() => {
-                            const resultsElement = newWindow.document.getElementById('results');
-                            if (resultsElement) {
-                                // 스타일과 결과 HTML 가져오기
-                                const styles = newWindow.document.querySelectorAll('style');
-                                let allStyles = '';
-                                styles.forEach(style => {
-                                    allStyles += style.outerHTML;
-                                });
-                                
-                                const resultHTML = allStyles + resultsElement.outerHTML;
-                                displayCFTSCORINGFullResults(resultHTML);
-                                
-                                // 3초 후 창 닫기
-                                setTimeout(() => {
-                                    newWindow.close();
-                                }, 3000);
-                                
-                                speak("분석이 완료되었습니다. 결과를 확인해 주세요.");
-                            }
-                        }, 2000);
-                    }
-                } catch (error) {
-                    if (newWindow.closed) {
-                        clearInterval(checkInterval);
-                        console.log('CFTSCORING 창이 닫혔습니다.');
-                        performInternalAnalysis(intervalStats);
-                    }
-                }
-            }, 500);
-            
-            // 10초 후에도 로드되지 않으면 내부 분석으로 대체
-            setTimeout(() => {
-                clearInterval(checkInterval);
-                if (!newWindow.closed && !newWindow.processExternalData) {
-                    console.log('CFTSCORING 로드 시간 초과');
-                    newWindow.close();
-                    performInternalAnalysis(intervalStats);
-                }
-            }, 10000);
+            // 내부 분석도 함께 실행
+            performInternalAnalysis(intervalStats);
         }
         
         // 내부 분석 함수

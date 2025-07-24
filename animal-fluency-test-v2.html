@@ -1801,19 +1801,13 @@
             // CSV 데이터를 클립보드에 복사
             navigator.clipboard.writeText(fullCsvData).then(() => {
                 console.log('CSV 데이터가 클립보드에 복사되었습니다.');
-                alert('검사 결과가 클립보드에 복사되었습니다.\n\nCFTSCORING 페이지가 열리면:\n1. CSV 데이터 입력란에 붙여넣기(Ctrl+V)\n2. "분석 시작" 버튼 클릭');
+                // CFTSCORING 페이지를 열지 않고 바로 내부 분석 실행
+                speak("결과를 분석하고 있습니다. 잠시만 기다려주세요.");
             }).catch(err => {
                 console.error('클립보드 복사 실패:', err);
             });
             
-            // 새 창에서 CFTSCORING 열기
-            const newWindow = window.open('https://psykim.github.io/CFTSCORING/index.html', '_blank', 'width=1200,height=800');
-            if (!newWindow) {
-                alert('팝업이 차단되었습니다. 팝업 차단을 해제해주세요.');
-                return;
-            }
-            
-            // 내부 분석도 함께 실행
+            // 내부 분석만 실행 (CFTSCORING 창 열지 않음)
             performInternalAnalysis(intervalStats);
         }
         

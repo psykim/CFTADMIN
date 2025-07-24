@@ -1777,38 +1777,30 @@
         function analyzeWithCFTSCORING() {
             console.log('CFTSCORING 분석 시작...');
             
-            // CSV 데이터 생성
-            const testDate = new Date();
             const intervalStats = calculateIntervalStats();
             
-            // CSV 형식의 데이터 준비
-            const csvHeader = 'ID,Gender,Age,Education,0-15s,15-30s,30-45s,45-60s';
-            const csvData = [
-                testDate.toISOString().slice(0,10).replace(/-/g,'') + '_' + 
-                    testDate.getHours().toString().padStart(2,'0') + 
-                    testDate.getMinutes().toString().padStart(2,'0'),
-                '미입력',
-                '미입력', 
-                '미입력',
-                intervalStats['0-15초'].length,
-                intervalStats['15-30초'].length,
-                intervalStats['30-45초'].length,
-                intervalStats['45-60초'].length
-            ].join(',');
+            // 각 구간별 동물 목록을 쉼표로 구분된 문자열로 변환
+            const responses = {
+                '0-15': intervalStats['0-15초'].join(','),
+                '15-30': intervalStats['15-30초'].join(','),
+                '30-45': intervalStats['30-45초'].join(','),
+                '45-60': intervalStats['45-60초'].join(',')
+            };
             
-            const fullCsvData = csvHeader + '\n' + csvData;
+            // URL 파라미터로 전달할 데이터 준비
+            const params = new URLSearchParams();
+            params.append('responses', JSON.stringify(responses));
+            params.append('autoAnalyze', 'true');
             
-            // CSV 데이터를 클립보드에 복사
-            navigator.clipboard.writeText(fullCsvData).then(() => {
-                console.log('CSV 데이터가 클립보드에 복사되었습니다.');
-                // CFTSCORING 페이지를 열지 않고 바로 내부 분석 실행
-                speak("결과를 분석하고 있습니다. 잠시만 기다려주세요.");
-            }).catch(err => {
-                console.error('클립보드 복사 실패:', err);
-            });
+            // CFTSCORING 페이지 열기
+            const scoringUrl = 'https://psykim.github.io/CFTSCORING/CFTSCORING.html?' + params.toString();
             
-            // 내부 분석만 실행 (CFTSCORING 창 열지 않음)
-            performInternalAnalysis(intervalStats);
+            speak("결과를 분석하고 있습니다. 새 창에서 CFTSCORING 페이지가 열립니다.");
+            
+            // 새 창에서 CFTSCORING 열기
+            setTimeout(() => {
+                window.open(scoringUrl, '_blank');
+            }, 1000);
         }
         
         // 내부 분석 함수

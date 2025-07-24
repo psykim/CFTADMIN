@@ -1788,8 +1788,8 @@
                 return;
             }
             
-            // CFTSCORING HTML 로드
-            fetch('file:///Users/kwk/development/CFTSCORING/CFTSCORING.html')
+            // CFTSCORING 저장소의 index.html 로드
+            fetch('https://psykim.github.io/CFTSCORING/index.html')
                 .then(response => response.text())
                 .then(html => {
                     newWindow.document.write(html);

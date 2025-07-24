@@ -623,10 +623,8 @@
                 
                 <div class="ready-box" id="readyBox">
                     <button class="start-button" id="manualStartBtn" onclick="handleStartClick()"><span>시작하기</span></button>
-                    <button class="start-button" style="background: #f44336; margin-top: 10px;" onclick="testClick()"><span>테스트 버튼</span></button>
                     <div class="ready-check">
                         <p>조용한 장소에서 검사를 시작하세요</p>
-                        <p style="font-size: 12px; color: #666; margin-top: 10px;">클릭 시 콘솔을 확인하세요</p>
                     </div>
                     <div id="audioPermissionNotice" style="display: none; margin-top: 30px; padding: 15px; background: rgba(255,255,255,0.1); border-radius: 10px;">
                         <p style="margin: 0; color: white; opacity: 0.8; font-size: 16px;">🔊 음성 안내를 시작하려면 화면을 클릭하세요</p>
@@ -726,10 +724,7 @@
             alert('버튼이 정상적으로 작동합니다!');
         }
         
-        // 페이지 로드 즉시 실행
-        console.log('=== 스크립트 로드됨 ===');
-        console.log('handleStartClick 함수 존재:', typeof handleStartClick);
-        console.log('testClick 함수 존재:', typeof testClick);
+        // 페이지 로드 즉시 실행 - 디버깅 완료됨
         
         // 전역 변수
         let animals = [];
@@ -799,17 +794,11 @@
             tryAutoVoiceStart();
         }
         
-        // 테스트 버튼 클릭 함수
-        function testClick() {
-            console.log('=== 테스트 버튼 클릭됨! ===');
-            alert('테스트 버튼이 작동합니다! JavaScript가 정상적으로 실행되고 있습니다.');
-        }
         
         // 시작 버튼 클릭 처리
         async function handleStartClick() {
             try {
-                console.log('=== handleStartClick 함수 호출됨 ===');
-                console.log('현재 상태:', {
+                    console.log('현재 상태:', {
                     microphonePermissionGranted,
                     recognition,
                     elevenLabsConnected,
@@ -892,7 +881,6 @@
         
         // 음성 안내 시작 함수
         function startVoiceIntroduction() {
-            console.log('=== startVoiceIntroduction 함수 호출됨 ===');
             
             // 이미 시작된 경우 중복 실행 방지
             if (voiceIntroStarted) {
@@ -2368,21 +2356,7 @@
 
         // 페이지 로드 시 초기화
         window.addEventListener('load', async () => {
-            console.log('=== 페이지 로드 이벤트 시작 ===');
             
-            // DOM 요소 존재 확인
-            const startButton = document.getElementById('manualStartBtn');
-            console.log('시작하기 버튼 DOM 요소:', startButton);
-            console.log('handleStartClick 함수 정의됨?', typeof handleStartClick);
-            console.log('testClick 함수 정의됨?', typeof testClick);
-            
-            // 백업 이벤트 리스너 추가
-            if (startButton && typeof handleStartClick === 'function') {
-                startButton.addEventListener('click', function() {
-                    console.log('백업 이벤트 리스너 실행됨');
-                    handleStartClick();
-                });
-            }
             
             // 음성 목록 먼저 로드
             const voices = await loadVoices();
@@ -2407,14 +2381,7 @@
                 testPage: document.getElementById('testPage')
             });
             
-            // 시작하기 버튼에 이벤트 리스너 추가
-            const manualStartBtn = document.getElementById('manualStartBtn');
-            if (manualStartBtn) {
-                console.log('시작하기 버튼 찾음, 이벤트 리스너 추가');
-                manualStartBtn.addEventListener('click', handleStartClick);
-            } else {
-                console.error('시작하기 버튼을 찾을 수 없습니다!');
-            }
+            // 중복 제거됨 - 위에서 이미 처리
             
             // 바로 검사 페이지로 이동
             showPage('test');

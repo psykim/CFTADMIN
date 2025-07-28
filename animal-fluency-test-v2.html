@@ -1781,7 +1781,7 @@
             const testDate = new Date();
             const intervalStats = calculateIntervalStats();
             
-            // CSV 형식의 데이터 준비
+            // CFTSCORING이 요구하는 CSV 형식의 데이터 준비
             const csvHeader = 'ID,Gender,Age,Education,0-15s,15-30s,30-45s,45-60s';
             const csvData = [
                 testDate.toISOString().slice(0,10).replace(/-/g,'') + '_' + 
@@ -1790,20 +1790,22 @@
                 '미입력',
                 '미입력', 
                 '미입력',
-                intervalStats['0-15초'].length,
-                intervalStats['15-30초'].length,
-                intervalStats['30-45초'].length,
-                intervalStats['45-60초'].length
+                intervalStats['0-15초'].join(' '),  // 공백으로 구분된 동물 목록
+                intervalStats['15-30초'].join(' '),
+                intervalStats['30-45초'].join(' '),
+                intervalStats['45-60초'].join(' ')
             ].join(',');
             
             const fullCsvData = csvHeader + '\n' + csvData;
             
-            // 새 창에서 CFTSCORING 열기
-            const newWindow = window.open('https://psykim.github.io/CFTSCORING/CFTSCORING.html', '_blank', 'width=1200,height=800');
-            if (!newWindow) {
-                alert('팝업이 차단되었습니다. 팝업 차단을 해제해주세요.');
-                return;
-            }
+            // iframe으로 CFTSCORING을 백그라운드에서 열기
+            const iframe = document.createElement('iframe');
+            iframe.style.display = 'none';  // 사용자에게 보이지 않음
+            iframe.style.width = '0';
+            iframe.style.height = '0';
+            iframe.style.position = 'absolute';
+            iframe.style.left = '-9999px';
+            iframe.src = 'https://psykim.github.io/CFTSCORING/CFTSCORING.html';
             
             // 메시지 이벤트 리스너 설정 (CFTSCORING에서 결과 받기)
             const messageHandler = function(event) {
@@ -1814,10 +1816,13 @@
                 
                 // CFTSCORING 결과인지 확인
                 if (event.data && event.data.type === 'CFTSCORING_RESULT') {
-                    console.log('CFTSCORING 결과 수신:', event.data);
+                    console.log('CFTSCORING 결과 수신');
                     
                     // 결과 HTML 표시
                     displayCFTSCORINGResult(event.data.html);
+                    
+                    // iframe 제거
+                    document.body.removeChild(iframe);
                     
                     // 리스너 제거
                     window.removeEventListener('message', messageHandler);
@@ -1826,11 +1831,11 @@
             
             window.addEventListener('message', messageHandler);
             
-            // CFTSCORING 페이지가 로드되면 CSV 데이터 전송
-            newWindow.onload = function() {
+            // iframe이 로드되면 CSV 데이터 전송
+            iframe.onload = function() {
                 setTimeout(() => {
                     // CSV 데이터를 CFTSCORING으로 전송
-                    newWindow.postMessage({
+                    iframe.contentWindow.postMessage({
                         type: 'CSV_DATA',
                         data: fullCsvData,
                         source: 'CFTADMIN'
@@ -1840,21 +1845,65 @@
                 }, 1000); // 페이지 완전 로드를 위한 대기
             };
             
-            // 타임아웃 설정 (30초 후에도 응답이 없으면 내부 분석 실행)
+            // iframe을 body에 추가
+            document.body.appendChild(iframe);
+            
+            // 타임아웃 설정 (30초 후에도 응답이 없으면 에러 처리)
             setTimeout(() => {
                 window.removeEventListener('message', messageHandler);
-                // 응답이 없으면 내부 분석 실행
+                // 응답이 없으면 에러 메시지
                 const resultsSection = document.getElementById('resultsSection');
                 if (resultsSection && !resultsSection.innerHTML.includes('CFTSCORING')) {
-                    console.log('CFTSCORING 응답 시간 초과, 내부 분석 실행');
-                    performInternalAnalysis(intervalStats);
+                    console.error('CFTSCORING 응답 시간 초과');
+                    resultsSection.innerHTML = `
+                        <div style="text-align: center; padding: 50px;">
+                            <div style="font-size: 24px; color: #dc3545; margin-bottom: 20px;">
+                                <i class="fas fa-exclamation-triangle"></i>
+                                분석 중 오류가 발생했습니다
+                            </div>
+                            <p style="color: #666;">잠시 후 다시 시도해주세요.</p>
+                            <button onclick="window.location.href = window.location.pathname" style="background-color: #007bff; color: white; border: none; padding: 12px 30px; font-size: 16px; border-radius: 5px; cursor: pointer; margin-top: 20px;">다시 검사하기</button>
+                        </div>
+                    `;
+                    // iframe 제거
+                    if (iframe.parentNode) {
+                        document.body.removeChild(iframe);
+                    }
                 }
             }, 30000);
         }
         
-        // 내부 분석 함수
-        function performInternalAnalysis(intervalStats) {
-            // 구간별 동물 수 계산
+        // CFTSCORING에서 받은 HTML 결과 표시
+        function displayCFTSCORINGResult(htmlContent) {
+            console.log('CFTSCORING 결과 HTML 표시');
+            
+            // 결과 섹션 초기화 및 HTML 표시
+            const resultsSection = document.getElementById('resultsSection');
+            resultsSection.innerHTML = '';
+            
+            // CFTSCORING 결과 컨테이너 생성
+            const containerDiv = document.createElement('div');
+            containerDiv.style.cssText = 'margin: 20px auto; max-width: 1200px; padding: 20px;';
+            containerDiv.innerHTML = htmlContent;
+            
+            // 다시 검사하기 버튼 추가
+            const buttonDiv = document.createElement('div');
+            buttonDiv.style.cssText = 'text-align: center; margin-top: 30px; padding: 20px;';
+            buttonDiv.innerHTML = '<button onclick="window.location.href = window.location.pathname" style="background-color: #007bff; color: white; border: none; padding: 12px 30px; font-size: 16px; border-radius: 5px; cursor: pointer;">다시 검사하기</button>';
+            
+            resultsSection.appendChild(containerDiv);
+            resultsSection.appendChild(buttonDiv);
+            resultsSection.style.display = 'block';
+            
+            // 스크롤
+            containerDiv.scrollIntoView({ behavior: 'smooth' });
+            
+            // 음성 안내
+            speak("분석이 완료되었습니다. 결과를 확인해 주세요.");
+        }
+        
+        // 내부 분석 함수들은 모두 제거
+        /*
             const counts = {
                 '0-15초': intervalStats['0-15초'].length,
                 '15-30초': intervalStats['15-30초'].length,
@@ -2020,8 +2069,8 @@
             speak("분석이 완료되었습니다. 결과를 확인해 주세요.");
         }
         
-        // 범주 분석 함수
-        function analyzeClusters(animals) {
+        // CFTSCORING 결과 표시 (기존 함수 제거)
+        /*
             // CFTSCORING과 동일한 범주 체계 사용
             const CATEGORIES = {
                 // 생물학적 분류
@@ -2171,10 +2220,10 @@
                 switching,
                 hardSwitching
             };
-        }
+        */
         
-        // CFTSCORING 전체 결과 표시
-        function displayCFTSCORINGFullResults(resultHTML) {
+        // 이벤트 리스너 (설명 페이지 관련 이벤트는 사용하지 않지만 에러 방지를 위해 유지)
+        if (instructionsNextBtn) {
             console.log('전체 결과 표시');
             
             // 결과를 담을 컨테이너 생성

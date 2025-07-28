@@ -1,0 +1,47 @@
+[
+  {
+    "selector": "#results",
+    "text": "판독 결과\n            \n            \n            \n                \n                    입력 화면으로 돌아가기\n                \n            \n            \n            \n            \n            \n                \n      ",
+    "visible": false,
+    "display": "none",
+    "visibility": "visible"
+  },
+  {
+    "selector": ".results",
+    "text": "판독 결과\n            \n            \n            \n                \n                    입력 화면으로 돌아가기\n                \n            \n            \n            \n            \n            \n                \n      ",
+    "visible": false,
+    "display": "none",
+    "visibility": "visible"
+  },
+  {
+    "selector": "[id*=\"result\"]",
+    "text": "판독 결과\n            \n            \n            \n                \n                    입력 화면으로 돌아가기\n                \n            \n            \n            \n            \n            \n                \n      ",
+    "visible": false,
+    "display": "none",
+    "visibility": "visible"
+  },
+  {
+    "selector": "[class*=\"result\"]",
+    "text": "판독 결과\n            \n            \n            \n                \n                    입력 화면으로 돌아가기\n                \n            \n            \n            \n            \n            \n                \n      ",
+    "visible": false,
+    "display": "none",
+    "visibility": "visible"
+  },
+  {
+    "selector": "[class*=\"score\"]",
+    "text": "60초 반응\n                        총점\n                        Z점수\n                        퍼센타일\n                        전반점수\n                        후반점수\n                        보속오류\n                      ",
+    "visible": false,
+    "display": "table",
+    "visibility": "visible"
+  },
+  {
+    "selector": "div with 점",
+    "text": "동물범주형유창성검사 채점기\n        \n        \n            \n                \n                    ID\n                    \n                \n                \n                    성별\n                    \n               ",
+    "visible": true
+  },
+  {
+    "selector": "div with 점",
+    "text": "점수 계산하기\n            동물 데이터베이스 관리\n            CSV 일괄 처리",
+    "visible": true
+  }
+]

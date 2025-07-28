@@ -1,0 +1,432 @@
+{
+  "found": true,
+  "visible": true,
+  "position": {
+    "top": 1401.125,
+    "left": 132.5,
+    "width": 1120,
+    "height": 255.171875
+  },
+  "computedStyles": {
+    "display": "table",
+    "visibility": "visible",
+    "opacity": "1"
+  },
+  "html": "<table class=\"score-table\" style=\"width: 100%; max-width: 1200px; margin: 0px auto; table-layout: fixed; display: table; visibility: visible; opacity: 1;\">\n                <colgroup>\n                    <col style=\"width: 15%;\">\n                    <col style=\"width: 12.14%;\">\n                    <col style=\"width: 12.14%;\">\n                    <col style=\"width: 12.14%;\">\n                    <col style=\"width: 12.14%;\">\n                    <col style=\"width: 12.14%;\">\n                    <col style=\"width: 12.14%;\">\n                    <col style=\"width: 12.14%;\">\n                </colgroup>\n                <tbody>\n                    <!-- 60초 반응 첫번째 행 -->\n                    <tr class=\"header-row\">\n                        <th rowspan=\"4\" style=\"vertical-align: middle; font-weight: bold; background-color: #e8f4f8;\">60초 반응</th>\n                        <th>총점</th>\n                        <th>Z점수</th>\n                        <th>퍼센타일</th>\n                        <th>전반점수</th>\n                        <th>후반점수</th>\n                        <th>보속오류</th>\n                        <th>침투오류</th>\n                    </tr>\n                    <tr>\n                        <td id=\"totalScore\" class=\"data-cell\">0</td>\n                        <td id=\"totalZScore\" class=\"data-cell\">-</td>\n                        <td id=\"totalPercentile\" class=\"data-cell\">-</td>\n                        <td id=\"firstHalfScore\" class=\"data-cell\">0</td>\n                        <td id=\"secondHalfScore\" class=\"data-cell\">0</td>\n                        <td id=\"perseverationScore\" class=\"data-cell\">0</td>\n                        <td id=\"intrusionScore\" class=\"data-cell\">0</td>\n                    </tr>\n                    \n                    <!-- 60초 반응 두번째 행 -->\n                    <tr class=\"header-row\">\n                        <th>범주수</th>\n                        <th>평균크기</th>\n                        <th>최대크기</th>\n                        <th>전환</th>\n                        <th>비효율전환</th>\n                        <th colspan=\"2\">-</th>\n                    </tr>\n                    <tr>\n                        <td id=\"categoryScore\" class=\"data-cell\">0</td>\n                        <td id=\"avgClusterSize\" class=\"data-cell\">0</td>\n                        <td id=\"maxClusterSize\" class=\"data-cell\">0</td>\n                        <td id=\"switchingScore\" class=\"data-cell\">0</td>\n                        <td id=\"inefficientSwitchingScore\" class=\"data-cell\">0</td>\n                        <td colspan=\"2\" class=\"data-cell\">-</td>\n                    </tr>\n                    \n                    <!-- 전반 30초 결과 -->\n                    <tr class=\"header-row\" style=\"border-top: 2px solid #ddd;\">\n                        <th rowspan=\"2\" style=\"vertical-align: middle; font-weight: bold; background-color: #e8f4f8;\">전반 30초 반응</th>\n                        <th>범주수</th>\n                        <th>평균크기</th>\n                        <th>최대크기</th>\n                        <th>전환</th>\n                        <th>비효율전환</th>\n                        <th>보속오류</th>\n                        <th>침투오류</th>\n                    </tr>\n                    <tr>\n                        <td id=\"first30SecCategoryScore\" class=\"data-cell\">0</td>\n                        <td id=\"first30SecAvgClusterSize\" class=\"data-cell\">0</td>\n                        <td id=\"first30SecMaxClusterSize\" class=\"data-cell\">0</td>\n                        <td id=\"first30SecSwitchingScore\" class=\"data-cell\">0</td>\n                        <td id=\"first30SecInefficient\" class=\"data-cell\">0</td>\n                        <td id=\"first30SecPerseverationScore\" class=\"data-cell\">0</td>\n                        <td id=\"first30SecIntrusionScore\" class=\"data-cell\">0</td>\n                    </tr>\n                </tbody>\n            </table>",
+  "rowsData": [
+    {
+      "rowIndex": 0,
+      "cellCount": 8,
+      "cells": [
+        {
+          "tagName": "TH",
+          "text": "60초 반응",
+          "id": "",
+          "className": "",
+          "backgroundColor": "rgb(232, 244, 248)",
+          "color": "rgb(51, 51, 51)",
+          "fontWeight": "700"
+        },
+        {
+          "tagName": "TH",
+          "text": "총점",
+          "id": "",
+          "className": "",
+          "backgroundColor": "rgb(245, 245, 245)",
+          "color": "rgb(51, 51, 51)",
+          "fontWeight": "600"
+        },
+        {
+          "tagName": "TH",
+          "text": "Z점수",
+          "id": "",
+          "className": "",
+          "backgroundColor": "rgb(245, 245, 245)",
+          "color": "rgb(51, 51, 51)",
+          "fontWeight": "600"
+        },
+        {
+          "tagName": "TH",
+          "text": "퍼센타일",
+          "id": "",
+          "className": "",
+          "backgroundColor": "rgb(245, 245, 245)",
+          "color": "rgb(51, 51, 51)",
+          "fontWeight": "600"
+        },
+        {
+          "tagName": "TH",
+          "text": "전반점수",
+          "id": "",
+          "className": "",
+          "backgroundColor": "rgb(245, 245, 245)",
+          "color": "rgb(51, 51, 51)",
+          "fontWeight": "600"
+        },
+        {
+          "tagName": "TH",
+          "text": "후반점수",
+          "id": "",
+          "className": "",
+          "backgroundColor": "rgb(245, 245, 245)",
+          "color": "rgb(51, 51, 51)",
+          "fontWeight": "600"
+        },
+        {
+          "tagName": "TH",
+          "text": "보속오류",
+          "id": "",
+          "className": "",
+          "backgroundColor": "rgb(245, 245, 245)",
+          "color": "rgb(51, 51, 51)",
+          "fontWeight": "600"
+        },
+        {
+          "tagName": "TH",
+          "text": "침투오류",
+          "id": "",
+          "className": "",
+          "backgroundColor": "rgb(245, 245, 245)",
+          "color": "rgb(51, 51, 51)",
+          "fontWeight": "600"
+        }
+      ]
+    },
+    {
+      "rowIndex": 1,
+      "cellCount": 7,
+      "cells": [
+        {
+          "tagName": "TD",
+          "text": "0",
+          "id": "totalScore",
+          "className": "data-cell",
+          "backgroundColor": "rgb(255, 255, 255)",
+          "color": "rgb(21, 101, 192)",
+          "fontWeight": "700"
+        },
+        {
+          "tagName": "TD",
+          "text": "-",
+          "id": "totalZScore",
+          "className": "data-cell",
+          "backgroundColor": "rgb(255, 255, 255)",
+          "color": "rgb(21, 101, 192)",
+          "fontWeight": "700"
+        },
+        {
+          "tagName": "TD",
+          "text": "-",
+          "id": "totalPercentile",
+          "className": "data-cell",
+          "backgroundColor": "rgb(255, 255, 255)",
+          "color": "rgb(21, 101, 192)",
+          "fontWeight": "700"
+        },
+        {
+          "tagName": "TD",
+          "text": "0",
+          "id": "firstHalfScore",
+          "className": "data-cell",
+          "backgroundColor": "rgb(255, 255, 255)",
+          "color": "rgb(21, 101, 192)",
+          "fontWeight": "700"
+        },
+        {
+          "tagName": "TD",
+          "text": "0",
+          "id": "secondHalfScore",
+          "className": "data-cell",
+          "backgroundColor": "rgb(255, 255, 255)",
+          "color": "rgb(21, 101, 192)",
+          "fontWeight": "700"
+        },
+        {
+          "tagName": "TD",
+          "text": "0",
+          "id": "perseverationScore",
+          "className": "data-cell",
+          "backgroundColor": "rgb(255, 255, 255)",
+          "color": "rgb(21, 101, 192)",
+          "fontWeight": "700"
+        },
+        {
+          "tagName": "TD",
+          "text": "0",
+          "id": "intrusionScore",
+          "className": "data-cell",
+          "backgroundColor": "rgb(255, 255, 255)",
+          "color": "rgb(21, 101, 192)",
+          "fontWeight": "700"
+        }
+      ]
+    },
+    {
+      "rowIndex": 2,
+      "cellCount": 6,
+      "cells": [
+        {
+          "tagName": "TH",
+          "text": "범주수",
+          "id": "",
+          "className": "",
+          "backgroundColor": "rgb(245, 245, 245)",
+          "color": "rgb(51, 51, 51)",
+          "fontWeight": "600"
+        },
+        {
+          "tagName": "TH",
+          "text": "평균크기",
+          "id": "",
+          "className": "",
+          "backgroundColor": "rgb(245, 245, 245)",
+          "color": "rgb(51, 51, 51)",
+          "fontWeight": "600"
+        },
+        {
+          "tagName": "TH",
+          "text": "최대크기",
+          "id": "",
+          "className": "",
+          "backgroundColor": "rgb(245, 245, 245)",
+          "color": "rgb(51, 51, 51)",
+          "fontWeight": "600"
+        },
+        {
+          "tagName": "TH",
+          "text": "전환",
+          "id": "",
+          "className": "",
+          "backgroundColor": "rgb(245, 245, 245)",
+          "color": "rgb(51, 51, 51)",
+          "fontWeight": "600"
+        },
+        {
+          "tagName": "TH",
+          "text": "비효율전환",
+          "id": "",
+          "className": "",
+          "backgroundColor": "rgb(245, 245, 245)",
+          "color": "rgb(51, 51, 51)",
+          "fontWeight": "600"
+        },
+        {
+          "tagName": "TH",
+          "text": "-",
+          "id": "",
+          "className": "",
+          "backgroundColor": "rgb(245, 245, 245)",
+          "color": "rgb(51, 51, 51)",
+          "fontWeight": "600"
+        }
+      ]
+    },
+    {
+      "rowIndex": 3,
+      "cellCount": 6,
+      "cells": [
+        {
+          "tagName": "TD",
+          "text": "0",
+          "id": "categoryScore",
+          "className": "data-cell",
+          "backgroundColor": "rgb(255, 255, 255)",
+          "color": "rgb(21, 101, 192)",
+          "fontWeight": "700"
+        },
+        {
+          "tagName": "TD",
+          "text": "0",
+          "id": "avgClusterSize",
+          "className": "data-cell",
+          "backgroundColor": "rgb(255, 255, 255)",
+          "color": "rgb(21, 101, 192)",
+          "fontWeight": "700"
+        },
+        {
+          "tagName": "TD",
+          "text": "0",
+          "id": "maxClusterSize",
+          "className": "data-cell",
+          "backgroundColor": "rgb(255, 255, 255)",
+          "color": "rgb(21, 101, 192)",
+          "fontWeight": "700"
+        },
+        {
+          "tagName": "TD",
+          "text": "0",
+          "id": "switchingScore",
+          "className": "data-cell",
+          "backgroundColor": "rgb(255, 255, 255)",
+          "color": "rgb(21, 101, 192)",
+          "fontWeight": "700"
+        },
+        {
+          "tagName": "TD",
+          "text": "0",
+          "id": "inefficientSwitchingScore",
+          "className": "data-cell",
+          "backgroundColor": "rgb(255, 255, 255)",
+          "color": "rgb(21, 101, 192)",
+          "fontWeight": "700"
+        },
+        {
+          "tagName": "TD",
+          "text": "-",
+          "id": "",
+          "className": "data-cell",
+          "backgroundColor": "rgb(255, 255, 255)",
+          "color": "rgb(21, 101, 192)",
+          "fontWeight": "700"
+        }
+      ]
+    },
+    {
+      "rowIndex": 4,
+      "cellCount": 8,
+      "cells": [
+        {
+          "tagName": "TH",
+          "text": "전반 30초 반응",
+          "id": "",
+          "className": "",
+          "backgroundColor": "rgb(232, 244, 248)",
+          "color": "rgb(51, 51, 51)",
+          "fontWeight": "700"
+        },
+        {
+          "tagName": "TH",
+          "text": "범주수",
+          "id": "",
+          "className": "",
+          "backgroundColor": "rgb(245, 245, 245)",
+          "color": "rgb(51, 51, 51)",
+          "fontWeight": "600"
+        },
+        {
+          "tagName": "TH",
+          "text": "평균크기",
+          "id": "",
+          "className": "",
+          "backgroundColor": "rgb(245, 245, 245)",
+          "color": "rgb(51, 51, 51)",
+          "fontWeight": "600"
+        },
+        {
+          "tagName": "TH",
+          "text": "최대크기",
+          "id": "",
+          "className": "",
+          "backgroundColor": "rgb(245, 245, 245)",
+          "color": "rgb(51, 51, 51)",
+          "fontWeight": "600"
+        },
+        {
+          "tagName": "TH",
+          "text": "전환",
+          "id": "",
+          "className": "",
+          "backgroundColor": "rgb(245, 245, 245)",
+          "color": "rgb(51, 51, 51)",
+          "fontWeight": "600"
+        },
+        {
+          "tagName": "TH",
+          "text": "비효율전환",
+          "id": "",
+          "className": "",
+          "backgroundColor": "rgb(245, 245, 245)",
+          "color": "rgb(51, 51, 51)",
+          "fontWeight": "600"
+        },
+        {
+          "tagName": "TH",
+          "text": "보속오류",
+          "id": "",
+          "className": "",
+          "backgroundColor": "rgb(245, 245, 245)",
+          "color": "rgb(51, 51, 51)",
+          "fontWeight": "600"
+        },
+        {
+          "tagName": "TH",
+          "text": "침투오류",
+          "id": "",
+          "className": "",
+          "backgroundColor": "rgb(245, 245, 245)",
+          "color": "rgb(51, 51, 51)",
+          "fontWeight": "600"
+        }
+      ]
+    },
+    {
+      "rowIndex": 5,
+      "cellCount": 7,
+      "cells": [
+        {
+          "tagName": "TD",
+          "text": "0",
+          "id": "first30SecCategoryScore",
+          "className": "data-cell",
+          "backgroundColor": "rgb(255, 255, 255)",
+          "color": "rgb(21, 101, 192)",
+          "fontWeight": "700"
+        },
+        {
+          "tagName": "TD",
+          "text": "0",
+          "id": "first30SecAvgClusterSize",
+          "className": "data-cell",
+          "backgroundColor": "rgb(255, 255, 255)",
+          "color": "rgb(21, 101, 192)",
+          "fontWeight": "700"
+        },
+        {
+          "tagName": "TD",
+          "text": "0",
+          "id": "first30SecMaxClusterSize",
+          "className": "data-cell",
+          "backgroundColor": "rgb(255, 255, 255)",
+          "color": "rgb(21, 101, 192)",
+          "fontWeight": "700"
+        },
+        {
+          "tagName": "TD",
+          "text": "0",
+          "id": "first30SecSwitchingScore",
+          "className": "data-cell",
+          "backgroundColor": "rgb(255, 255, 255)",
+          "color": "rgb(21, 101, 192)",
+          "fontWeight": "700"
+        },
+        {
+          "tagName": "TD",
+          "text": "0",
+          "id": "first30SecInefficient",
+          "className": "data-cell",
+          "backgroundColor": "rgb(255, 255, 255)",
+          "color": "rgb(21, 101, 192)",
+          "fontWeight": "700"
+        },
+        {
+          "tagName": "TD",
+          "text": "0",
+          "id": "first30SecPerseverationScore",
+          "className": "data-cell",
+          "backgroundColor": "rgb(255, 255, 255)",
+          "color": "rgb(21, 101, 192)",
+          "fontWeight": "700"
+        },
+        {
+          "tagName": "TD",
+          "text": "0",
+          "id": "first30SecIntrusionScore",
+          "className": "data-cell",
+          "backgroundColor": "rgb(255, 255, 255)",
+          "color": "rgb(21, 101, 192)",
+          "fontWeight": "700"
+        }
+      ]
+    }
+  ]
+}

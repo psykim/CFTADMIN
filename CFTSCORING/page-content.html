@@ -1,0 +1,3833 @@
+<!DOCTYPE html><html lang="ko"><head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>동물범주형유창성검사 채점기</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background-color: #f5f5f5;
+            padding: 20px;
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        h1 {
+            color: #333;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+        
+        h2 {
+            color: #555;
+            margin-top: 30px;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #e0e0e0;
+        }
+        
+        .section {
+            margin-bottom: 30px;
+        }
+        
+        .form-group {
+            margin-bottom: 15px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #555;
+        }
+        
+        input, select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+        
+        /* 성별 버튼과 높이를 맞춘 입력 필드 */
+        .aligned-input {
+            height: 46px; /* 성별 토글 버튼과 동일한 높이 (padding 10px + font-size 16px + border 2px) */
+            padding: 10px;
+            box-sizing: border-box;
+        }
+        
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+        }
+        
+        .time-section {
+            background-color: #f9f9f9;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            border: 1px solid #e0e0e0;
+        }
+        
+        .time-section h3 {
+            color: #666;
+            margin-bottom: 15px;
+            font-size: 18px;
+        }
+        
+        .input-group {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+        
+        .input-group input {
+            flex: 1;
+        }
+        
+        button {
+            padding: 10px 20px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s;
+        }
+        
+        button:hover {
+            background-color: #0056b3;
+        }
+        
+        button:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
+        }
+        
+        .response-tag {
+            display: inline-block;
+            background-color: #e3f2fd;
+            color: #1976d2;
+            padding: 5px 15px;
+            border-radius: 20px;
+            margin: 5px;
+            position: relative;
+        }
+        
+        .response-tag .remove {
+            margin-left: 10px;
+            cursor: pointer;
+            color: #d32f2f;
+            font-weight: bold;
+        }
+        
+        /* 질문 태그 스타일 */
+        .question-tag {
+            background-color: #ffe4b5;
+            border: 1px dashed #ff8c00;
+            opacity: 0.8;
+        }
+        
+        .question-tag:hover {
+            background-color: #ffd4a3;
+        }
+        
+        .calculate-btn {
+            flex: 1;
+            padding: 15px;
+            font-size: 18px;
+            background-color: #28a745;
+        }
+        
+        .calculate-btn:hover {
+            background-color: #218838;
+        }
+        
+        .db-manage-btn {
+            flex: 1;
+            padding: 15px;
+            font-size: 18px;
+            background-color: #1976d2;
+        }
+        
+        .db-manage-btn:hover {
+            background-color: #1565c0;
+        }
+        
+        .csv-btn {
+            flex: 1;
+            padding: 15px;
+            font-size: 18px;
+            background-color: #17a2b8;
+        }
+        
+        .csv-btn:hover {
+            background-color: #138496;
+        }
+        
+        /* CSV 업로드 스타일 */
+        .csv-upload-section {
+            background-color: #e8f5f9;
+            padding: 20px;
+            border-radius: 8px;
+            margin-top: 20px;
+            border: 2px solid #17a2b8;
+            display: none;
+        }
+        
+        .csv-format-example {
+            background-color: #f8f9fa;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 15px 0;
+            font-family: monospace;
+            font-size: 12px;
+            overflow-x: auto;
+        }
+        
+        .csv-results {
+            margin-top: 20px;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        
+        .csv-result-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 12px;
+        }
+        
+        .csv-result-table th,
+        .csv-result-table td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+        
+        .csv-result-table th {
+            background-color: #f5f5f5;
+            font-weight: bold;
+            position: sticky;
+            top: 0;
+        }
+        
+        .button-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+        
+        .results {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 40px;
+            background-color: white;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.12);
+            border-radius: 20px;
+            display: none;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .results::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 5px;
+            background: linear-gradient(90deg, #1565c0 0%, #42a5f5 50%, #1976d2 100%);
+        }
+        
+        /* 컴팩트한 표 형식 스타일 */
+        .score-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+            background: white;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            border-radius: 10px;
+            overflow: hidden;
+        }
+        
+        .score-table th,
+        .score-table td {
+            padding: 8px 10px;
+            text-align: center;
+            border: 1px solid #e0e0e0;
+        }
+        
+        .score-table th {
+            background-color: #f5f5f5;
+            font-weight: 600;
+            color: #333;
+            font-size: 13px;
+            white-space: nowrap;
+            padding: 10px 8px;
+        }
+        
+        /* 헤더 행 스타일 */
+        .score-table tr.header-row {
+            background-color: #f5f5f5;
+        }
+        
+        .score-table td {
+            font-size: 16px;
+            font-weight: bold;
+            color: #1565c0;
+            white-space: nowrap;
+            background-color: #fafafa; /* 기본 배경색 */
+        }
+        
+        /* 데이터 셀은 항상 흰색 배경 */
+        .score-table td.data-cell {
+            background-color: white !important;
+        }
+        
+        .score-table td.low-z-score {
+            color: #d32f2f;
+        }
+        
+        .score-table thead th {
+            vertical-align: middle;
+        }
+        
+        /* 첫 번째 td가 data-cell 클래스가 없을 때만 회색 배경 */
+        .score-table tbody td:first-child:not(.data-cell) {
+            font-weight: bold;
+            background-color: #f5f5f5;
+        }
+        
+        .score-table .warning {
+            color: #d32f2f;
+        }
+        
+        .section-title {
+            text-align: center;
+            margin: 30px 0 20px 0;
+            color: #90a4ae;
+            font-size: 24px;
+            font-weight: 500;
+        }
+        
+        .score-card {
+            background-color: #f8f9fa;
+            padding: 25px;
+            border-radius: 15px;
+            text-align: center;
+            border: 1px solid #e0e0e0;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+        
+        .score-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+            border-color: #1976d2;
+        }
+        
+        .score-card h4 {
+            color: #666;
+            font-size: 14px;
+            margin-bottom: 10px;
+            font-weight: normal;
+        }
+        
+        .score-card .score {
+            font-size: 42px;
+            font-weight: bold;
+            color: #1565c0;
+            margin-top: 15px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+            background: linear-gradient(135deg, #1565c0, #42a5f5);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .analysis-section {
+            background-color: #f8f9fa;
+            padding: 25px;
+            border-radius: 12px;
+            margin-bottom: 25px;
+            border: 2px solid #e3f2fd;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        
+        .analysis-section h3 {
+            color: #1565c0;
+            font-size: 22px;
+            margin-bottom: 20px;
+            padding-bottom: 12px;
+            border-bottom: 3px solid #1976d2;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .analysis-section h3::before {
+            content: "📊";
+            font-size: 24px;
+        }
+        
+        .response-list {
+            background-color: #f5f5f5;
+            padding: 20px;
+            border-radius: 8px;
+        }
+        
+        .response-item {
+            padding: 8px 0;
+            border-bottom: 1px solid #e0e0e0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .response-item:last-child {
+            border-bottom: none;
+        }
+        
+        .response-categories {
+            font-size: 12px;
+            color: #666;
+            margin-left: 10px;
+        }
+        
+        .cluster-item {
+            margin-bottom: 10px;
+            padding: 10px;
+            background-color: #f9f9f9;
+            border-radius: 5px;
+        }
+        
+        .category-tag {
+            display: inline-block;
+            padding: 3px 8px;
+            margin: 2px;
+            background-color: #e3f2fd;
+            border: 1px solid #90caf9;
+            border-radius: 12px;
+            font-size: 12px;
+            color: #1565c0;
+        }
+        
+        .category-info {
+            margin-bottom: 10px;
+            font-size: 14px;
+        }
+        
+        .used-categories {
+            margin-top: 8px;
+        }
+        
+        .algorithm-info {
+            background-color: #e3f2fd;
+            border: 1px solid #90caf9;
+            color: #1565c0;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            font-size: 14px;
+        }
+        
+        .algorithm-info h4 {
+            margin-top: 0;
+            margin-bottom: 10px;
+        }
+        
+        .warning {
+            background-color: #fff3cd;
+            border: 1px solid #ffeaa7;
+            color: #856404;
+            padding: 10px;
+            border-radius: 5px;
+            margin-bottom: 15px;
+        }
+        
+        .switching-detail {
+            margin: 10px 0;
+            padding: 10px;
+            background-color: #f9f9f9;
+            border-radius: 5px;
+        }
+        
+        .switching-item {
+            padding: 8px 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            border-left: 3px solid transparent;
+            margin: 2px 0;
+        }
+        
+        .switching-item.has-switch {
+            background-color: #ffebee;
+            border-left-color: #ff5722;
+        }
+        
+        .switching-arrow {
+            color: #ff5722;
+            font-weight: bold;
+            font-size: 18px;
+        }
+        
+        .no-switch {
+            color: #666;
+        }
+        
+        .switch-marker {
+            background-color: #ff5722;
+            color: white;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+        
+        .switching-detail h4 {
+            margin-bottom: 15px;
+            color: #333;
+        }
+        
+        .animal-number {
+            font-weight: bold;
+            color: #1976d2;
+            min-width: 100px;
+        }
+        
+        .shared-categories {
+            margin-left: 40px;
+            font-size: 12px;
+            color: #4caf50;
+            margin-top: 2px;
+        }
+        
+        .no-shared-categories {
+            margin-left: 40px;
+            font-size: 12px;
+            color: #f44336;
+            margin-top: 2px;
+        }
+        
+        /* 데이터베이스 관리 스타일 */
+        .database-management {
+            background-color: #f0f7ff;
+            border: 2px solid #1976d2;
+            padding-top: 30px;
+        }
+        
+        .db-controls {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .db-controls input[type="text"] {
+            width: 300px;
+            text-align: center;
+        }
+        
+        .btn-primary {
+            background-color: #1976d2;
+            color: white;
+            padding: 8px 16px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        
+        .btn-primary:hover {
+            background-color: #1565c0;
+        }
+        
+        .btn-success {
+            background-color: #4caf50;
+            color: white;
+            padding: 8px 16px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        
+        .btn-success:hover {
+            background-color: #45a049;
+        }
+        
+        .btn-secondary {
+            background-color: #757575;
+            color: white;
+            padding: 8px 16px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        
+        .btn-secondary:hover {
+            background-color: #616161;
+        }
+        
+        .btn-danger {
+            background-color: #f44336;
+            color: white;
+            padding: 6px 12px;
+            border: none;
+            border-radius: 3px;
+            cursor: pointer;
+            font-size: 12px;
+        }
+        
+        .btn-danger:hover {
+            background-color: #d32f2f;
+        }
+        
+        .btn-edit {
+            background-color: #ff9800;
+            color: white;
+            padding: 6px 12px;
+            border: none;
+            border-radius: 3px;
+            cursor: pointer;
+            font-size: 12px;
+            margin-right: 5px;
+        }
+        
+        .btn-edit:hover {
+            background-color: #f57c00;
+        }
+        
+        .animal-form {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .category-checkboxes {
+            display: grid;
+            gap: 15px;
+            margin: 20px 0;
+        }
+        
+        .category-checkboxes h4 {
+            margin: 10px 0 5px 0;
+            color: #555;
+            font-size: 16px;
+        }
+        
+        .category-checkboxes label {
+            display: inline-block;
+            margin-right: 15px;
+            margin-bottom: 5px;
+            cursor: pointer;
+        }
+        
+        .category-checkboxes input[type="checkbox"] {
+            margin-right: 5px;
+        }
+        
+        .form-buttons {
+            margin-top: 20px;
+            display: flex;
+            gap: 10px;
+        }
+        
+        .database-view {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-top: 20px;
+        }
+        
+        .db-stats {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-bottom: 20px;
+            padding: 15px;
+            background-color: #f5f5f5;
+            border-radius: 5px;
+            align-items: center;
+            justify-content: space-between;
+        }
+        
+        .db-stats-info {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            flex: 1;
+        }
+        
+        .db-stats span {
+            font-size: 14px;
+            color: #666;
+        }
+        
+        .db-stats strong {
+            color: #1976d2;
+            font-size: 16px;
+        }
+        
+        .animal-list {
+            max-height: 600px;
+            overflow-y: auto;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            padding: 10px;
+        }
+        
+        .animal-item {
+            padding: 10px;
+            margin-bottom: 8px;
+            background-color: #f9f9f9;
+            border-radius: 5px;
+            border: 1px solid #e0e0e0;
+        }
+        
+        .animal-item:hover {
+            background-color: #f0f0f0;
+        }
+        
+        .animal-info {
+            width: 100%;
+        }
+        
+        .animal-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 5px;
+        }
+        
+        .animal-name {
+            font-weight: bold;
+            font-size: 16px;
+            color: #333;
+        }
+        
+        .animal-categories {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 8px;
+            margin-top: 10px;
+            font-size: 12px;
+        }
+        
+        .category-check {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            padding: 4px 8px;
+            background-color: #f5f5f5;
+            border-radius: 4px;
+            border: 1px solid #e0e0e0;
+        }
+        
+        .category-check.checked {
+            background-color: #e3f2fd;
+            border-color: #90caf9;
+            font-weight: bold;
+        }
+        
+        .category-check input[type="checkbox"] {
+            width: auto;
+            margin: 0;
+            pointer-events: none;
+        }
+        
+        .search-highlight {
+            background-color: yellow;
+            font-weight: bold;
+        }
+        
+        /* 성별 토글 스타일 */
+        .gender-toggle {
+            display: flex;
+            gap: 10px;
+            width: 100%;
+        }
+        
+        .gender-toggle input[type="radio"] {
+            display: none;
+        }
+        
+        .gender-option {
+            flex: 1;
+            padding: 10px;
+            text-align: center;
+            background-color: #f5f5f5;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 16px;
+            font-weight: normal;
+        }
+        
+        .gender-toggle input[type="radio"]:checked + .gender-option {
+            background-color: #007bff;
+            color: white;
+            border-color: #007bff;
+            font-weight: bold;
+        }
+        
+        .gender-option:hover {
+            background-color: #e9ecef;
+        }
+        
+        .gender-toggle input[type="radio"]:checked + .gender-option:hover {
+            background-color: #0056b3;
+        }
+        
+        /* 점수 계산 상세 테이블 스타일 */
+        .detail-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        
+        .detail-table th,
+        .detail-table td {
+            border: 1px solid #e0e0e0;
+            padding: 12px;
+            text-align: left;
+        }
+        
+        .detail-table th {
+            background-color: #1976d2;
+            color: white;
+            font-weight: bold;
+            text-align: center;
+        }
+        
+        .detail-table tr:nth-child(even) {
+            background-color: #f5f5f5;
+        }
+        
+        .detail-table tr:hover {
+            background-color: #e3f2fd;
+        }
+        
+        .detail-table tbody tr {
+            transition: background-color 0.2s;
+        }
+        
+        .detail-table td.intrusion {
+            color: #f44336;
+            font-weight: bold;
+        }
+        
+        .detail-table td.perseveration {
+            color: #ff9800;
+            font-weight: bold;
+        }
+        
+        .detail-table td.valid {
+            color: #4caf50;
+        }
+        
+        .detail-table td.switch {
+            color: #2196f3;
+            font-weight: bold;
+        }
+        
+        /* 변형 명칭 관리 스타일 */
+        .variants-section {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #f8f9fa;
+            border-radius: 5px;
+            border: 1px solid #dee2e6;
+        }
+        
+        .variants-description {
+            font-size: 12px;
+            color: #666;
+            margin-bottom: 10px;
+            line-height: 1.4;
+        }
+        
+        .variant-input-group {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+        
+        .variant-input-group input {
+            flex: 1;
+        }
+        
+        .variants-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            min-height: 40px;
+            padding: 10px;
+            background-color: white;
+            border-radius: 5px;
+            border: 1px solid #ddd;
+        }
+        
+        .variant-tag {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 6px 12px;
+            background-color: #e3f2fd;
+            color: #1976d2;
+            border-radius: 15px;
+            font-size: 14px;
+            border: 1px solid #90caf9;
+        }
+        
+        .variant-remove {
+            cursor: pointer;
+            color: #d32f2f;
+            font-weight: bold;
+            font-size: 16px;
+            line-height: 1;
+        }
+        
+        .variant-remove:hover {
+            background-color: #d32f2f;
+            color: white;
+            border-radius: 50%;
+            width: 18px;
+            height: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="container" style="display: none;">
+        <h1>동물범주형유창성검사 채점기</h1>
+        
+        <div class="section">
+            <div class="info-grid">
+                <div class="form-group">
+                    <label for="subjectId">ID</label>
+                    <input type="text" id="subjectId" placeholder="피검자 ID" class="aligned-input" style="">
+                </div>
+                <div class="form-group">
+                    <label for="gender">성별</label>
+                    <div class="gender-toggle">
+                        <input type="radio" id="gender-male" name="gender" value="male" style="">
+                        <label for="gender-male" class="gender-option">남성</label>
+                        <input type="radio" id="gender-female" name="gender" value="female" style="">
+                        <label for="gender-female" class="gender-option">여성</label>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="age">연령</label>
+                    <input type="number" id="age" placeholder="연령" class="aligned-input" style="">
+                </div>
+                <div class="form-group">
+                    <label for="education">학력 (년)</label>
+                    <input type="number" id="education" placeholder="교육년수 입력" class="aligned-input" style="">
+                </div>
+            </div>
+        </div>
+        
+        <div class="section">
+            <div class="time-section">
+                <h3>0-15초 구간</h3>
+                <div class="input-group">
+                    <input type="text" id="input-0-15" placeholder="동물 이름 입력" onkeypress="handleKeyPress(event, '0-15')" style="">
+                    <button onclick="addResponse('0-15')">추가</button>
+                </div>
+                <div id="responses-0-15" class="responses"></div>
+            </div>
+            
+            <div class="time-section">
+                <h3>15-30초 구간</h3>
+                <div class="input-group">
+                    <input type="text" id="input-15-30" placeholder="동물 이름 입력" onkeypress="handleKeyPress(event, '15-30')" style="">
+                    <button onclick="addResponse('15-30')">추가</button>
+                </div>
+                <div id="responses-15-30" class="responses"></div>
+            </div>
+            
+            <div class="time-section">
+                <h3>30-45초 구간</h3>
+                <div class="input-group">
+                    <input type="text" id="input-30-45" placeholder="동물 이름 입력" onkeypress="handleKeyPress(event, '30-45')" style="">
+                    <button onclick="addResponse('30-45')">추가</button>
+                </div>
+                <div id="responses-30-45" class="responses"></div>
+            </div>
+            
+            <div class="time-section">
+                <h3>45-60초 구간</h3>
+                <div class="input-group">
+                    <input type="text" id="input-45-60" placeholder="동물 이름 입력" onkeypress="handleKeyPress(event, '45-60')" style="">
+                    <button onclick="addResponse('45-60')">추가</button>
+                </div>
+                <div id="responses-45-60" class="responses"></div>
+            </div>
+        </div>
+        
+        <div class="button-group">
+            <button class="calculate-btn" onclick="calculateScores()">점수 계산하기</button>
+            <button class="db-manage-btn" onclick="showDatabaseManagement()">동물 데이터베이스 관리</button>
+            <button class="csv-btn" onclick="showCSVUpload()">CSV 일괄 처리</button>
+        </div>
+    </div>
+    
+    <div id="results" class="results" style="display: none;">
+            <h2 style="text-align: center; color: #1565c0; font-size: 32px; margin-bottom: 30px; padding: 20px; background: linear-gradient(135deg, #e3f2fd 0%, #f3f4f6 100%); border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.1);">판독 결과</h2>
+            
+            <!-- 버튼들 -->
+            <div style="text-align: right; margin-bottom: 30px;">
+                <button onclick="showAnalysisDetails()" class="btn-primary" style="padding: 10px 25px; font-size: 14px; background: #17a2b8; color: white; border: none; border-radius: 8px; cursor: pointer; transition: all 0.3s ease; box-shadow: 0 2px 5px rgba(0,0,0,0.2); margin-right: 10px;">
+                    분석 과정 보기
+                </button>
+                <button onclick="backToInput()" class="btn-primary" style="padding: 10px 25px; font-size: 14px; background: #1976d2; color: white; border: none; border-radius: 8px; cursor: pointer; transition: all 0.3s ease; box-shadow: 0 2px 5px rgba(0,0,0,0.2);">
+                    입력 화면으로 돌아가기
+                </button>
+            </div>
+            
+            
+            <!-- 통합 결과 테이블 -->
+            <table class="score-table" style="width: 100%; max-width: 1200px; margin: 0 auto; table-layout: fixed;">
+                <colgroup>
+                    <col style="width: 15%;">
+                    <col style="width: 12.14%;">
+                    <col style="width: 12.14%;">
+                    <col style="width: 12.14%;">
+                    <col style="width: 12.14%;">
+                    <col style="width: 12.14%;">
+                    <col style="width: 12.14%;">
+                    <col style="width: 12.14%;">
+                </colgroup>
+                <tbody>
+                    <!-- 60초 반응 첫번째 행 -->
+                    <tr class="header-row">
+                        <th rowspan="4" style="vertical-align: middle; font-weight: bold; background-color: #e8f4f8;">60초 반응</th>
+                        <th>총점</th>
+                        <th>Z점수</th>
+                        <th>퍼센타일</th>
+                        <th>전반점수</th>
+                        <th>후반점수</th>
+                        <th>보속오류</th>
+                        <th>침투오류</th>
+                    </tr>
+                    <tr>
+                        <td id="totalScore" class="data-cell">0</td>
+                        <td id="totalZScore" class="data-cell">-</td>
+                        <td id="totalPercentile" class="data-cell">-</td>
+                        <td id="firstHalfScore" class="data-cell">0</td>
+                        <td id="secondHalfScore" class="data-cell">0</td>
+                        <td id="perseverationScore" class="data-cell">0</td>
+                        <td id="intrusionScore" class="data-cell">0</td>
+                    </tr>
+                    
+                    <!-- 60초 반응 두번째 행 -->
+                    <tr class="header-row">
+                        <th>범주수</th>
+                        <th>평균크기</th>
+                        <th>최대크기</th>
+                        <th>전환</th>
+                        <th>비효율전환</th>
+                        <th colspan="2">-</th>
+                    </tr>
+                    <tr>
+                        <td id="categoryScore" class="data-cell">0</td>
+                        <td id="avgClusterSize" class="data-cell">0</td>
+                        <td id="maxClusterSize" class="data-cell">0</td>
+                        <td id="switchingScore" class="data-cell">0</td>
+                        <td id="inefficientSwitchingScore" class="data-cell">0</td>
+                        <td colspan="2" class="data-cell">-</td>
+                    </tr>
+                    
+                    <!-- 전반 30초 결과 -->
+                    <tr class="header-row" style="border-top: 2px solid #ddd;">
+                        <th rowspan="2" style="vertical-align: middle; font-weight: bold; background-color: #e8f4f8;">전반 30초 반응</th>
+                        <th>범주수</th>
+                        <th>평균크기</th>
+                        <th>최대크기</th>
+                        <th>전환</th>
+                        <th>비효율전환</th>
+                        <th>보속오류</th>
+                        <th>침투오류</th>
+                    </tr>
+                    <tr>
+                        <td id="first30SecCategoryScore" class="data-cell">0</td>
+                        <td id="first30SecAvgClusterSize" class="data-cell">0</td>
+                        <td id="first30SecMaxClusterSize" class="data-cell">0</td>
+                        <td id="first30SecSwitchingScore" class="data-cell">0</td>
+                        <td id="first30SecInefficient" class="data-cell">0</td>
+                        <td id="first30SecPerseverationScore" class="data-cell">0</td>
+                        <td id="first30SecIntrusionScore" class="data-cell">0</td>
+                    </tr>
+                </tbody>
+            </table>
+            
+            <div id="normInfo" style="display: none;"></div>
+            
+            <div class="analysis-section" id="clusterAnalysisSection" style="display: none;">
+                <div id="clusterAnalysis">
+                    <p style="color: #666; text-align: center; padding: 20px;">
+                        점수 계산을 실행하면 분석 결과가 여기에 표시됩니다.
+                    </p>
+                </div>
+            </div>
+            
+            <!-- 임상적 해석 (표 아래 위치) -->
+            <div id="patternAnalysis" style="margin-top: 30px; padding: 20px; background: #f8f9fa; border-radius: 10px; border-left: 4px solid #1976d2;">
+                <p style="color: #666; text-align: center;">
+                    점수 계산을 실행하면 임상적 해석이 여기에 표시됩니다.
+                </p>
+            </div>
+            
+            
+        </div>
+        
+        <!-- 분석 과정 상세 보기 섹션 -->
+        <div id="analysisDetails" class="results" style="display: none;">
+            <h2 style="text-align: center; color: #1565c0; font-size: 32px; margin-bottom: 30px; padding: 20px; background: linear-gradient(135deg, #e3f2fd 0%, #f3f4f6 100%); border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.1);">분석 과정</h2>
+            
+            <!-- 돌아가기 버튼 -->
+            <div style="text-align: right; margin-bottom: 30px;">
+                <button onclick="backToResults()" class="btn-primary" style="padding: 10px 25px; font-size: 14px; background: #1976d2; color: white; border: none; border-radius: 8px; cursor: pointer; transition: all 0.3s ease; box-shadow: 0 2px 5px rgba(0,0,0,0.2);">
+                    결과로 돌아가기
+                </button>
+            </div>
+            
+            <!-- 분석 과정 내용이 여기에 표시됨 -->
+            <div id="analysisContent">
+                <!-- 동적으로 채워질 부분 -->
+            </div>
+        </div>
+        
+        <!-- 동물 데이터베이스 관리 섹션 -->
+        <div class="section database-management" style="display: block; margin-top: 120px;">
+            <div class="db-controls">
+                <label style="font-weight: bold; margin-right: 10px;">검색</label>
+                <input type="text" id="searchAnimal" placeholder="동물 검색..." onkeyup="searchAnimals()" style="">
+                <button onclick="closeDatabaseManagement()" class="btn-secondary">닫기</button>
+            </div>
+            
+            <!-- 동물 추가/수정 폼 -->
+            <div id="animalForm" style="display: none;" class="animal-form">
+                <h3 id="formTitle">새 동물 추가</h3>
+                <div class="form-group">
+                    <label>동물 이름:</label>
+                    <input type="text" id="animalName" required="" style="">
+                </div>
+                
+                <div class="category-checkboxes">
+                    <h4>생물학적 분류</h4>
+                    <label><input type="checkbox" id="cat_MAMMAL" style=""> 포유류</label>
+                    <label><input type="checkbox" id="cat_BIRD" style=""> 조류</label>
+                    <label><input type="checkbox" id="cat_REPTILE" style=""> 파충류</label>
+                    <label><input type="checkbox" id="cat_AMPHIBIAN" style=""> 양서류</label>
+                    <label><input type="checkbox" id="cat_FISH" style=""> 어류</label>
+                    <label><input type="checkbox" id="cat_INSECT" style=""> 곤충</label>
+                    <label><input type="checkbox" id="cat_MOLLUSK" style=""> 연체동물</label>
+                    <label><input type="checkbox" id="cat_CRUSTACEAN" style=""> 갑각류</label>
+                    
+                    <h4>서식지 분류</h4>
+                    <label><input type="checkbox" id="cat_MARINE" style=""> 해양생물</label>
+                    <label><input type="checkbox" id="cat_FRESHWATER" style=""> 담수생물</label>
+                    
+                    <h4>인간과의 관계</h4>
+                    <label><input type="checkbox" id="cat_DOMESTIC" style=""> 가축</label>
+                    <label><input type="checkbox" id="cat_PET" style=""> 애완동물</label>
+                    <label><input type="checkbox" id="cat_WILD" style=""> 야생동물</label>
+                    
+                    <h4>문화적 분류</h4>
+                    <label><input type="checkbox" id="cat_ZODIAC" style=""> 12간지</label>
+                    <label><input type="checkbox" id="cat_MYTHOLOGY" style=""> 신화/상상의 동물</label>
+                    <label><input type="checkbox" id="cat_PREHISTORIC" style=""> 선사시대 동물</label>
+                </div>
+                
+                <!-- 변형 명칭 관리 섹션 -->
+                <div class="variants-section">
+                    <h4>변형 명칭 관리</h4>
+                    <p class="variants-description">이 동물의 다른 표현들 (성별, 연령, 사투리, 외래어 표기 변형 등)을 관리합니다.<br>
+                    예: 개 → 강아지, 멍멍이, 암캐, 수캐<br>
+                    예: 하이에나 → 하이애나 (외래어 표기 변형)</p>
+                    
+                    <div class="variant-input-group">
+                        <input type="text" id="variantInput" placeholder="변형 명칭 입력 (예: 강아지, 멍멍이)" style="">
+                        <button type="button" onclick="addVariant()" class="btn-secondary">추가</button>
+                    </div>
+                    
+                    <div id="variantsList" class="variants-list">
+                        <!-- 변형 명칭들이 여기에 표시됩니다 -->
+                    </div>
+                </div>
+                
+                <div class="form-buttons">
+                    <button onclick="saveAnimal()" class="btn-primary">저장</button>
+                    <button onclick="cancelAnimalForm()" class="btn-secondary">취소</button>
+                </div>
+            </div>
+            
+            <!-- 데이터베이스 목록 -->
+            <div id="databaseView" class="database-view">
+                <div class="db-stats">
+                    <div class="db-stats-info">
+                        <span>총 동물 수: <strong id="totalAnimals">0</strong></span>
+                        <span>포유류: <strong id="mammalCount">0</strong></span>
+                        <span>조류: <strong id="birdCount">0</strong></span>
+                        <span>파충류: <strong id="reptileCount">0</strong></span>
+                        <span>양서류: <strong id="amphibianCount">0</strong></span>
+                        <span>어류: <strong id="fishCount">0</strong></span>
+                        <span>곤충: <strong id="insectCount">0</strong></span>
+                        <span>연체동물: <strong id="molluskCount">0</strong></span>
+                        <span>갑각류: <strong id="crustaceanCount">0</strong></span>
+                    </div>
+                    <button onclick="showAddAnimalForm()" class="btn-success">새 동물 추가</button>
+                    <button onclick="showVariantsManager()" class="btn-primary" style="margin-left: 10px;">변형 명칭 사전 관리</button>
+                </div>
+                
+                <div id="animalList" class="animal-list"></div>
+            </div>
+        </div>
+        
+        <!-- 변형 명칭 사전 관리 섹션 -->
+        <div class="section variants-management" style="display: none; margin-top: 120px;">
+            <div class="db-controls">
+                <h2 style="text-align: center; margin-bottom: 20px;">동물 변형 명칭 사전 관리</h2>
+                <button onclick="closeVariantsManager()" class="btn-secondary" style="float: right;">닫기</button>
+                <div style="clear: both;"></div>
+            </div>
+            
+            <!-- 신규 변형 명칭 등록 -->
+            <div class="animal-form" style="background: #e3f2fd; border: 2px solid #1976d2; margin-bottom: 20px;">
+                <h3 style="color: #1565c0; margin-bottom: 20px;">새 동물 변형 명칭 등록</h3>
+                <div style="display: flex; gap: 15px; align-items: flex-start;">
+                    <div style="flex: 1;">
+                        <label style="font-weight: bold; display: block; margin-bottom: 5px;">동물 데이터베이스에서 검색:</label>
+                        <input type="text" id="searchAnimalForVariant" placeholder="동물 이름 입력 (예: 하이에나)" onkeyup="searchAnimalsForVariant()" style="width: 100%;">
+                        <div id="animalSearchResults" style="max-height: 200px; overflow-y: auto; background: white; 
+                             border: 1px solid #ddd; margin-top: 5px; display: none;">
+                            <!-- 검색 결과가 여기에 표시됩니다 -->
+                        </div>
+                    </div>
+                    <div style="flex: 1;">
+                        <label style="font-weight: bold; display: block; margin-bottom: 5px;">선택된 동물:</label>
+                        <div id="selectedAnimalInfo" style="padding: 10px; background: white; border: 1px solid #ddd; 
+                             min-height: 50px; display: flex; align-items: center; justify-content: center; color: #666;">
+                            동물을 선택해주세요
+                        </div>
+                    </div>
+                </div>
+                <button onclick="createNewVariantEntry()" class="btn-success" style="margin-top: 15px;" disabled="" id="createVariantBtn">새 변형 명칭 등록 시작</button>
+            </div>
+            
+            <!-- 기존 변형 명칭 목록 및 검색 -->
+            <div class="db-controls" style="margin-top: 30px;">
+                <label style="font-weight: bold; margin-right: 10px;">기존 변형 명칭 검색</label>
+                <input type="text" id="searchVariant" placeholder="동물 명칭 검색..." onkeyup="searchVariantAnimals()" style="">
+            </div>
+            
+            <!-- 변형 명칭 편집 폼 -->
+            <div id="variantEditForm" style="display: none;" class="animal-form">
+                <h3 id="variantFormTitle">변형 명칭 편집</h3>
+                <p class="variants-description">기본 동물: <strong id="variantBaseAnimal"></strong></p>
+                
+                <div class="variant-input-group">
+                    <input type="text" id="newVariantInput" placeholder="새 변형 명칭 입력 (예: 하이애나, 강아지)" style="">
+                    <button type="button" onclick="addNewVariant()" class="btn-secondary">추가</button>
+                </div>
+                
+                <div id="variantEditList" class="variants-list" style="margin: 20px 0; max-height: 300px; overflow-y: auto;">
+                    <!-- 변형 명칭들이 여기에 표시됩니다 -->
+                </div>
+                
+                <div class="form-buttons">
+                    <button onclick="saveVariantChanges()" class="btn-primary">저장</button>
+                    <button onclick="cancelVariantEdit()" class="btn-secondary">취소</button>
+                </div>
+            </div>
+            
+            <!-- 변형 명칭 사전 목록 -->
+            <div id="variantsView" class="database-view">
+                <div class="db-stats">
+                    <div class="db-stats-info">
+                        <span>총 동물 수: <strong id="totalVariantAnimals">0</strong></span>
+                        <span>총 변형 명칭 수: <strong id="totalVariants">0</strong></span>
+                    </div>
+                    <div style="display: flex; gap: 10px;">
+                        <button onclick="exportVariants()" class="btn-primary" title="현재 변형 명칭 데이터를 파일로 저장합니다">변형 명칭 내보내기</button>
+                        <button onclick="importVariants()" class="btn-secondary" title="저장된 변형 명칭 파일을 불러옵니다">변형 명칭 가져오기</button>
+                        <button onclick="showVariantsHelp()" class="btn-secondary" style="background: #9e9e9e;">사용법</button>
+                    </div>
+                </div>
+                
+                <div id="variantAnimalList" class="animal-list"></div>
+            </div>
+        </div>
+        
+        <!-- CSV 일괄 처리 섹션 -->
+        <div class="csv-upload-section" id="csvUploadSection">
+            <h2>CSV 일괄 처리</h2>
+            
+            <div class="csv-format-info">
+                <h3>CSV 파일 형식</h3>
+                <p>다음 형식으로 CSV 파일을 준비해주세요:</p>
+                <div class="csv-format-example">
+ID,성별,연령,학력,0-15초,15-30초,30-45초,45-60초
+001,남성,65,12,개,고양이,소,말,돼지,닭,호랑이,사자,뱀,거북이
+002,여성,72,6,개,소,말,닭,오리,개구리,토끼,쥐
+003,남성,58,16,사자,호랑이,표범,치타,고양이,개,늑대,여우,너구리,곰,판다
+                </div>
+                <p><strong>주의사항:</strong></p>
+                <ul>
+                    <li>첫 번째 줄은 반드시 헤더로 위와 같이 작성</li>
+                    <li>각 시간대별 동물은 쉼표(,)로 구분</li>
+                    <li>성별은 "남성" 또는 "여성"으로 입력</li>
+                    <li>UTF-8 인코딩으로 저장</li>
+                </ul>
+            </div>
+            
+            <div class="csv-upload-area">
+                <input type="file" id="csvFile" accept=".csv" style="margin: 20px 0px;">
+                <button onclick="processCSV()" class="btn-primary">CSV 처리하기</button>
+                <button onclick="downloadCSVTemplate()" class="btn-secondary">템플릿 다운로드</button>
+                <button onclick="hideCSVUpload()" class="btn-secondary">닫기</button>
+            </div>
+            
+            <div id="csvResults" class="csv-results"></div>
+        </div>
+    
+    
+    <!-- 외부 동물 데이터베이스 참조 -->
+    <script src="animal-database.js"></script>
+    <script src="animal-variants.js"></script>
+    <script src="normative_data.js"></script>
+    
+    <script>
+        // Z점수를 퍼센타일로 변환하는 함수 (표준정규분포 누적분포함수)
+        function zScoreToPercentile(zScore) {
+            // 근사식을 사용한 표준정규분포 누적분포함수
+            const t = 1 / (1 + 0.2316419 * Math.abs(zScore));
+            const d = 0.3989423 * Math.exp(-zScore * zScore / 2);
+            const probability = d * t * (0.3193815 + t * (-0.3565638 + t * (1.781478 + t * (-1.821256 + t * 1.330274))));
+            
+            if (zScore > 0) {
+                return (1 - probability) * 100;
+            } else {
+                return probability * 100;
+            }
+        }
+        
+        // 정상규준을 기반으로 Z점수와 퍼센타일 계산
+        function calculateNormativeScores(totalScore, age, education) {
+            // getAgeGroup과 getEducationGroup 함수가 로드되었는지 확인
+            if (typeof getAgeGroup !== 'function' || typeof getEducationGroup !== 'function') {
+                console.error('정상규준 함수가 로드되지 않았습니다.');
+                return null;
+            }
+            
+            const ageGroup = getAgeGroup(age);
+            const eduGroup = getEducationGroup(education);
+            
+            console.log(`Age: ${age} → Group: ${ageGroup}`);
+            console.log(`Education: ${education} → Group: ${eduGroup}`);
+            
+            // 해당 규준 데이터 찾기
+            if (typeof NORMATIVE_DATA === 'undefined') {
+                console.error('NORMATIVE_DATA가 정의되지 않았습니다.');
+                return null;
+            }
+            
+            const normData = NORMATIVE_DATA[ageGroup]?.[eduGroup];
+            
+            if (!normData) {
+                console.error('규준 데이터를 찾을 수 없습니다:', ageGroup, eduGroup);
+                return null;
+            }
+            
+            // Z점수 계산
+            const zScore = (totalScore - normData.mean) / normData.sd;
+            
+            // 퍼센타일 계산
+            const percentile = zScoreToPercentile(zScore);
+            
+            // 5퍼센타일 이하 여부 판단
+            const isBelow5Percentile = totalScore <= normData.cutoff_5_percentile;
+            
+            return {
+                mean: normData.mean,
+                sd: normData.sd,
+                zScore: zScore,
+                percentile: percentile,
+                cutoff5: normData.cutoff_5_percentile,
+                isBelow5Percentile: isBelow5Percentile
+            };
+        }
+        
+        // 전역 변수로 반응 저장
+        const responses = {
+            '0-15': [],
+            '15-30': [],
+            '30-45': [],
+            '45-60': []
+        };
+        
+        // 범주 정의 (수정된 버전)
+        const CATEGORIES = {
+            // 생물학적 분류
+            MAMMAL: '포유류',
+            BIRD: '조류',
+            REPTILE: '파충류',
+            AMPHIBIAN: '양서류',
+            FISH: '어류',
+            INSECT: '곤충',
+            MOLLUSK: '연체동물',
+            CRUSTACEAN: '갑각류',
+            
+            // 서식지별 분류
+            MARINE: '해양동물',
+            FRESHWATER: '담수동물',
+            
+            // 인간과의 관계
+            DOMESTIC: '가축',
+            PET: '애완동물',
+            WILD: '야생동물',
+            
+            // 문화적 분류
+            ZODIAC: '12간지',
+            MYTHOLOGY: '신화/상상의 동물',
+            PREHISTORIC: '선사시대 동물'
+        };
+        
+        // 동물 데이터베이스는 외부 파일(animal-database.js)에서 로드됨
+        // 특정 동물의 모든 범주 가져오기
+        function getAnimalCategories(animalName) {
+            // 변형 명칭을 기본 명칭으로 정규화
+            const normalizedName = (typeof normalizeAnimalName === 'function') ? normalizeAnimalName(animalName) : animalName;
+            const animalData = ANIMAL_CATEGORIES[normalizedName || animalName];
+            if (!animalData) return [];
+            
+            const categories = [];
+            for (const [cat, value] of Object.entries(animalData)) {
+                if (value === true && CATEGORIES[cat]) {
+                    categories.push({
+                        code: cat,
+                        name: CATEGORIES[cat]
+                    });
+                }
+            }
+            return categories;
+        }
+        
+        // 특정 동물의 주요 생물학적 범주 가져오기 (클러스터 분석용)
+        function getPrimaryBiologicalCategory(animalName) {
+            // 변형 명칭을 기본 명칭으로 정규화
+            const normalizedName = (typeof normalizeAnimalName === 'function') ? normalizeAnimalName(animalName) : animalName;
+            const animalData = ANIMAL_CATEGORIES[normalizedName || animalName];
+            if (!animalData) return '기타';
+            
+            // 생물학적 분류 우선순위
+            const biologicalCategories = ['MAMMAL', 'BIRD', 'REPTILE', 'AMPHIBIAN', 'FISH', 'INSECT', 'MOLLUSK', 'CRUSTACEAN'];
+            
+            for (const bioCategory of biologicalCategories) {
+                if (animalData[bioCategory] === true) {
+                    return CATEGORIES[bioCategory];
+                }
+            }
+            
+            // 신화동물인 경우
+            if (animalData['MYTHOLOGY'] === true) {
+                return CATEGORIES['MYTHOLOGY'];
+            }
+            
+            return '기타';
+        }
+        
+        // 공통 범주 기반 전환 분석 알고리즘 (전면 재작성)
+        function analyzeTransitionsAndClusters(responses) {
+            console.log('=== 전환 분석 시작 ===');
+            console.log('입력된 동물들:', responses.map(r => r.normalizedResponse));
+            
+            if (responses.length === 0) return { transitions: [], clusters: [], switchingScore: 0, inefficientSwitchingScore: 0 };
+            
+            // 중복 제거하여 unique한 동물만 남기되, 순서는 첫 출현 순서 유지
+            const seenAnimals = new Set();
+            const uniqueResponses = [];
+            
+            for (const response of responses) {
+                if (!seenAnimals.has(response.normalizedResponse)) {
+                    seenAnimals.add(response.normalizedResponse);
+                    uniqueResponses.push(response);
+                }
+            }
+            
+            console.log('중복 제거 후 동물들:', uniqueResponses.map(r => r.normalizedResponse));
+            
+            // 각 동물의 범주 정보를 미리 준비
+            const animalData = [];
+            for (const response of uniqueResponses) {
+                const originalAnimal = response.normalizedResponse;
+                const normalizedAnimal = (typeof normalizeAnimalName === 'function') ? normalizeAnimalName(originalAnimal) : originalAnimal;
+                const animal = normalizedAnimal || originalAnimal;
+                const categories = [];
+                const categoryData = ANIMAL_CATEGORIES[animal] || {};
+                
+                for (const [cat, value] of Object.entries(categoryData)) {
+                    if (value === true) {
+                        categories.push(cat);
+                    }
+                }
+                
+                animalData.push({
+                    name: animal,
+                    categories: categories,
+                    originalName: originalAnimal
+                });
+            }
+            
+            // 클러스터링 및 전환 분석
+            const clusters = [];
+            const transitions = [];
+            let switchingScore = 0;
+            let inefficientSwitchingScore = 0;
+            
+            let currentClusterStart = 0;
+            let currentClusterCategories = [...animalData[0].categories]; // 첫 동물의 모든 범주로 시작
+            
+            console.log(`\n첫 동물: ${animalData[0].name}, 범주: ${currentClusterCategories.map(c => CATEGORIES[c] || c)}`);
+            
+            for (let i = 1; i < animalData.length; i++) {
+                const currentAnimal = animalData[i];
+                console.log(`\n${i+1}번째 동물: ${currentAnimal.name}`);
+                console.log(`  범주: ${currentAnimal.categories.map(c => CATEGORIES[c] || c)}`);
+                
+                // 현재 클러스터의 공통 범주와 겹치는 범주가 있는지 확인
+                const overlappingCategories = currentAnimal.categories.filter(cat => 
+                    currentClusterCategories.includes(cat)
+                );
+                
+                console.log(`  현재 클러스터 공통범주: ${currentClusterCategories.map(c => CATEGORIES[c] || c)}`);
+                console.log(`  겹치는 범주: ${overlappingCategories.map(c => CATEGORIES[c] || c)}`);
+                
+                if (overlappingCategories.length > 0) {
+                    // 겹치는 범주가 있으면 같은 클러스터에 속함
+                    // 공통 범주를 겹치는 범주로 업데이트
+                    currentClusterCategories = overlappingCategories;
+                    console.log(`  → 같은 클러스터 유지, 공통범주 업데이트: ${currentClusterCategories.map(c => CATEGORIES[c] || c)}`);
+                } else {
+                    // 겹치는 범주가 없으면 전환 발생
+                    console.log(`  → 전환 발생!`);
+                    
+                    // 이전 클러스터 저장
+                    const clusterSize = i - currentClusterStart;
+                    const clusterAnimals = animalData.slice(currentClusterStart, i).map(a => a.name);
+                    
+                    // 클러스터의 최종 공통 범주 결정 (최대 크기를 만드는 범주)
+                    const bestCategory = findBestCategoryForCluster(animalData.slice(currentClusterStart, i));
+                    
+                    clusters.push({
+                        animals: clusterAnimals,
+                        size: clusterSize,
+                        commonCategories: bestCategory.categories,
+                        startIndex: currentClusterStart,
+                        endIndex: i - 1
+                    });
+                    
+                    console.log(`  이전 클러스터: ${clusterAnimals.join(', ')} (크기: ${clusterSize}, 범주: ${bestCategory.categories.map(c => CATEGORIES[c] || c)})`);
+                    
+                    // 전환 정보 추가
+                    transitions.push({
+                        index: i,
+                        from: animalData[i-1].name,
+                        to: currentAnimal.name,
+                        fromCategories: animalData[i-1].categories,
+                        toCategories: currentAnimal.categories
+                    });
+                    switchingScore++;
+                    
+                    // 크기 1인 클러스터에서 전환이면 비효율 전환
+                    if (clusterSize === 1) {
+                        inefficientSwitchingScore++;
+                        console.log(`  → 비효율 전환! (크기 1인 클러스터에서 전환)`);
+                    }
+                    
+                    // 새로운 클러스터 시작
+                    currentClusterStart = i;
+                    currentClusterCategories = [...currentAnimal.categories];
+                }
+            }
+            
+            // 마지막 클러스터 저장
+            if (animalData.length > 0) {
+                const lastClusterSize = animalData.length - currentClusterStart;
+                const lastClusterAnimals = animalData.slice(currentClusterStart).map(a => a.name);
+                const bestLastCategory = findBestCategoryForCluster(animalData.slice(currentClusterStart));
+                
+                clusters.push({
+                    animals: lastClusterAnimals,
+                    size: lastClusterSize,
+                    commonCategories: bestLastCategory.categories,
+                    startIndex: currentClusterStart,
+                    endIndex: animalData.length - 1
+                });
+                
+                console.log(`\n마지막 클러스터: ${lastClusterAnimals.join(', ')} (크기: ${lastClusterSize}, 범주: ${bestLastCategory.categories.map(c => CATEGORIES[c] || c)})`);
+            }
+            
+            console.log('\n=== 전환 분석 결과 ===');
+            console.log(`총 전환 횟수: ${switchingScore}`);
+            console.log(`비효율전환 횟수: ${inefficientSwitchingScore}`);
+            console.log(`클러스터 수: ${clusters.length}`);
+            console.log('클러스터 구성:');
+            clusters.forEach((cluster, idx) => {
+                const categoryNames = cluster.commonCategories.map(cat => CATEGORIES[cat] || cat).join(', ');
+                console.log(`  클러스터 ${idx + 1}: ${cluster.animals.join(', ')} (크기: ${cluster.size}, 공통범주: ${categoryNames})`);
+            });
+            
+            return { transitions, clusters, switchingScore, inefficientSwitchingScore };
+        }
+        
+        // 클러스터에 대해 최적의 공통 범주를 찾는 함수
+        function findBestCategoryForCluster(animals) {
+            if (animals.length === 0) return { categories: [], count: 0 };
+            if (animals.length === 1) return { categories: animals[0].categories, count: 1 };
+            
+            // 모든 가능한 범주 조합을 찾아서 가장 많은 동물을 포함하는 범주 선택
+            const allCategories = new Set();
+            animals.forEach(animal => {
+                animal.categories.forEach(cat => allCategories.add(cat));
+            });
+            
+            let bestCategories = [];
+            let bestCount = 0;
+            
+            // 각 범주별로 몇 개의 동물이 속하는지 확인
+            for (const category of allCategories) {
+                const count = animals.filter(animal => 
+                    animal.categories.includes(category)
+                ).length;
+                
+                if (count > bestCount) {
+                    bestCount = count;
+                    bestCategories = [category];
+                }
+            }
+            
+            // 여러 범주의 교집합도 확인 (2개 범주의 교집합만)
+            const categoriesArray = Array.from(allCategories);
+            for (let i = 0; i < categoriesArray.length; i++) {
+                for (let j = i + 1; j < categoriesArray.length; j++) {
+                    const cat1 = categoriesArray[i];
+                    const cat2 = categoriesArray[j];
+                    
+                    const count = animals.filter(animal => 
+                        animal.categories.includes(cat1) && animal.categories.includes(cat2)
+                    ).length;
+                    
+                    if (count > bestCount) {
+                        bestCount = count;
+                        bestCategories = [cat1, cat2];
+                    }
+                }
+            }
+            
+            return { categories: bestCategories, count: bestCount };
+        }
+        
+        // 동물들의 최적 공통 범주 찾기 (가장 많은 동물을 포함하는 범주 조합)
+        function findOptimalCommonCategories(animals) {
+            if (animals.length <= 1) return animals[0]?.categories || [];
+            
+            // 모든 범주 수집
+            const allCategories = new Set();
+            animals.forEach(animal => {
+                animal.categories.forEach(cat => allCategories.add(cat));
+            });
+            
+            // 각 범주별로 몇 개의 동물이 속하는지 계산
+            const categoryAnimalCount = {};
+            allCategories.forEach(cat => {
+                categoryAnimalCount[cat] = animals.filter(
+                    animal => animal.categories.includes(cat)
+                ).length;
+            });
+            
+            // 모든 동물이 공유하는 범주들 찾기
+            const sharedByAll = [];
+            for (const cat of allCategories) {
+                if (categoryAnimalCount[cat] === animals.length) {
+                    sharedByAll.push(cat);
+                }
+            }
+            
+            // 모든 동물이 공유하는 범주가 있으면 그것을 반환
+            if (sharedByAll.length > 0) {
+                return sharedByAll;
+            }
+            
+            // 그렇지 않으면 가장 많은 동물이 공유하는 범주들 반환
+            const maxCount = Math.max(...Object.values(categoryAnimalCount));
+            const optimalCategories = [];
+            for (const [cat, count] of Object.entries(categoryAnimalCount)) {
+                if (count === maxCount && count > 1) {
+                    optimalCategories.push(cat);
+                }
+            }
+            
+            return optimalCategories;
+        }
+        
+        function handleKeyPress(event, timeRange) {
+            if (event.key === 'Enter') {
+                addResponse(timeRange);
+            }
+        }
+        
+        function addResponse(timeRange) {
+            const input = document.getElementById(`input-${timeRange}`);
+            const value = input.value.trim();
+            
+            if (value) {
+                // 질문 패턴 감지 (물음표가 있거나 "~도 되요?", "~도 돼요?" 등의 패턴)
+                const isQuestion = value.includes('?') || 
+                                 /도\s*(되요|돼요|되나요|되나|됩니까|되니|되냐)/i.test(value) ||
+                                 /맞아요|맞나요|맞죠|맞습니까/i.test(value) ||
+                                 /할\s*수\s*있(어요|나요|습니까)/i.test(value) ||
+                                 /가능한가요|가능해요|가능합니까/i.test(value);
+                
+                if (isQuestion) {
+                    // 질문에서 동물 이름 추출 시도
+                    let extractedAnimal = value.replace(/[?？]/g, '') // 물음표 제거
+                        .replace(/도\s*(되요|돼요|되나요|되나|됩니까|되니|되냐).*/i, '') // 질문 부분 제거
+                        .replace(/.*?(맞아요|맞나요|맞죠|맞습니까).*/i, '')
+                        .replace(/.*?할\s*수\s*있(어요|나요|습니까).*/i, '')
+                        .replace(/.*?(가능한가요|가능해요|가능합니까).*/i, '')
+                        .trim();
+                    
+                    // 질문 표시를 위한 특별한 마커 추가
+                    responses[timeRange].push(`[질문] ${value}`);
+                    console.log(`질문 감지됨: "${value}" (동물: "${extractedAnimal}"는 정반응으로 처리하지 않음)`);
+                } else {
+                    // 일반 반응
+                    responses[timeRange].push(value);
+                }
+                
+                input.value = '';
+                displayResponses(timeRange);
+            }
+        }
+        
+        function removeResponse(timeRange, index) {
+            responses[timeRange].splice(index, 1);
+            displayResponses(timeRange);
+        }
+        
+        function displayResponses(timeRange) {
+            const container = document.getElementById(`responses-${timeRange}`);
+            container.innerHTML = responses[timeRange]
+                .map((response, index) => {
+                    const isQuestion = response.startsWith('[질문]');
+                    const displayText = isQuestion ? response.substring(5) : response;
+                    const className = isQuestion ? 'response-tag question-tag' : 'response-tag';
+                    
+                    return `<span class="${className}" title="${isQuestion ? '질문은 정반응으로 처리되지 않습니다' : ''}">
+                        ${displayText}${isQuestion ? ' ❓' : ''}
+                        <span class="remove" onclick="removeResponse('${timeRange}', ${index})">×</span>
+                    </span>`;
+                }).join('');
+        }
+        
+        function calculateScores() {
+            console.log('calculateScores 함수 시작');
+            
+            try {
+                // 정상규준 점수를 위한 변수 선언
+                let normScores = null;
+                
+                // 모든 반응을 순서대로 정리
+                const allResponses = [];
+                let order = 1;
+            
+            ['0-15', '15-30', '30-45', '45-60'].forEach(range => {
+                console.log(`Processing range ${range}:`, responses[range]);
+                responses[range].forEach(response => {
+                    // 질문으로 표시된 항목은 건너뛰기
+                    if (response.startsWith('[질문]')) {
+                        console.log(`질문 항목 제외: ${response}`);
+                        return;
+                    }
+                    
+                    // 변형 명칭을 기본 명칭으로 정규화
+                    const trimmed = response.trim();
+                    const normalized = (typeof normalizeAnimalName === 'function') ? normalizeAnimalName(trimmed) : null;
+                    
+                    // normalized가 null이면 데이터베이스에 없는 단어
+                    // ANIMAL_CATEGORIES에서 직접 확인
+                    const finalNormalized = normalized || (ANIMAL_CATEGORIES[trimmed] ? trimmed : null);
+                    
+                    allResponses.push({
+                        response: response,
+                        normalizedResponse: finalNormalized,
+                        originalResponse: trimmed,
+                        order,
+                        timeRange: range
+                    });
+                    order++;
+                });
+            });
+            
+            if (allResponses.length === 0) {
+                alert('반응을 입력해주세요.');
+                return;
+            }
+            
+            // 1. Total Score (중복 제외, 침투 반응 제외)
+            const validResponses = allResponses.filter(r => r.normalizedResponse !== null);
+            const uniqueResponses = [...new Set(validResponses.map(r => r.normalizedResponse))];
+            const totalScore = uniqueResponses.length;
+            
+            // 2. First Half Score (침투 제외, 중복 제외)
+            const firstHalfResponses = allResponses.filter(r => 
+                (r.timeRange === '0-15' || r.timeRange === '15-30') && r.normalizedResponse !== null
+            );
+            const firstHalfScore = new Set(firstHalfResponses.map(r => r.normalizedResponse)).size;
+            
+            // 3. Second Half Score (침투 제외, 중복 제외)
+            const secondHalfResponses = allResponses.filter(r => 
+                (r.timeRange === '30-45' || r.timeRange === '45-60') && r.normalizedResponse !== null
+            );
+            const secondHalfScore = new Set(secondHalfResponses.map(r => r.normalizedResponse)).size;
+            
+            // 4. Perseveration Score (침투 반응 제외)
+            const responseCount = {};
+            validResponses.forEach(r => {
+                responseCount[r.normalizedResponse] = (responseCount[r.normalizedResponse] || 0) + 1;
+            });
+            const perseverationScore = Object.values(responseCount)
+                .filter(count => count > 1)
+                .reduce((sum, count) => sum + (count - 1), 0);
+            
+            // 5. Intrusion Score (데이터베이스에 없는 동물)
+            let intrusionScore = 0;
+            const intrusions = [];
+            allResponses.forEach(response => {
+                if (response.normalizedResponse === null) {
+                    intrusionScore++;
+                    if (!intrusions.includes(response.response)) {
+                        intrusions.push(response.response);
+                    }
+                }
+            });
+            
+            // 6. 공통 범주 기반 전환 분석 (침투 반응 제외)
+            console.log('analyzeTransitionsAndClusters 호출 전, validResponses:', validResponses);
+            const { transitions, clusters, switchingScore, inefficientSwitchingScore } = analyzeTransitionsAndClusters(validResponses);
+            console.log('analyzeTransitionsAndClusters 결과:', { transitions, clusters, switchingScore, inefficientSwitchingScore });
+            
+            // 7. 범주점수 (각 클러스터마다 1개의 대표 범주만 카운트, 중복 제외)
+            console.log('\n=== 범주 점수 계산 ===');
+            const usedCategories = new Set();
+            clusters.forEach((cluster, idx) => {
+                console.log(`\n클러스터 ${idx + 1} (${cluster.animals.join(', ')}):`);
+                console.log('  공통 범주:', cluster.commonCategories.map(cat => CATEGORIES[cat] || cat));
+                
+                // 각 클러스터의 대표 범주 결정 (가장 많이 공유된 범주 선택)
+                if (cluster.commonCategories.length > 0) {
+                    // 공통 범주 중 첫 번째를 대표로 선택
+                    const representativeCategory = cluster.commonCategories[0];
+                    console.log(`  → 대표 범주로 '${CATEGORIES[representativeCategory]}' 선택`);
+                    usedCategories.add(representativeCategory);
+                } else {
+                    // 공통 범주가 없으면 첫 번째 동물의 주요 범주 선택
+                    const firstAnimalCategories = [];
+                    const firstAnimalData = ANIMAL_CATEGORIES[cluster.animals[0]] || {};
+                    
+                    // 생물학적 분류 우선
+                    const biologicalCategories = ['MAMMAL', 'BIRD', 'REPTILE', 'AMPHIBIAN', 'FISH', 'INSECT', 'MOLLUSK', 'CRUSTACEAN'];
+                    for (const bioCategory of biologicalCategories) {
+                        if (firstAnimalData[bioCategory] === true) {
+                            console.log(`  → 대표 범주로 '${CATEGORIES[bioCategory]}' 선택 (첫 동물의 생물학적 분류)`);
+                            usedCategories.add(bioCategory);
+                            break;
+                        }
+                    }
+                }
+            });
+            const categoryScore = usedCategories.size;
+            console.log('\n사용된 범주들:', Array.from(usedCategories).map(cat => CATEGORIES[cat] || cat));
+            console.log(`총 범주 점수: ${categoryScore}`);
+            
+            // 8. 클러스터 분석
+            const clusterSizes = clusters.map(c => c.size);
+            const avgClusterSize = clusterSizes.length > 0 
+                ? clusterSizes.reduce((sum, size) => sum + size, 0) / clusterSizes.length
+                : 0;
+            const maxClusterSize = Math.max(...clusterSizes, 0);
+            
+            // 9. 비효율전환점수는 이미 analyzeTransitionsAndClusters에서 계산됨
+            // (크기 1인 클러스터에서 전환이 발생한 횟수)
+            
+            // 10. 30초 반응 기반 점수 계산
+            const first30SecResponses = allResponses.filter(r => 
+                (r.timeRange === '0-15' || r.timeRange === '15-30')
+            );
+            
+            // 30초 반응 중 정반응만 필터
+            const first30SecValidResponses = first30SecResponses.filter(r => r.normalizedResponse !== null);
+            
+            // 30초 보속 점수
+            const first30SecResponseCount = {};
+            first30SecValidResponses.forEach(r => {
+                first30SecResponseCount[r.normalizedResponse] = (first30SecResponseCount[r.normalizedResponse] || 0) + 1;
+            });
+            const first30SecPerseverationScore = Object.values(first30SecResponseCount)
+                .filter(count => count > 1)
+                .reduce((sum, count) => sum + (count - 1), 0);
+            
+            // 30초 침투 점수
+            const first30SecIntrusionScore = first30SecResponses.filter(r => r.normalizedResponse === null).length;
+            
+            // 30초 전환 분석
+            const { transitions: first30SecTransitions, clusters: first30SecClusters, switchingScore: first30SecSwitchingScore, inefficientSwitchingScore: first30SecInefficient } = 
+                analyzeTransitionsAndClusters(first30SecValidResponses);
+            
+            // 30초 범주 점수
+            const first30SecUsedCategories = new Set();
+            first30SecClusters.forEach(cluster => {
+                if (cluster.commonCategories.length > 0) {
+                    first30SecUsedCategories.add(cluster.commonCategories[0]);
+                }
+            });
+            const first30SecCategoryScore = first30SecUsedCategories.size;
+            
+            // 30초 비효율전환 점수는 이미 analyzeTransitionsAndClusters에서 계산됨
+            
+            // 30초 평균 범주크기와 최대범주크기 계산
+            const first30SecClusterSizes = first30SecClusters.map(c => c.size);
+            const first30SecAvgClusterSize = first30SecClusterSizes.length > 0 
+                ? first30SecClusterSizes.reduce((sum, size) => sum + size, 0) / first30SecClusterSizes.length
+                : 0;
+            const first30SecMaxClusterSize = Math.max(...first30SecClusterSizes, 0);
+            
+            // 결과 표시
+            document.getElementById('totalScore').textContent = totalScore;
+            document.getElementById('firstHalfScore').textContent = firstHalfScore;
+            document.getElementById('secondHalfScore').textContent = secondHalfScore;
+            
+            // 정상규준 기반 점수 계산 및 표시
+            try {
+                const age = parseInt(document.getElementById('age').value);
+                const education = parseInt(document.getElementById('education').value);
+                
+                if (age && education !== null && education !== undefined && !isNaN(education)) {
+                    console.log('정상규준 계산 시작 - 나이:', age, '교육년수:', education);
+                    normScores = calculateNormativeScores(totalScore, age, education);
+                    
+                    if (normScores) {
+                        // 별도 카드에 Z점수와 퍼센타일 표시
+                        const zScoreElement = document.getElementById('totalZScore');
+                        const percentileElement = document.getElementById('totalPercentile');
+                        const normInfoElement = document.getElementById('normInfo');
+                        
+                        if (zScoreElement && percentileElement) {
+                            const zScoreText = normScores.zScore.toFixed(2);
+                            const percentileText = normScores.percentile.toFixed(1);
+                            
+                            zScoreElement.textContent = zScoreText;
+                            // Z점수가 -1.5 이하일 때 빨간색으로 표시
+                            if (normScores.zScore <= -1.5) {
+                                zScoreElement.classList.add('low-z-score');
+                            } else {
+                                zScoreElement.classList.remove('low-z-score');
+                            }
+                            // 부등호 표시와 실제 퍼센타일 값
+                            const percentileCategory = normScores.isBelow5Percentile ? '<5' : '≥5';
+                            percentileElement.textContent = `${percentileCategory} (${Math.round(normScores.percentile)})`;
+                            
+                            // 5퍼센타일 이하인 경우 빨간색 표시
+                            if (normScores.isBelow5Percentile) {
+                                percentileElement.style.color = '#d32f2f';
+                            } else {
+                                percentileElement.style.color = '';
+                            }
+                        }
+                        
+                        // normInfo는 이제 사용하지 않으므로 숨김
+                        if (normInfoElement) {
+                            normInfoElement.style.display = 'none';
+                        }
+                    }
+                } else {
+                    console.log('나이 또는 교육년수가 입력되지 않아 정상규준 계산을 건너뜁니다');
+                    // 정상규준 정보가 없을 때 기본값 표시
+                    const zScoreElement = document.getElementById('totalZScore');
+                    const percentileElement = document.getElementById('totalPercentile');
+                    if (zScoreElement) {
+                        zScoreElement.textContent = '-';
+                        zScoreElement.classList.remove('low-z-score');
+                    }
+                    if (percentileElement) {
+                        percentileElement.textContent = '-';
+                        percentileElement.style.color = '';
+                    }
+                }
+            } catch (normError) {
+                console.error('정상규준 계산 중 오류:', normError);
+                // 정상규준 오류가 있어도 나머지 점수는 표시되도록 계속 진행
+            }
+            document.getElementById('perseverationScore').textContent = perseverationScore;
+            document.getElementById('intrusionScore').textContent = intrusionScore;
+            document.getElementById('switchingScore').textContent = switchingScore;
+            document.getElementById('inefficientSwitchingScore').textContent = inefficientSwitchingScore;
+            document.getElementById('categoryScore').textContent = categoryScore;
+            document.getElementById('avgClusterSize').textContent = avgClusterSize.toFixed(1);
+            document.getElementById('maxClusterSize').textContent = maxClusterSize;
+            
+            // 30초 기반 점수 표시
+            document.getElementById('first30SecPerseverationScore').textContent = first30SecPerseverationScore;
+            document.getElementById('first30SecIntrusionScore').textContent = first30SecIntrusionScore;
+            document.getElementById('first30SecSwitchingScore').textContent = first30SecSwitchingScore;
+            document.getElementById('first30SecCategoryScore').textContent = first30SecCategoryScore;
+            document.getElementById('first30SecInefficient').textContent = first30SecInefficient;
+            const first30SecAvgElement = document.getElementById('first30SecAvgClusterSize');
+            if (first30SecAvgElement) {
+                first30SecAvgElement.textContent = first30SecAvgClusterSize.toFixed(1);
+            }
+            const first30SecMaxElement = document.getElementById('first30SecMaxClusterSize');
+            if (first30SecMaxElement) {
+                first30SecMaxElement.textContent = first30SecMaxClusterSize;
+            }
+            
+            // 점수 계산 상세 과정 표 표시 - 제거됨 (클러스터 분석 표에 통합)
+            /*
+            const detailTableHtml = `
+                <table class="detail-table">
+                    <thead>
+                        <tr>
+                            <th>시간대</th>
+                            <th>반응 단어</th>
+                            <th>반응 유형</th>
+                            <th>전환 여부</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${generateDetailTableRows()}
+                    </tbody>
+                </table>
+            `;
+            */
+            
+            // 상세 테이블 행 생성 함수
+            function generateDetailTableRows() {
+                const timeRanges = ['0-15', '15-30', '30-45', '45-60'];
+                let rows = '';
+                let transitionIndex = 0;
+                
+                // 보속 반응 추적을 위한 맵
+                const seenAnimals = new Map();
+                allResponses.forEach((response, idx) => {
+                    if (response.normalizedResponse !== null) {
+                        if (!seenAnimals.has(response.normalizedResponse)) {
+                            seenAnimals.set(response.normalizedResponse, []);
+                        }
+                        seenAnimals.get(response.normalizedResponse).push(idx);
+                    }
+                });
+                
+                timeRanges.forEach(range => {
+                    const rangeResponses = allResponses.filter(r => r.timeRange === range);
+                    if (rangeResponses.length === 0) return;
+                    
+                    rangeResponses.forEach((response, idx) => {
+                        const isFirstInRange = idx === 0;
+                        const globalIndex = allResponses.findIndex(r => r === response);
+                        
+                        // 반응 유형 결정
+                        let responseType = '정반응';
+                        if (response.normalizedResponse === null) {
+                            responseType = '침투';
+                        } else if (seenAnimals.get(response.normalizedResponse) && 
+                                 seenAnimals.get(response.normalizedResponse).indexOf(globalIndex) > 0) {
+                            responseType = '보속';
+                        }
+                        
+                        // 전환 여부 확인
+                        let transitionInfo = '';
+                        let categoryInfo = '';
+                        
+                        // 침투 반응은 전환 분석에서 제외됨
+                        if (responseType === '침투') {
+                            transitionInfo = '동물에 해당하지 않음';
+                        } else if (transitionIndex < transitions.length && 
+                            transitions[transitionIndex].animal === response.response) {
+                            const trans = transitions[transitionIndex];
+                            
+                            // 현재 클러스터의 공유 범주 찾기
+                            const currentCluster = clusters.find(c => 
+                                c.animals.some(a => a.animal === response.response)
+                            );
+                            
+                            if (trans.isSwitch) {
+                                transitionInfo = `전환 #${trans.switchNumber}`;
+                                // 전환 시 전환된 첫 단어가 속한 모든 범주 표시
+                                const animalData = ANIMAL_CATEGORIES[response.normalizedResponse];
+                                if (animalData) {
+                                    const allCategories = [];
+                                    for (const [cat, value] of Object.entries(animalData)) {
+                                        if (value === true) {
+                                            allCategories.push(CATEGORIES[cat]);
+                                        }
+                                    }
+                                    if (allCategories.length > 0) {
+                                        categoryInfo = ` (${allCategories.join(', ')})`;
+                                    }
+                                }
+                            } else if (trans.index === 1) {
+                                transitionInfo = '시작';
+                                // 시작 시 해당 동물의 모든 범주 표시
+                                const animalData = ANIMAL_CATEGORIES[response.normalizedResponse];
+                                if (animalData) {
+                                    const allCategories = [];
+                                    for (const [cat, value] of Object.entries(animalData)) {
+                                        if (value === true) {
+                                            allCategories.push(CATEGORIES[cat]);
+                                        }
+                                    }
+                                    if (allCategories.length > 0) {
+                                        categoryInfo = ` (${allCategories.join(', ')})`;
+                                    }
+                                }
+                            } else {
+                                transitionInfo = '유지';
+                                if (trans.sharedWithPrev && trans.sharedWithPrev.length > 0) {
+                                    categoryInfo = ` (${trans.sharedWithPrev.map(cat => CATEGORIES[cat]).join(', ')})`;
+                                }
+                            }
+                            transitionIndex++;
+                        }
+                        
+                        rows += `
+                            <tr>
+                                ${isFirstInRange ? `<td rowspan="${rangeResponses.length}">${range}초</td>` : ''}
+                                <td>${response.order}. ${response.response}</td>
+                                <td class="${responseType === '침투' ? 'intrusion' : responseType === '보속' ? 'perseveration' : 'valid'}">${responseType}</td>
+                                <td class="${transitionInfo.includes('전환') ? 'switch' : ''}">${transitionInfo}${categoryInfo}</td>
+                            </tr>
+                        `;
+                    });
+                });
+                
+                return rows;
+            }
+            
+            // switchingAnalysis 제거 - 클러스터 분석 표에 통합됨
+            // const switchingAnalysisHtml = detailTableHtml;
+            // document.getElementById('switchingAnalysis').innerHTML = switchingAnalysisHtml;
+            // console.log('switchingAnalysis 표시 완료');
+            
+            // 클러스터 및 범주 분석 표 표시
+            // 범주 판정 과정 상세 표시
+            console.log('범주 판정 과정 표시 시작...');
+            const categoryProcessHtml = `
+                <div>
+                    <h4 style="text-align: center; color: #616161; margin-bottom: 20px; font-size: 20px;">
+                        분석 과정
+                    </h4>
+                    ${generateCategoryProcessDetail()}
+                </div>
+            `;
+            console.log('categoryProcessHtml 생성 완료');
+            
+            const clusterTableHtml = ``;
+            
+            // 클러스터 테이블 행 생성 함수
+            function generateClusterTableRows() {
+                let rows = '';
+                
+                clusters.forEach((cluster, idx) => {
+                    // 공통 범주 표시
+                    const commonCategoriesStr = cluster.commonCategories.map(cat => CATEGORIES[cat]).join(', ') || '없음';
+                    
+                    // 대표 범주 결정
+                    let representativeCategory = '';
+                    if (cluster.commonCategories.length > 0) {
+                        representativeCategory = CATEGORIES[cluster.commonCategories[0]];
+                    } else if (cluster.animals.length > 0) {
+                        const firstAnimalData = ANIMAL_CATEGORIES[cluster.animals[0]] || {};
+                        const biologicalCategories = ['MAMMAL', 'BIRD', 'REPTILE', 'AMPHIBIAN', 'FISH', 'INSECT', 'MOLLUSK', 'CRUSTACEAN'];
+                        for (const bioCategory of biologicalCategories) {
+                            if (firstAnimalData[bioCategory] === true) {
+                                representativeCategory = CATEGORIES[bioCategory];
+                                break;
+                            }
+                        }
+                    }
+                    
+                    const animalsList = cluster.animals.join(', ');
+                    
+                    rows += `
+                        <tr>
+                            <td style="text-align: center; font-weight: bold;">클러스터 ${idx + 1}<br>(크기: ${cluster.size})</td>
+                            <td>${animalsList}</td>
+                            <td style="color: #666;">${commonCategoriesStr}</td>
+                            <td style="color: #2196f3; font-weight: bold;">${representativeCategory || '-'}</td>
+                        </tr>
+                    `;
+                });
+                
+                return rows;
+            }
+            
+            // 범주 판정 과정 상세 표시 함수
+            function generateCategoryProcessDetail() {
+                console.log('generateCategoryProcessDetail 호출됨');
+                console.log('allResponses:', allResponses);
+                console.log('clusters:', clusters);
+                
+                let html = '<div style="font-size: 14px; line-height: 1.8;">';
+                
+                // 단어별 범주 판정 과정 테이블
+                html += `<table class="detail-table" style="margin-bottom: 20px; width: 100%; background: #fff; border-radius: 10px; overflow: hidden; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
+                    <thead>
+                        <tr>
+                            <th>순서</th>
+                            <th>시간대</th>
+                            <th>단어</th>
+                            <th>반응유형</th>
+                            <th>보유 범주</th>
+                            <th>클러스터 공통범주</th>
+                            <th>겹치는 범주</th>
+                            <th>판정</th>
+                            <th>클러스터</th>
+                        </tr>
+                    </thead>
+                    <tbody>`;
+                
+                // 모든 반응에 대한 상세 분석 정보 생성
+                let currentClusterIdx = 0;
+                let processedAnimals = 0;
+                const seenAnimals = {};
+                
+                if (!allResponses || allResponses.length === 0) {
+                    html += '<tr><td colspan="9" style="text-align: center; color: #999;">데이터가 없습니다.</td></tr>';
+                } else {
+                    allResponses.forEach((response, idx) => {
+                    const animal = response.normalizedResponse;
+                    const originalAnimal = response.originalResponse || response.response;
+                    
+                    // 시간대 매핑
+                    const timeRange = response.timeRange || '';
+                    const timeRangeDisplay = timeRange === '0-15' ? '0-15초' :
+                                           timeRange === '15-30' ? '15-30초' :
+                                           timeRange === '30-45' ? '30-45초' :
+                                           timeRange === '45-60' ? '45-60초' : '';
+                    
+                    // 반응유형 판정
+                    let responseType = '';
+                    let rowColor = '#f0f0f0';
+                    
+                    if (animal === null) {
+                        // 침투반응
+                        responseType = '<span style="color: #f44336; font-weight: bold;">침투</span>';
+                        rowColor = '#ffebee';
+                        
+                        html += `<tr style="background-color: ${rowColor};">
+                            <td style="text-align: center;">${idx + 1}</td>
+                            <td style="text-align: center;">${timeRangeDisplay}</td>
+                            <td><strong>${originalAnimal}</strong></td>
+                            <td style="text-align: center;">${responseType}</td>
+                            <td colspan="5" style="text-align: center; color: #999;">동물이 아님</td>
+                        </tr>`;
+                        return;
+                    }
+                    
+                    // 보속반응 체크
+                    seenAnimals[animal] = (seenAnimals[animal] || 0) + 1;
+                    if (seenAnimals[animal] > 1) {
+                        responseType = '<span style="color: #ff9800; font-weight: bold;">보속</span>';
+                        rowColor = '#fff3e0';
+                        
+                        html += `<tr style="background-color: ${rowColor};">
+                            <td style="text-align: center;">${idx + 1}</td>
+                            <td style="text-align: center;">${timeRangeDisplay}</td>
+                            <td><strong>${animal}</strong></td>
+                            <td style="text-align: center;">${responseType}</td>
+                            <td colspan="5" style="text-align: center; color: #999;">중복 반응 (${seenAnimals[animal]}번째)</td>
+                        </tr>`;
+                        return;
+                    }
+                    
+                    // 정반응 처리
+                    responseType = '<span style="color: #4caf50;">정반응</span>';
+                    rowColor = '#f0f0f0';
+                    processedAnimals++;
+                    
+                    const animalData = ANIMAL_CATEGORIES[animal] || {};
+                    const categories = [];
+                    for (const [cat, value] of Object.entries(animalData)) {
+                        if (value === true) categories.push(cat);
+                    }
+                    
+                    // 현재 동물이 속한 클러스터 찾기
+                    let belongsToCluster = null;
+                    let clusterCommonCategories = [];
+                    let overlappingCategories = [];
+                    let decision = '';
+                    
+                    // 처리된 정반응 인덱스 기준으로 클러스터 찾기
+                    let validAnimalIdx = processedAnimals - 1;
+                    
+                    for (let i = 0; i < clusters.length; i++) {
+                        const cluster = clusters[i];
+                        if (cluster.animals.includes(animal)) {
+                            belongsToCluster = i + 1;
+                            clusterCommonCategories = cluster.commonCategories;
+                            
+                            // 이전 정반응 동물과의 관계 확인
+                            if (validAnimalIdx > 0 && i === currentClusterIdx) {
+                                // 같은 클러스터 유지
+                                overlappingCategories = categories.filter(cat => 
+                                    clusterCommonCategories.includes(cat)
+                                );
+                                decision = '유지';
+                            } else if (validAnimalIdx > 0 && i !== currentClusterIdx) {
+                                // 전환 발생
+                                decision = '전환';
+                                currentClusterIdx = i;
+                            } else if (validAnimalIdx === 0) {
+                                // 첫 정반응 동물
+                                decision = '시작';
+                                currentClusterIdx = i;
+                                overlappingCategories = categories;
+                            }
+                            break;
+                        }
+                    }
+                    
+                    // 전환 판정에 따른 행 색상
+                    if (decision === '전환') {
+                        rowColor = '#ffe0e0';
+                    } else if (decision === '시작') {
+                        rowColor = '#e0ffe0';
+                    }
+                    
+                    html += `<tr style="background-color: ${rowColor};">
+                        <td style="text-align: center;">${idx + 1}</td>
+                        <td style="text-align: center;">${timeRangeDisplay}</td>
+                        <td><strong>${animal}</strong></td>
+                        <td style="text-align: center;">${responseType}</td>
+                        <td>${categories.map(c => CATEGORIES[c]).join(', ')}</td>
+                        <td>${clusterCommonCategories.map(c => CATEGORIES[c]).join(', ') || '-'}</td>
+                        <td>${overlappingCategories.map(c => CATEGORIES[c]).join(', ') || '없음'}</td>
+                        <td style="text-align: center; font-weight: bold; color: ${decision === '전환' ? '#d32f2f' : decision === '시작' ? '#4caf50' : '#2196f3'};">
+                            ${decision}
+                            ${decision === '전환' && clusters[currentClusterIdx-1]?.size === 1 ? 
+                              '<span style="background: #ffeb3b; padding: 2px 6px; border-radius: 3px; color: #333; font-size: 11px; margin-left: 5px;">비효율</span>' : ''}
+                        </td>
+                        <td style="text-align: center;">클러스터 ${belongsToCluster}</td>
+                    </tr>`;
+                    });
+                }
+                
+                html += '</tbody></table>';
+                
+                html += '</div>';
+                return html;
+            }
+            
+            console.log('clusterAnalysis에 내용 설정 시작...');
+            const clusterAnalysisElement = document.getElementById('clusterAnalysis');
+            if (clusterAnalysisElement) {
+                clusterAnalysisElement.innerHTML = categoryProcessHtml;
+                console.log('clusterAnalysis 내용 설정 완료');
+            } else {
+                console.error('clusterAnalysis 요소를 찾을 수 없습니다!');
+            }
+            
+            // 패턴 분석 및 해석 표시
+            console.log('패턴 분석 시작...');
+            const patternAnalysisResult = analyzePerformancePattern({
+                totalScore,
+                firstHalfScore,
+                secondHalfScore,
+                perseverationScore,
+                intrusionScore,
+                numberOfClusters: clusters.length,
+                meanClusterSize: avgClusterSize,
+                switching: switchingScore,
+                hardSwitching: inefficientSwitchingScore,
+                normScores: normScores
+            });
+            
+            const patternAnalysisElement = document.getElementById('patternAnalysis');
+            if (patternAnalysisElement) {
+                patternAnalysisElement.innerHTML = `
+                    <div style="margin-bottom: 15px;">
+                        <span style="font-weight: bold; color: #1565c0;">판정 패턴:</span>
+                        <span style="font-size: 18px; font-weight: bold; color: #d32f2f; margin-left: 10px;">
+                            ${patternAnalysisResult.pattern}
+                        </span>
+                    </div>
+                    <div style="line-height: 1.8; color: #333;">
+                        ${patternAnalysisResult.interpretation}
+                    </div>
+                `;
+                console.log('패턴 분석 내용 설정 완료');
+            }
+            
+            
+            
+            // 입력 섹션 숨기기
+            document.querySelector('.container').style.display = 'none';
+            
+            // 결과 섹션 표시
+            const resultsElement = document.getElementById('results');
+            resultsElement.style.display = 'block';
+            resultsElement.style.visibility = 'visible';
+            resultsElement.style.opacity = '1';
+            
+            // 강제로 리플로우 트리거
+            resultsElement.offsetHeight;
+            
+            // 결과 위치로 스크롤
+            setTimeout(() => {
+                window.scrollTo(0, 0);
+            }, 100);
+            
+            console.log('calculateScores 함수 완료');
+            
+            } catch (error) {
+                console.error('calculateScores 에러:', error);
+                alert('점수 계산 중 오류가 발생했습니다: ' + error.message);
+            }
+        }
+        
+        // 패턴 분석 및 해석 생성
+        function analyzePerformancePattern(scores) {
+            const { 
+                totalScore, 
+                firstHalfScore, 
+                secondHalfScore, 
+                perseverationScore, 
+                intrusionScore,
+                numberOfClusters,
+                meanClusterSize,
+                switching,
+                hardSwitching
+            } = scores;
+            
+            // normScores는 scores 객체에서 별도로 가져오기
+            const normScores = scores.normScores || null;
+            
+            // 정상 범위 기준 (예시값 - 실제 연구 기준에 따라 조정 필요)
+            const norms = {
+                totalScore: { low: 12, borderline: 15, normal: 18 },
+                firstHalfScore: { low: 7, normal: 10 },
+                secondHalfScore: { low: 5, normal: 8 },
+                perseverationScore: { normal: 2, high: 4 },
+                intrusionScore: { normal: 1, high: 2 },
+                numberOfClusters: { low: 3, normal: 5 },
+                meanClusterSize: { low: 2.5, normal: 3.5 },
+                switching: { low: 4, normal: 6 },
+                hardSwitching: { normal: 2, high: 4 }
+            };
+            
+            // 패턴 판정
+            let pattern = '';
+            let interpretation = '';
+            
+            // 1. 정상 수행 패턴
+            if (totalScore >= norms.totalScore.normal && 
+                perseverationScore <= norms.perseverationScore.normal && 
+                intrusionScore <= norms.intrusionScore.normal &&
+                numberOfClusters >= norms.numberOfClusters.normal) {
+                pattern = '정상 수행 패턴';
+                interpretation = `동물 이름대기 과제에서 총 ${totalScore}개의 동물을 산출하여 정상 범위의 수행을 보였습니다. 전반 30초와 후반 30초 모두 적절한 산출을 보였으며, 오류는 관찰되지 않았습니다. 의미 범주화와 전환 능력이 모두 양호하여 정상적인 언어유창성을 시사합니다.`;
+            }
+            // 2. 전형적 치매 패턴
+            else if (totalScore < norms.totalScore.low && 
+                     firstHalfScore < norms.firstHalfScore.low && 
+                     secondHalfScore < norms.secondHalfScore.low &&
+                     perseverationScore > norms.perseverationScore.high &&
+                     numberOfClusters < norms.numberOfClusters.low) {
+                pattern = '전형적 치매 패턴';
+                interpretation = `동물 이름대기 과제에서 총 ${totalScore}개만을 산출하여 현저히 저하된 수행을 보였습니다. 전반부와 후반부 모두에서 산출이 제한적이었으며, 동일한 동물을 반복해서 말하는 보속오류가 다수 관찰되었습니다. 의미 범주 형성이 제한적이고 범주 간 전환이 어려워 의미기억 저장소 접근의 어려움 또는 전두엽 기능 저하가 시사됩니다.`;
+            }
+            // 3. 전두엽 기능장애 패턴
+            else if (totalScore < norms.totalScore.normal && 
+                     firstHalfScore >= norms.firstHalfScore.normal && 
+                     secondHalfScore < norms.secondHalfScore.low &&
+                     numberOfClusters < norms.numberOfClusters.low &&
+                     switching < norms.switching.low) {
+                pattern = '전두엽 기능장애 패턴';
+                interpretation = `동물 이름대기 과제에서 총 ${totalScore}개를 산출하여 저하된 수행을 보였습니다. 초반에는 비교적 적절한 산출을 보였으나 시간이 지날수록 현저히 감소하는 양상을 보였습니다. 의미 범주 수와 전환 횟수가 제한적이어서 인지적 유연성 저하와 지속적인 탐색 전략 유지의 어려움이 시사됩니다.`;
+            }
+            // 4. 피질하 패턴
+            else if (totalScore < norms.totalScore.normal && 
+                     intrusionScore > norms.intrusionScore.high &&
+                     meanClusterSize < norms.meanClusterSize.low &&
+                     hardSwitching > norms.hardSwitching.high) {
+                pattern = '피질하 패턴';
+                interpretation = `동물 이름대기 과제에서 총 ${totalScore}개를 산출하여 저하된 수행을 보였습니다. 동물이 아닌 단어들이 침투하는 오류가 다수 관찰되었으며, 각 범주 내 산출이 제한적이고 비효율적인 전환이 많아 주의력 조절과 억제 기능의 어려움이 시사됩니다.`;
+            }
+            // 5. 경도인지장애 패턴
+            else if (totalScore >= norms.totalScore.borderline && 
+                     totalScore < norms.totalScore.normal &&
+                     secondHalfScore < norms.secondHalfScore.normal &&
+                     perseverationScore <= norms.perseverationScore.normal &&
+                     numberOfClusters >= norms.numberOfClusters.normal &&
+                     meanClusterSize < norms.meanClusterSize.normal) {
+                pattern = '경도인지장애 패턴';
+                interpretation = `동물 이름대기 과제에서 총 ${totalScore}개를 산출하여 경계선 수준의 수행을 보였습니다. 초반에는 적절한 산출을 보였으나 후반부에 감소하는 양상을 보였습니다. 범주 수는 유지되나 각 범주 내 산출이 다소 제한적이어서 의미기억 저장소의 경미한 손상 가능성이 시사됩니다.`;
+            }
+            // 6. 우울증 관련 패턴
+            else if (totalScore < norms.totalScore.normal && 
+                     firstHalfScore < norms.firstHalfScore.normal &&
+                     perseverationScore === 0 && 
+                     intrusionScore === 0 &&
+                     numberOfClusters >= norms.numberOfClusters.normal &&
+                     switching < norms.switching.normal) {
+                pattern = '우울증 관련 패턴';
+                interpretation = `동물 이름대기 과제에서 총 ${totalScore}개를 산출하여 저하된 수행을 보였습니다. 오류는 없었으나 전반적으로 산출이 느리고 범주 간 전환이 제한적이어서 정신운동속도 저하와 인지적 주도성 감소가 시사됩니다.`;
+            }
+            // 기타 패턴
+            else {
+                pattern = '비특이적 패턴';
+                interpretation = `동물 이름대기 과제에서 총 ${totalScore}개를 산출하였습니다. 수행 패턴이 특정 진단군의 전형적인 양상과 일치하지 않아 종합적인 임상 평가가 필요합니다.`;
+            }
+            
+            // 정상규준 정보 추가
+            if (normScores) {
+                const zScoreText = normScores.zScore.toFixed(2);
+                const percentileText = normScores.percentile.toFixed(1);
+                const normInterpretation = normScores.isBelow5Percentile 
+                    ? `정상규준(평균: ${normScores.mean.toFixed(1)}, 표준편차: ${normScores.sd.toFixed(1)})과 비교 시 Z점수 ${zScoreText}, 백분위 ${percentileText}%ile로 5퍼센타일 이하에 해당하여 유의미한 저하를 시사합니다.`
+                    : `정상규준(평균: ${normScores.mean.toFixed(1)}, 표준편차: ${normScores.sd.toFixed(1)})과 비교 시 Z점수 ${zScoreText}, 백분위 ${percentileText}%ile에 해당합니다.`;
+                
+                interpretation += ` ${normInterpretation}`;
+            }
+            
+            return {
+                pattern: pattern,
+                interpretation: interpretation
+            };
+        }
+        
+        // 입력 화면으로 돌아가기
+        function backToInput() {
+            // 결과 섹션 숨기기
+            document.getElementById('results').style.display = 'none';
+            document.getElementById('analysisDetails').style.display = 'none';
+            
+            // 입력 섹션 표시
+            document.querySelector('.container').style.display = 'block';
+            
+            // 상단으로 스크롤
+            window.scrollTo(0, 0);
+        }
+        
+        // 분석 과정 보기
+        function showAnalysisDetails() {
+            // 결과 섹션 숨기기
+            document.getElementById('results').style.display = 'none';
+            
+            // 분석 과정 섹션 표시
+            document.getElementById('analysisDetails').style.display = 'block';
+            
+            // 분석 과정 내용 복사
+            const clusterContent = document.getElementById('clusterAnalysis').innerHTML;
+            document.getElementById('analysisContent').innerHTML = clusterContent;
+            
+            // 상단으로 스크롤
+            window.scrollTo(0, 0);
+        }
+        
+        // 결과로 돌아가기
+        function backToResults() {
+            // 분석 과정 섹션 숨기기
+            document.getElementById('analysisDetails').style.display = 'none';
+            
+            // 결과 섹션 표시
+            document.getElementById('results').style.display = 'block';
+            
+            // 상단으로 스크롤
+            window.scrollTo(0, 0);
+        }
+        
+        // =====================================================
+        // 데이터베이스 관리 함수들
+        // =====================================================
+        
+        let editingAnimal = null;
+        let currentVariants = []; // 현재 편집 중인 동물의 변형 명칭들
+        
+        // 데이터베이스 관리 화면 표시
+        function showDatabaseManagement() {
+            const dbSection = document.querySelector('.database-management');
+            const resultsSection = document.getElementById('results');
+            const containerSection = document.querySelector('.container');
+            
+            // 다른 섹션들 숨기기
+            resultsSection.style.display = 'none';
+            containerSection.style.display = 'none';
+            
+            // 데이터베이스 관리 섹션 표시
+            dbSection.style.display = 'block';
+            updateDatabaseStats();
+            displayAllAnimals();
+            
+            // 상단으로 스크롤
+            window.scrollTo(0, 0);
+        }
+        
+        // 데이터베이스 관리 화면 닫기
+        function closeDatabaseManagement() {
+            const dbSection = document.querySelector('.database-management');
+            const containerSection = document.querySelector('.container');
+            
+            // 데이터베이스 관리 섹션 숨기기
+            dbSection.style.display = 'none';
+            
+            // 입력 화면 표시
+            containerSection.style.display = 'block';
+            
+            // 상단으로 스크롤
+            window.scrollTo(0, 0);
+        }
+        
+        // 동물 추가 폼 표시
+        function showAddAnimalForm() {
+            editingAnimal = null;
+            currentVariants = [];
+            document.getElementById('formTitle').textContent = '새 동물 추가';
+            document.getElementById('animalName').value = '';
+            clearAllCheckboxes();
+            displayVariants();
+            document.getElementById('animalForm').style.display = 'block';
+        }
+        
+        // 동물 수정 폼 표시
+        function showEditAnimalForm(animalName) {
+            editingAnimal = animalName;
+            const animalData = ANIMAL_CATEGORIES[animalName];
+            
+            document.getElementById('formTitle').textContent = `'${animalName}' 수정`;
+            document.getElementById('animalName').value = animalName;
+            
+            // 체크박스 상태 설정
+            clearAllCheckboxes();
+            for (const [category, value] of Object.entries(animalData)) {
+                const checkbox = document.getElementById(`cat_${category}`);
+                if (checkbox) {
+                    checkbox.checked = value;
+                }
+            }
+            
+            // 현재 동물의 변형 명칭들 로드
+            loadAnimalVariants(animalName);
+            
+            document.getElementById('animalForm').style.display = 'block';
+        }
+        
+        // 모든 체크박스 초기화
+        function clearAllCheckboxes() {
+            const checkboxes = document.querySelectorAll('.category-checkboxes input[type="checkbox"]');
+            checkboxes.forEach(cb => cb.checked = false);
+        }
+        
+        // 동물 저장
+        function saveAnimal() {
+            const animalName = document.getElementById('animalName').value.trim();
+            if (!animalName) {
+                alert('동물 이름을 입력해주세요.');
+                return;
+            }
+            
+            // 중복 체크 (수정이 아닌 경우)
+            if (!editingAnimal && ANIMAL_CATEGORIES[animalName]) {
+                alert('이미 존재하는 동물입니다.');
+                return;
+            }
+            
+            // 카테고리 데이터 수집
+            const categories = [
+                'MAMMAL', 'BIRD', 'REPTILE', 'AMPHIBIAN', 'FISH', 'INSECT', 'MOLLUSK', 'CRUSTACEAN',
+                'MARINE', 'FRESHWATER',
+                'DOMESTIC', 'PET', 'WILD',
+                'ZODIAC', 'MYTHOLOGY', 'PREHISTORIC'
+            ];
+            
+            const animalData = {};
+            categories.forEach(cat => {
+                const checkbox = document.getElementById(`cat_${cat}`);
+                animalData[cat] = checkbox ? checkbox.checked : false;
+            });
+            
+            // 수정인 경우 기존 데이터 삭제
+            if (editingAnimal && editingAnimal !== animalName) {
+                delete ANIMAL_CATEGORIES[editingAnimal];
+            }
+            
+            // 데이터 저장
+            ANIMAL_CATEGORIES[animalName] = animalData;
+            
+            // 변형 명칭 저장 (animal-variants.js가 로드되어 있고 함수가 있는 경우)
+            if (typeof animalVariants !== 'undefined' && typeof variantToBase !== 'undefined') {
+                // 기존 변형 명칭들 제거 (역방향 매핑에서)
+                if (editingAnimal && editingAnimal !== animalName) {
+                    // 동물 이름이 변경된 경우 기존 변형들 정리
+                    const oldVariants = getAnimalVariants ? getAnimalVariants(editingAnimal) : [];
+                    if (oldVariants) {
+                        oldVariants.forEach(variant => {
+                            delete variantToBase[variant];
+                        });
+                    }
+                    delete animalVariants[editingAnimal];
+                }
+                
+                // 새로운 변형 명칭들 저장
+                if (currentVariants.length > 0) {
+                    animalVariants[animalName] = {
+                        base: animalName,
+                        variants: [...currentVariants]
+                    };
+                    
+                    // 역방향 매핑 업데이트
+                    currentVariants.forEach(variant => {
+                        variantToBase[variant] = animalName;
+                    });
+                } else {
+                    // 변형 명칭이 없으면 기본 엔트리만 유지
+                    animalVariants[animalName] = {
+                        base: animalName,
+                        variants: []
+                    };
+                }
+                
+                // 기본 동물명도 자기 자신을 가리키도록 설정
+                variantToBase[animalName] = animalName;
+            }
+            
+            // 저장 알림
+            alert(editingAnimal ? '동물 정보가 수정되었습니다.' : '새 동물이 추가되었습니다.');
+            
+            // 폼 닫기 및 목록 업데이트
+            cancelAnimalForm();
+            updateDatabaseStats();
+            displayAllAnimals();
+        }
+        
+        // 동물 삭제
+        function deleteAnimal(animalName) {
+            if (confirm(`'${animalName}'을(를) 정말 삭제하시겠습니까?`)) {
+                // 동물 카테고리에서 삭제
+                delete ANIMAL_CATEGORIES[animalName];
+                
+                // 변형 명칭들도 함께 삭제
+                if (typeof animalVariants !== 'undefined' && typeof variantToBase !== 'undefined') {
+                    const variants = getAnimalVariants ? getAnimalVariants(animalName) : [];
+                    if (variants) {
+                        variants.forEach(variant => {
+                            delete variantToBase[variant];
+                        });
+                    }
+                    delete animalVariants[animalName];
+                    delete variantToBase[animalName];
+                }
+                
+                alert('동물이 삭제되었습니다.');
+                updateDatabaseStats();
+                displayAllAnimals();
+            }
+        }
+        
+        // 폼 취소
+        function cancelAnimalForm() {
+            document.getElementById('animalForm').style.display = 'none';
+            editingAnimal = null;
+            currentVariants = [];
+        }
+        
+        // =====================================================
+        // 변형 명칭 관리 함수들
+        // =====================================================
+        
+        // 현재 동물의 변형 명칭들 로드
+        function loadAnimalVariants(animalName) {
+            if (typeof getAnimalVariants === 'function') {
+                const variants = getAnimalVariants(animalName);
+                currentVariants = variants ? [...variants] : [];
+            } else {
+                currentVariants = [];
+            }
+            displayVariants();
+        }
+        
+        // 변형 명칭 추가
+        function addVariant() {
+            const variantInput = document.getElementById('variantInput');
+            const variant = variantInput.value.trim();
+            
+            if (!variant) {
+                alert('변형 명칭을 입력해주세요.');
+                return;
+            }
+            
+            if (currentVariants.includes(variant)) {
+                alert('이미 존재하는 변형 명칭입니다.');
+                return;
+            }
+            
+            currentVariants.push(variant);
+            variantInput.value = '';
+            displayVariants();
+        }
+        
+        // 변형 명칭 제거
+        function removeVariant(variant) {
+            const index = currentVariants.indexOf(variant);
+            if (index > -1) {
+                currentVariants.splice(index, 1);
+                displayVariants();
+            }
+        }
+        
+        // 변형 명칭들 표시
+        function displayVariants() {
+            const variantsList = document.getElementById('variantsList');
+            
+            if (currentVariants.length === 0) {
+                variantsList.innerHTML = '<div style="color: #999; font-style: italic;">변형 명칭이 없습니다.</div>';
+                return;
+            }
+            
+            const variantsHtml = currentVariants.map(variant => `
+                <div class="variant-tag">
+                    <span>${variant}</span>
+                    <span class="variant-remove" onclick="removeVariant('${variant}')" title="제거">×</span>
+                </div>
+            `).join('');
+            
+            variantsList.innerHTML = variantsHtml;
+        }
+        
+        // 변형 명칭 입력 시 엔터키 처리
+        document.addEventListener('DOMContentLoaded', function() {
+            const variantInput = document.getElementById('variantInput');
+            if (variantInput) {
+                variantInput.addEventListener('keypress', function(event) {
+                    if (event.key === 'Enter') {
+                        event.preventDefault();
+                        addVariant();
+                    }
+                });
+            }
+        });
+        
+        // 데이터베이스 통계 업데이트
+        function updateDatabaseStats() {
+            const stats = {
+                total: 0,
+                MAMMAL: 0,
+                BIRD: 0,
+                REPTILE: 0,
+                AMPHIBIAN: 0,
+                FISH: 0,
+                INSECT: 0,
+                MOLLUSK: 0,
+                CRUSTACEAN: 0
+            };
+            
+            for (const [animalName, animalData] of Object.entries(ANIMAL_CATEGORIES)) {
+                stats.total++;
+                if (animalData.MAMMAL) stats.MAMMAL++;
+                if (animalData.BIRD) stats.BIRD++;
+                if (animalData.REPTILE) stats.REPTILE++;
+                if (animalData.AMPHIBIAN) stats.AMPHIBIAN++;
+                if (animalData.FISH) stats.FISH++;
+                if (animalData.INSECT) stats.INSECT++;
+                if (animalData.MOLLUSK) stats.MOLLUSK++;
+                if (animalData.CRUSTACEAN) stats.CRUSTACEAN++;
+            }
+            
+            document.getElementById('totalAnimals').textContent = stats.total;
+            document.getElementById('mammalCount').textContent = stats.MAMMAL;
+            document.getElementById('birdCount').textContent = stats.BIRD;
+            document.getElementById('reptileCount').textContent = stats.REPTILE;
+            document.getElementById('amphibianCount').textContent = stats.AMPHIBIAN;
+            document.getElementById('fishCount').textContent = stats.FISH;
+            document.getElementById('insectCount').textContent = stats.INSECT;
+            document.getElementById('molluskCount').textContent = stats.MOLLUSK;
+            document.getElementById('crustaceanCount').textContent = stats.CRUSTACEAN;
+        }
+        
+        // 모든 동물 표시
+        function displayAllAnimals() {
+            const searchTerm = document.getElementById('searchAnimal').value.toLowerCase();
+            const animalList = document.getElementById('animalList');
+            animalList.innerHTML = '';
+            
+            const sortedAnimals = Object.keys(ANIMAL_CATEGORIES).sort((a, b) => a.localeCompare(b, 'ko'));
+            
+            sortedAnimals.forEach(animalName => {
+                // 기본 이름으로 검색
+                let shouldShow = false;
+                
+                if (!searchTerm) {
+                    shouldShow = true;
+                } else if (animalName.toLowerCase().includes(searchTerm)) {
+                    shouldShow = true;
+                } else if (typeof getAnimalVariants === 'function') {
+                    // 변형 명칭으로도 검색
+                    const variants = getAnimalVariants(animalName);
+                    if (variants && variants.some(variant => variant.toLowerCase().includes(searchTerm))) {
+                        shouldShow = true;
+                    }
+                }
+                
+                if (!shouldShow) {
+                    return;
+                }
+                
+                const animalData = ANIMAL_CATEGORIES[animalName];
+                const animalItem = createAnimalItem(animalName, animalData, searchTerm);
+                animalList.appendChild(animalItem);
+            });
+        }
+        
+        // 동물 항목 생성
+        function createAnimalItem(animalName, animalData, searchTerm) {
+            const div = document.createElement('div');
+            div.className = 'animal-item';
+            
+            // 동물 정보
+            const infoDiv = document.createElement('div');
+            infoDiv.className = 'animal-info';
+            
+            // 헤더 (이름 + 버튼)
+            const headerDiv = document.createElement('div');
+            headerDiv.className = 'animal-header';
+            
+            // 동물 이름 (검색어 하이라이트)
+            const nameDiv = document.createElement('div');
+            nameDiv.className = 'animal-name';
+            if (searchTerm) {
+                nameDiv.innerHTML = animalName.replace(
+                    new RegExp(searchTerm, 'gi'),
+                    match => `<span class="search-highlight">${match}</span>`
+                );
+            } else {
+                nameDiv.textContent = animalName;
+            }
+            headerDiv.appendChild(nameDiv);
+            
+            // 액션 버튼들
+            const editBtn = document.createElement('button');
+            editBtn.className = 'btn-edit';
+            editBtn.textContent = '수정';
+            editBtn.onclick = () => showEditAnimalForm(animalName);
+            
+            const deleteBtn = document.createElement('button');
+            deleteBtn.className = 'btn-danger';
+            deleteBtn.textContent = '삭제';
+            deleteBtn.onclick = () => deleteAnimal(animalName);
+            
+            headerDiv.appendChild(editBtn);
+            headerDiv.appendChild(deleteBtn);
+            
+            infoDiv.appendChild(headerDiv);
+            
+            // 모든 카테고리를 체크박스 형태로 표시
+            const categoriesDiv = document.createElement('div');
+            categoriesDiv.className = 'animal-categories';
+            
+            // 모든 카테고리를 순서대로 표시
+            const categoryOrder = [
+                'MAMMAL', 'BIRD', 'REPTILE', 'AMPHIBIAN', 'FISH', 'INSECT', 'MOLLUSK', 'CRUSTACEAN',
+                'MARINE', 'FRESHWATER',
+                'DOMESTIC', 'PET', 'WILD',
+                'ZODIAC', 'MYTHOLOGY', 'PREHISTORIC'
+            ];
+            
+            categoryOrder.forEach(category => {
+                if (CATEGORIES[category]) {
+                    const checkDiv = document.createElement('div');
+                    checkDiv.className = 'category-check' + (animalData[category] ? ' checked' : '');
+                    
+                    const checkbox = document.createElement('input');
+                    checkbox.type = 'checkbox';
+                    checkbox.checked = animalData[category] || false;
+                    checkbox.disabled = true;
+                    
+                    const label = document.createElement('span');
+                    label.textContent = CATEGORIES[category];
+                    
+                    checkDiv.appendChild(checkbox);
+                    checkDiv.appendChild(label);
+                    categoriesDiv.appendChild(checkDiv);
+                }
+            });
+            
+            infoDiv.appendChild(categoriesDiv);
+            
+            div.appendChild(infoDiv);
+            
+            return div;
+        }
+        
+        // 동물 검색
+        function searchAnimals() {
+            displayAllAnimals();
+        }
+        
+        // 데이터베이스 내보내기 (추가 기능)
+        function exportDatabase() {
+            const dataStr = JSON.stringify(ANIMAL_CATEGORIES, null, 2);
+            const dataBlob = new Blob([dataStr], { type: 'application/json' });
+            const url = URL.createObjectURL(dataBlob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = 'animal-database.json';
+            link.click();
+            URL.revokeObjectURL(url);
+        }
+        
+        // 데이터베이스 가져오기 (추가 기능)
+        function importDatabase() {
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.accept = '.json';
+            input.onchange = (e) => {
+                const file = e.target.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = (e) => {
+                        try {
+                            const data = JSON.parse(e.target.result);
+                            if (confirm('기존 데이터베이스를 덮어쓰시겠습니까?')) {
+                                Object.assign(ANIMAL_CATEGORIES, data);
+                                updateDatabaseStats();
+                                displayAllAnimals();
+                                alert('데이터베이스를 성공적으로 가져왔습니다.');
+                            }
+                        } catch (error) {
+                            alert('파일을 읽는 중 오류가 발생했습니다.');
+                        }
+                    };
+                    reader.readAsText(file);
+                }
+            };
+            input.click();
+        }
+        
+        // =====================================================
+        // CSV 일괄 처리 기능
+        // =====================================================
+        
+        // CSV 업로드 섹션 표시
+        function showCSVUpload() {
+            document.getElementById('csvUploadSection').style.display = 'block';
+            document.getElementById('results').style.display = 'none';
+            document.querySelector('.database-management').style.display = 'none';
+            document.querySelector('.variants-management').style.display = 'none';
+        }
+        
+        // 변형 명칭 관리자 표시
+        function showVariantsManager() {
+            const variantsSection = document.querySelector('.variants-management');
+            const resultsSection = document.getElementById('results');
+            const containerSection = document.querySelector('.container');
+            const dbSection = document.querySelector('.database-management');
+            
+            // 다른 섹션들 숨기기
+            resultsSection.style.display = 'none';
+            containerSection.style.display = 'none';
+            dbSection.style.display = 'none';
+            
+            // 변형 명칭 관리 섹션 표시
+            variantsSection.style.display = 'block';
+            displayAllVariants();
+            updateVariantsStats();
+            
+            // 상단으로 스크롤
+            window.scrollTo(0, 0);
+        }
+        
+        // 변형 명칭 관리자 닫기
+        function closeVariantsManager() {
+            const variantsSection = document.querySelector('.variants-management');
+            const dbSection = document.querySelector('.database-management');
+            
+            // 변형 명칭 섹션 숨기기
+            variantsSection.style.display = 'none';
+            
+            // 검색 초기화
+            document.getElementById('searchAnimalForVariant').value = '';
+            document.getElementById('animalSearchResults').style.display = 'none';
+            document.getElementById('selectedAnimalInfo').innerHTML = '동물을 선택해주세요';
+            document.getElementById('createVariantBtn').disabled = true;
+            selectedAnimalForVariant = null;
+            
+            // 데이터베이스 관리 화면으로 돌아가기
+            dbSection.style.display = 'block';
+        }
+        
+        // 변형 명칭 등록을 위한 동물 검색
+        let selectedAnimalForVariant = null;
+        
+        function searchAnimalsForVariant() {
+            const searchTerm = document.getElementById('searchAnimalForVariant').value.trim().toLowerCase();
+            const resultsDiv = document.getElementById('animalSearchResults');
+            
+            if (!searchTerm) {
+                resultsDiv.style.display = 'none';
+                return;
+            }
+            
+            // ANIMAL_CATEGORIES에서 검색
+            const matchingAnimals = Object.keys(ANIMAL_CATEGORIES).filter(animal => 
+                animal.toLowerCase().includes(searchTerm)
+            ).sort();
+            
+            if (matchingAnimals.length === 0) {
+                resultsDiv.innerHTML = '<div style="padding: 10px; color: #666;">검색 결과가 없습니다</div>';
+                resultsDiv.style.display = 'block';
+                return;
+            }
+            
+            // 검색 결과 표시
+            resultsDiv.innerHTML = matchingAnimals.slice(0, 10).map(animal => {
+                const hasVariants = animalVariants && animalVariants[animal];
+                const variantCount = hasVariants ? animalVariants[animal].variants.length : 0;
+                const statusText = hasVariants ? `(변형 ${variantCount}개 등록됨)` : '(변형 미등록)';
+                const statusColor = hasVariants ? '#4caf50' : '#ff9800';
+                
+                return `
+                    <div style="padding: 10px; border-bottom: 1px solid #eee; cursor: pointer; display: flex; justify-content: space-between;"
+                         onmouseover="this.style.backgroundColor='#f5f5f5'" 
+                         onmouseout="this.style.backgroundColor='white'"
+                         onclick="selectAnimalForVariant('${animal}')">
+                        <span>${animal}</span>
+                        <span style="font-size: 12px; color: ${statusColor};">${statusText}</span>
+                    </div>
+                `;
+            }).join('');
+            
+            if (matchingAnimals.length > 10) {
+                resultsDiv.innerHTML += '<div style="padding: 10px; color: #666; text-align: center;">... 외 ' + 
+                    (matchingAnimals.length - 10) + '개 더 있음</div>';
+            }
+            
+            resultsDiv.style.display = 'block';
+        }
+        
+        // 동물 선택
+        function selectAnimalForVariant(animalName) {
+            selectedAnimalForVariant = animalName;
+            
+            // 선택된 동물 정보 표시
+            const infoDiv = document.getElementById('selectedAnimalInfo');
+            const hasVariants = animalVariants && animalVariants[animalName];
+            
+            // 동물의 범주 정보 가져오기
+            const categories = getAnimalCategories(animalName);
+            const categoryNames = categories.map(cat => cat.name).join(', ');
+            
+            infoDiv.innerHTML = `
+                <div style="width: 100%;">
+                    <div style="font-size: 18px; font-weight: bold; color: #1976d2; margin-bottom: 5px;">${animalName}</div>
+                    <div style="font-size: 12px; color: #666;">범주: ${categoryNames || '없음'}</div>
+                    ${hasVariants ? 
+                        `<div style="font-size: 12px; color: #4caf50; margin-top: 5px;">
+                            기존 변형: ${animalVariants[animalName].variants.join(', ')}
+                        </div>` : 
+                        '<div style="font-size: 12px; color: #ff9800; margin-top: 5px;">등록된 변형 없음</div>'
+                    }
+                </div>
+            `;
+            
+            // 검색 결과 숨기기
+            document.getElementById('animalSearchResults').style.display = 'none';
+            
+            // 버튼 활성화
+            document.getElementById('createVariantBtn').disabled = false;
+        }
+        
+        // 새 변형 명칭 등록 시작
+        function createNewVariantEntry() {
+            if (!selectedAnimalForVariant) {
+                alert('동물을 먼저 선택해주세요.');
+                return;
+            }
+            
+            // 편집 폼으로 이동
+            editVariants(selectedAnimalForVariant);
+            
+            // 선택 초기화
+            document.getElementById('searchAnimalForVariant').value = '';
+            document.getElementById('selectedAnimalInfo').innerHTML = '동물을 선택해주세요';
+            document.getElementById('createVariantBtn').disabled = true;
+            selectedAnimalForVariant = null;
+        }
+        
+        // 모든 변형 명칭 표시
+        function displayAllVariants() {
+            const variantList = document.getElementById('variantAnimalList');
+            if (!variantList) return;
+            
+            variantList.innerHTML = '';
+            
+            // animalVariants가 정의되어 있는지 확인
+            if (typeof animalVariants === 'undefined') {
+                variantList.innerHTML = '<p style="padding: 20px; text-align: center;">변형 명칭 데이터를 로드할 수 없습니다.</p>';
+                return;
+            }
+            
+            // 모든 동물과 변형 명칭 표시
+            const sortedAnimals = Object.keys(animalVariants).sort();
+            
+            sortedAnimals.forEach(animal => {
+                const data = animalVariants[animal];
+                const variantCount = data.variants ? data.variants.length : 0;
+                
+                const animalDiv = document.createElement('div');
+                animalDiv.className = 'animal-item';
+                animalDiv.innerHTML = `
+                    <div class="animal-info">
+                        <span class="animal-name">${animal}</span>
+                        <span class="animal-variants">변형 명칭: ${variantCount}개</span>
+                    </div>
+                    <div class="animal-actions">
+                        <button onclick="editVariants('${animal}')" class="btn-edit">편집</button>
+                    </div>
+                `;
+                
+                variantList.appendChild(animalDiv);
+            });
+        }
+        
+        // 변형 명칭 통계 업데이트
+        function updateVariantsStats() {
+            if (typeof animalVariants === 'undefined') return;
+            
+            const totalAnimals = Object.keys(animalVariants).length;
+            let totalVariants = 0;
+            
+            Object.values(animalVariants).forEach(data => {
+                if (data.variants) {
+                    totalVariants += data.variants.length;
+                }
+            });
+            
+            document.getElementById('totalVariantAnimals').textContent = totalAnimals;
+            document.getElementById('totalVariants').textContent = totalVariants;
+        }
+        
+        // 변형 명칭 검색
+        function searchVariantAnimals() {
+            const searchTerm = document.getElementById('searchVariant').value.toLowerCase();
+            const variantList = document.getElementById('variantAnimalList');
+            const items = variantList.getElementsByClassName('animal-item');
+            
+            Array.from(items).forEach(item => {
+                const animalName = item.querySelector('.animal-name').textContent.toLowerCase();
+                const shouldShow = animalName.includes(searchTerm);
+                item.style.display = shouldShow ? 'flex' : 'none';
+            });
+        }
+        
+        // 변형 명칭 편집
+        let editingVariantAnimal = null;
+        let currentEditingVariants = [];
+        
+        function editVariants(animalName) {
+            editingVariantAnimal = animalName;
+            
+            // animalVariants에서 데이터 가져오기
+            const data = animalVariants[animalName];
+            currentEditingVariants = data && data.variants ? [...data.variants] : [];
+            
+            // 폼 표시
+            document.getElementById('variantFormTitle').textContent = `'${animalName}' 변형 명칭 편집`;
+            document.getElementById('variantBaseAnimal').textContent = animalName;
+            document.getElementById('variantEditForm').style.display = 'block';
+            
+            // 변형 명칭 목록 표시
+            displayEditingVariants();
+        }
+        
+        // 편집 중인 변형 명칭 표시
+        function displayEditingVariants() {
+            const listContainer = document.getElementById('variantEditList');
+            listContainer.innerHTML = '';
+            
+            if (currentEditingVariants.length === 0) {
+                listContainer.innerHTML = '<p style="text-align: center; padding: 20px; color: #666;">등록된 변형 명칭이 없습니다.</p>';
+                return;
+            }
+            
+            currentEditingVariants.forEach((variant, index) => {
+                const variantDiv = document.createElement('div');
+                variantDiv.className = 'variant-item';
+                variantDiv.style.cssText = 'display: flex; justify-content: space-between; align-items: center; padding: 10px; margin: 5px 0; background: #f5f5f5; border-radius: 5px;';
+                variantDiv.innerHTML = `
+                    <span>${variant}</span>
+                    <button onclick="removeEditingVariant(${index})" class="btn-danger">삭제</button>
+                `;
+                listContainer.appendChild(variantDiv);
+            });
+        }
+        
+        // 새 변형 명칭 추가
+        function addNewVariant() {
+            const input = document.getElementById('newVariantInput');
+            const variant = input.value.trim();
+            
+            if (!variant) {
+                alert('변형 명칭을 입력해주세요.');
+                return;
+            }
+            
+            if (currentEditingVariants.includes(variant)) {
+                alert('이미 등록된 변형 명칭입니다.');
+                return;
+            }
+            
+            currentEditingVariants.push(variant);
+            input.value = '';
+            displayEditingVariants();
+        }
+        
+        // 편집 중인 변형 명칭 제거
+        function removeEditingVariant(index) {
+            currentEditingVariants.splice(index, 1);
+            displayEditingVariants();
+        }
+        
+        // 변형 명칭 변경사항 저장
+        function saveVariantChanges() {
+            if (!editingVariantAnimal) return;
+            
+            // animalVariants 업데이트
+            if (!animalVariants[editingVariantAnimal]) {
+                animalVariants[editingVariantAnimal] = {
+                    base: editingVariantAnimal,
+                    variants: []
+                };
+            }
+            
+            animalVariants[editingVariantAnimal].variants = [...currentEditingVariants];
+            
+            // variantToBase 재구성
+            regenerateVariantToBase();
+            
+            alert('변형 명칭이 저장되었습니다.\n\n주의: 변경사항은 현재 세션에만 적용됩니다.\n영구 저장을 위해서는 개발자에게 문의하세요.');
+            
+            // 폼 닫기
+            cancelVariantEdit();
+            
+            // 목록 갱신
+            displayAllVariants();
+            updateVariantsStats();
+        }
+        
+        // variantToBase 재생성
+        function regenerateVariantToBase() {
+            // 기존 variantToBase 초기화
+            if (typeof variantToBase !== 'undefined') {
+                // 모든 속성 제거
+                Object.keys(variantToBase).forEach(key => delete variantToBase[key]);
+                
+                // animalVariants를 기반으로 재구성
+                Object.entries(animalVariants).forEach(([base, data]) => {
+                    if (data.variants) {
+                        data.variants.forEach(variant => {
+                            variantToBase[variant] = base;
+                        });
+                    }
+                });
+            }
+        }
+        
+        // 변형 명칭 편집 취소
+        function cancelVariantEdit() {
+            editingVariantAnimal = null;
+            currentEditingVariants = [];
+            document.getElementById('variantEditForm').style.display = 'none';
+            document.getElementById('newVariantInput').value = '';
+        }
+        
+        // 변형 명칭 데이터 내보내기
+        function exportVariants() {
+            if (typeof animalVariants === 'undefined') {
+                alert('변형 명칭 데이터가 없습니다.');
+                return;
+            }
+            
+            const dataStr = `const animalVariants = ${JSON.stringify(animalVariants, null, 2)};
+            
+// Reverse mapping for quick lookup
+const variantToBase = ${JSON.stringify(variantToBase || {}, null, 2)};`;
+            
+            const blob = new Blob([dataStr], { type: 'application/javascript' });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = 'animal-variants.js';
+            link.click();
+            URL.revokeObjectURL(url);
+        }
+        
+        // 변형 명칭 사용법 표시
+        function showVariantsHelp() {
+            alert(`변형 명칭 관리 사용법:
+
+1. 새 변형 명칭 등록:
+   - 상단 파란색 박스에서 동물 이름을 검색합니다
+   - 검색 결과에서 원하는 동물을 클릭합니다
+   - "새 변형 명칭 등록 시작" 버튼을 클릭합니다
+   - 변형 명칭을 추가하고 저장합니다
+
+2. 기존 변형 명칭 편집:
+   - 하단 목록에서 편집할 동물의 "편집" 버튼을 클릭합니다
+   - 변형 명칭을 추가/삭제하고 저장합니다
+
+3. 데이터 관리:
+   - 내보내기: 현재 변형 명칭 데이터를 .js 파일로 저장
+   - 가져오기: 저장된 .js 파일에서 데이터 불러오기
+   
+예시:
+   하이에나 → 하이애나 (외래어 표기 변형)
+   개 → 강아지, 멍멍이 (연령/애칭 변형)
+
+주의: 변경사항은 현재 세션에만 적용됩니다.
+영구 저장을 위해서는 "내보내기" 기능을 사용하세요.`);
+        }
+        
+        // 변형 명칭 데이터 가져오기
+        function importVariants() {
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.accept = '.js,.json';
+            input.onchange = (e) => {
+                const file = e.target.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = (e) => {
+                        try {
+                            // JavaScript 파일 형식 처리
+                            if (file.name.endsWith('.js')) {
+                                // 기존 전역 변수 백업
+                                const backupAnimalVariants = animalVariants;
+                                const backupVariantToBase = variantToBase;
+                                
+                                try {
+                                    // eval을 사용하여 JavaScript 실행
+                                    eval(e.target.result);
+                                    alert('변형 명칭 데이터를 성공적으로 가져왔습니다.');
+                                    displayAllVariants();
+                                    updateVariantsStats();
+                                } catch (evalError) {
+                                    // 복원
+                                    window.animalVariants = backupAnimalVariants;
+                                    window.variantToBase = backupVariantToBase;
+                                    throw evalError;
+                                }
+                            } 
+                            // JSON 파일 형식 처리
+                            else if (file.name.endsWith('.json')) {
+                                const data = JSON.parse(e.target.result);
+                                window.animalVariants = data.animalVariants || data;
+                                regenerateVariantToBase();
+                                alert('변형 명칭 데이터를 성공적으로 가져왔습니다.');
+                                displayAllVariants();
+                                updateVariantsStats();
+                            } else {
+                                alert('지원하지 않는 파일 형식입니다. .js 또는 .json 파일을 선택해주세요.');
+                            }
+                        } catch (error) {
+                            console.error('Import error:', error);
+                            alert('파일을 읽는 중 오류가 발생했습니다: ' + error.message);
+                        }
+                    };
+                    reader.readAsText(file);
+                }
+            };
+            input.click();
+        }
+        
+        // CSV 업로드 섹션 숨기기
+        function hideCSVUpload() {
+            document.getElementById('csvUploadSection').style.display = 'none';
+        }
+        
+        // CSV 템플릿 다운로드
+        function downloadCSVTemplate() {
+            const template = 'ID,성별,연령,학력,0-15초,15-30초,30-45초,45-60초\n' +
+                           '001,남성,65,12,"개,고양이,소,말,돼지","닭,호랑이,사자,뱀,거북이","토끼,쥐,원숭이,양,염소","오리,거위,비둘기,참새,독수리"\n' +
+                           '002,여성,72,6,"개,소,말,닭,오리","개구리,토끼,쥐,고양이,돼지","사자,호랑이,곰,여우,늑대","뱀,거북이,악어,도마뱀,개구리"\n' +
+                           '샘플,남성,55,16,"개,고양이,소,말,돼지","닭,오리,거위,비둘기,참새","호랑이,사자,곰,늑대,여우","뱀,거북이,악어,도마뱀,개구리"';
+            
+            const blob = new Blob(['\ufeff' + template], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = '동물유창성검사_템플릿.csv';
+            link.click();
+        }
+        
+        // CSV 파일 처리
+        function processCSV() {
+            const fileInput = document.getElementById('csvFile');
+            const file = fileInput.files[0];
+            
+            if (!file) {
+                alert('CSV 파일을 선택해주세요.');
+                return;
+            }
+            
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const csv = e.target.result;
+                    const rows = parseCSV(csv);
+                    
+                    if (rows.length < 2) {
+                        alert('데이터가 없습니다.');
+                        return;
+                    }
+                    
+                    // 헤더 확인
+                    const header = rows[0];
+                    if (!validateHeader(header)) {
+                        alert('CSV 헤더 형식이 올바르지 않습니다.');
+                        return;
+                    }
+                    
+                    // 각 행 처리
+                    const results = [];
+                    for (let i = 1; i < rows.length; i++) {
+                        if (rows[i].length >= 8) {
+                            const result = processRow(rows[i], i);
+                            results.push(result);
+                        }
+                    }
+                    
+                    // 결과 표시
+                    displayCSVResults(results);
+                    
+                } catch (error) {
+                    console.error('CSV 처리 오류:', error);
+                    alert('CSV 파일 처리 중 오류가 발생했습니다: ' + error.message);
+                }
+            };
+            reader.readAsText(file);
+        }
+        
+        // CSV 파싱 - 따옴표로 묶인 셀을 올바르게 처리
+        function parseCSV(csv) {
+            const lines = csv.split('\n');
+            const rows = [];
+            
+            for (let line of lines) {
+                if (line.trim()) {
+                    const row = [];
+                    let cell = '';
+                    let insideQuotes = false;
+                    
+                    for (let i = 0; i < line.length; i++) {
+                        const char = line[i];
+                        
+                        if (char === '"') {
+                            insideQuotes = !insideQuotes;
+                        } else if (char === ',' && !insideQuotes) {
+                            row.push(cell.trim());
+                            cell = '';
+                        } else {
+                            cell += char;
+                        }
+                    }
+                    
+                    // 마지막 셀 추가
+                    row.push(cell.trim());
+                    rows.push(row);
+                }
+            }
+            
+            return rows;
+        }
+        
+        // 헤더 검증
+        function validateHeader(header) {
+            const expected = ['ID', '성별', '연령', '학력', '0-15초', '15-30초', '30-45초', '45-60초'];
+            return header.length >= 8 && 
+                   header[0] === expected[0] &&
+                   header[1] === expected[1] &&
+                   header[2] === expected[2] &&
+                   header[3] === expected[3];
+        }
+        
+        // 개별 행 처리
+        function processRow(row, rowIndex) {
+            const id = row[0];
+            const gender = row[1];
+            const age = parseInt(row[2]) || 0;
+            const education = parseInt(row[3]) || 0;
+            
+            // 각 시간대별 반응 파싱
+            const responses = {
+                '0-15': parseAnimals(row[4]),
+                '15-30': parseAnimals(row[5]),
+                '30-45': parseAnimals(row[6]),
+                '45-60': parseAnimals(row[7])
+            };
+            
+            // 점수 계산 (기존 calculateScores 로직 활용)
+            const scores = calculateScoresForCSV({
+                id: id,
+                gender: gender,
+                age: age,
+                education: education,
+                responses: responses
+            });
+            
+            return {
+                row: rowIndex + 1,
+                id: id,
+                gender: gender,
+                age: age,
+                education: education,
+                ...scores
+            };
+        }
+        
+        // 동물 이름 파싱
+        function parseAnimals(animalsStr) {
+            if (!animalsStr) return [];
+            return animalsStr.split(',').map(a => a.trim()).filter(a => a);
+        }
+        
+        // CSV용 점수 계산
+        function calculateScoresForCSV(data) {
+            // 전역 responses 객체 임시 백업
+            const backup = JSON.parse(JSON.stringify(responses));
+            
+            // CSV 데이터로 responses 설정
+            responses['0-15'] = data.responses['0-15'];
+            responses['15-30'] = data.responses['15-30'];
+            responses['30-45'] = data.responses['30-45'];
+            responses['45-60'] = data.responses['45-60'];
+            
+            // 모든 반응을 순서대로 정리
+            const allResponses = [];
+            let order = 1;
+            
+            ['0-15', '15-30', '30-45', '45-60'].forEach(range => {
+                data.responses[range].forEach(response => {
+                    const trimmed = response.trim();
+                    
+                    // 질문 패턴 감지 (CSV에서도 동일한 로직 적용)
+                    const isQuestion = trimmed.includes('?') || 
+                                     /도\s*(되요|돼요|되나요|되나|됩니까|되니|되냐)/i.test(trimmed) ||
+                                     /맞아요|맞나요|맞죠|맞습니까/i.test(trimmed) ||
+                                     /할\s*수\s*있(어요|나요|습니까)/i.test(trimmed) ||
+                                     /가능한가요|가능해요|가능합니까/i.test(trimmed);
+                    
+                    if (isQuestion) {
+                        console.log(`CSV에서 질문 항목 제외: ${trimmed}`);
+                        return; // 질문은 처리하지 않음
+                    }
+                    
+                    const normalized = (typeof normalizeAnimalName === 'function') ? normalizeAnimalName(trimmed) : null;
+                    const finalNormalized = normalized || (ANIMAL_CATEGORIES[trimmed] ? trimmed : null);
+                    
+                    allResponses.push({
+                        response: response,
+                        normalizedResponse: finalNormalized,
+                        originalResponse: trimmed,
+                        order,
+                        timeRange: range
+                    });
+                    order++;
+                });
+            });
+            
+            // 점수 계산 로직 (기존 calculateScores 함수의 로직 재사용)
+            const validResponses = allResponses.filter(r => r.normalizedResponse !== null);
+            const uniqueResponses = [...new Set(validResponses.map(r => r.normalizedResponse))];
+            const totalScore = uniqueResponses.length;
+            
+            const firstHalfResponses = allResponses.filter(r => 
+                (r.timeRange === '0-15' || r.timeRange === '15-30') && r.normalizedResponse !== null
+            );
+            const firstHalfScore = new Set(firstHalfResponses.map(r => r.normalizedResponse)).size;
+            
+            const secondHalfResponses = allResponses.filter(r => 
+                (r.timeRange === '30-45' || r.timeRange === '45-60') && r.normalizedResponse !== null
+            );
+            const secondHalfScore = new Set(secondHalfResponses.map(r => r.normalizedResponse)).size;
+            
+            const responseCount = {};
+            validResponses.forEach(r => {
+                responseCount[r.normalizedResponse] = (responseCount[r.normalizedResponse] || 0) + 1;
+            });
+            const perseverationScore = Object.values(responseCount)
+                .filter(count => count > 1)
+                .reduce((sum, count) => sum + (count - 1), 0);
+            
+            let intrusionScore = 0;
+            allResponses.forEach(response => {
+                if (response.normalizedResponse === null) {
+                    intrusionScore++;
+                }
+            });
+            
+            const { transitions, clusters, switchingScore, inefficientSwitchingScore } = analyzeTransitionsAndClusters(validResponses);
+            
+            const usedCategories = new Set();
+            clusters.forEach(cluster => {
+                if (cluster.commonCategories.length > 0) {
+                    usedCategories.add(cluster.commonCategories[0]);
+                }
+            });
+            const categoryScore = usedCategories.size;
+            
+            const clusterSizes = clusters.map(c => c.size);
+            const avgClusterSize = clusterSizes.length > 0 
+                ? clusterSizes.reduce((sum, size) => sum + size, 0) / clusterSizes.length
+                : 0;
+            const maxClusterSize = Math.max(...clusterSizes, 0);
+            
+            // inefficientSwitchingScore는 이미 analyzeTransitionsAndClusters에서 계산됨
+            
+            // 전역 responses 복원
+            Object.assign(responses, backup);
+            
+            return {
+                totalScore,
+                firstHalfScore,
+                secondHalfScore,
+                perseverationScore,
+                intrusionScore,
+                switchingScore,
+                inefficientSwitchingScore,
+                categoryScore,
+                avgClusterSize: avgClusterSize.toFixed(1),
+                maxClusterSize
+            };
+        }
+        
+        // CSV 결과 표시
+        function displayCSVResults(results) {
+            let html = '<h3>처리 결과</h3>';
+            html += '<table class="csv-result-table">';
+            html += '<thead><tr>';
+            html += '<th>번호</th><th>ID</th><th>성별</th><th>연령</th><th>학력</th>';
+            html += '<th>총점</th><th>전반</th><th>후반</th><th>보속</th><th>침투</th>';
+            html += '<th>전환</th><th>비효율</th><th>범주수</th><th>평균크기</th><th>최대크기</th>';
+            html += '</tr></thead><tbody>';
+            
+            results.forEach(r => {
+                html += '<tr>';
+                html += `<td>${r.row}</td>`;
+                html += `<td>${r.id}</td>`;
+                html += `<td>${r.gender}</td>`;
+                html += `<td>${r.age}</td>`;
+                html += `<td>${r.education}</td>`;
+                html += `<td>${r.totalScore}</td>`;
+                html += `<td>${r.firstHalfScore}</td>`;
+                html += `<td>${r.secondHalfScore}</td>`;
+                html += `<td>${r.perseverationScore}</td>`;
+                html += `<td>${r.intrusionScore}</td>`;
+                html += `<td>${r.switchingScore}</td>`;
+                html += `<td>${r.inefficientSwitchingScore}</td>`;
+                html += `<td>${r.categoryScore}</td>`;
+                html += `<td>${r.avgClusterSize}</td>`;
+                html += `<td>${r.maxClusterSize}</td>`;
+                html += '</tr>';
+            });
+            
+            html += '</tbody></table>';
+            
+            // 결과 다운로드 버튼
+            html += '<div style="margin-top: 20px;">';
+            html += '<button onclick="downloadCSVResults(' + JSON.stringify(results).replace(/"/g, '&quot;') + ')" class="btn-primary">결과 다운로드</button>';
+            html += '</div>';
+            
+            document.getElementById('csvResults').innerHTML = html;
+        }
+        
+        // CSV 결과 다운로드
+        function downloadCSVResults(results) {
+            let csv = 'ID,성별,연령,학력,총점,전반점수,후반점수,보속,침투,전환,비효율전환,범주수,평균범주크기,최대범주크기\n';
+            
+            results.forEach(r => {
+                csv += `${r.id},${r.gender},${r.age},${r.education},`;
+                csv += `${r.totalScore},${r.firstHalfScore},${r.secondHalfScore},`;
+                csv += `${r.perseverationScore},${r.intrusionScore},${r.switchingScore},`;
+                csv += `${r.inefficientSwitchingScore},${r.categoryScore},`;
+                csv += `${r.avgClusterSize},${r.maxClusterSize}\n`;
+            });
+            
+            const blob = new Blob(['\ufeff' + csv], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = '동물유창성검사_결과_' + new Date().toISOString().slice(0, 10) + '.csv';
+            link.click();
+        }
+        // URL 파라미터 처리 (시행 프로그램에서 전달받은 데이터)
+        window.addEventListener('DOMContentLoaded', function() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const responsesParam = urlParams.get('responses');
+            const autoAnalyze = urlParams.get('autoAnalyze');
+            
+            if (responsesParam) {
+                try {
+                    const responsesData = JSON.parse(responsesParam);
+                    
+                    // 각 구간별로 데이터 입력
+                    for (const [timeRange, animalsStr] of Object.entries(responsesData)) {
+                        if (animalsStr) {
+                            const animals = animalsStr.split(',').map(a => a.trim()).filter(a => a);
+                            
+                            // responses 객체에 직접 추가
+                            responses[timeRange] = animals;
+                            
+                            // UI 업데이트
+                            displayResponses(timeRange);
+                        }
+                    }
+                    
+                    // 자동 분석 실행
+                    if (autoAnalyze === 'true') {
+                        setTimeout(() => {
+                            calculateScores();
+                        }, 500);
+                    }
+                } catch (error) {
+                    console.error('URL 파라미터 처리 오류:', error);
+                }
+            }
+        });
+    </script>
+
+</body></html>

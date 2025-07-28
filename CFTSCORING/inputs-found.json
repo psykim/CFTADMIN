@@ -1,0 +1,258 @@
+[
+  {
+    "type": "text",
+    "name": "",
+    "id": "subjectId",
+    "placeholder": "피검자 ID",
+    "value": "",
+    "visible": true
+  },
+  {
+    "type": "radio",
+    "name": "gender",
+    "id": "gender-male",
+    "placeholder": "",
+    "value": "male",
+    "visible": false
+  },
+  {
+    "type": "radio",
+    "name": "gender",
+    "id": "gender-female",
+    "placeholder": "",
+    "value": "female",
+    "visible": false
+  },
+  {
+    "type": "number",
+    "name": "",
+    "id": "age",
+    "placeholder": "연령",
+    "value": "",
+    "visible": true
+  },
+  {
+    "type": "number",
+    "name": "",
+    "id": "education",
+    "placeholder": "교육년수 입력",
+    "value": "",
+    "visible": true
+  },
+  {
+    "type": "text",
+    "name": "",
+    "id": "input-0-15",
+    "placeholder": "동물 이름 입력",
+    "value": "",
+    "visible": true
+  },
+  {
+    "type": "text",
+    "name": "",
+    "id": "input-15-30",
+    "placeholder": "동물 이름 입력",
+    "value": "",
+    "visible": true
+  },
+  {
+    "type": "text",
+    "name": "",
+    "id": "input-30-45",
+    "placeholder": "동물 이름 입력",
+    "value": "",
+    "visible": true
+  },
+  {
+    "type": "text",
+    "name": "",
+    "id": "input-45-60",
+    "placeholder": "동물 이름 입력",
+    "value": "",
+    "visible": true
+  },
+  {
+    "type": "text",
+    "name": "",
+    "id": "searchAnimal",
+    "placeholder": "동물 검색...",
+    "value": "",
+    "visible": false
+  },
+  {
+    "type": "text",
+    "name": "",
+    "id": "animalName",
+    "placeholder": "",
+    "value": "",
+    "visible": false
+  },
+  {
+    "type": "checkbox",
+    "name": "",
+    "id": "cat_MAMMAL",
+    "placeholder": "",
+    "value": "on",
+    "visible": false
+  },
+  {
+    "type": "checkbox",
+    "name": "",
+    "id": "cat_BIRD",
+    "placeholder": "",
+    "value": "on",
+    "visible": false
+  },
+  {
+    "type": "checkbox",
+    "name": "",
+    "id": "cat_REPTILE",
+    "placeholder": "",
+    "value": "on",
+    "visible": false
+  },
+  {
+    "type": "checkbox",
+    "name": "",
+    "id": "cat_AMPHIBIAN",
+    "placeholder": "",
+    "value": "on",
+    "visible": false
+  },
+  {
+    "type": "checkbox",
+    "name": "",
+    "id": "cat_FISH",
+    "placeholder": "",
+    "value": "on",
+    "visible": false
+  },
+  {
+    "type": "checkbox",
+    "name": "",
+    "id": "cat_INSECT",
+    "placeholder": "",
+    "value": "on",
+    "visible": false
+  },
+  {
+    "type": "checkbox",
+    "name": "",
+    "id": "cat_MOLLUSK",
+    "placeholder": "",
+    "value": "on",
+    "visible": false
+  },
+  {
+    "type": "checkbox",
+    "name": "",
+    "id": "cat_CRUSTACEAN",
+    "placeholder": "",
+    "value": "on",
+    "visible": false
+  },
+  {
+    "type": "checkbox",
+    "name": "",
+    "id": "cat_MARINE",
+    "placeholder": "",
+    "value": "on",
+    "visible": false
+  },
+  {
+    "type": "checkbox",
+    "name": "",
+    "id": "cat_FRESHWATER",
+    "placeholder": "",
+    "value": "on",
+    "visible": false
+  },
+  {
+    "type": "checkbox",
+    "name": "",
+    "id": "cat_DOMESTIC",
+    "placeholder": "",
+    "value": "on",
+    "visible": false
+  },
+  {
+    "type": "checkbox",
+    "name": "",
+    "id": "cat_PET",
+    "placeholder": "",
+    "value": "on",
+    "visible": false
+  },
+  {
+    "type": "checkbox",
+    "name": "",
+    "id": "cat_WILD",
+    "placeholder": "",
+    "value": "on",
+    "visible": false
+  },
+  {
+    "type": "checkbox",
+    "name": "",
+    "id": "cat_ZODIAC",
+    "placeholder": "",
+    "value": "on",
+    "visible": false
+  },
+  {
+    "type": "checkbox",
+    "name": "",
+    "id": "cat_MYTHOLOGY",
+    "placeholder": "",
+    "value": "on",
+    "visible": false
+  },
+  {
+    "type": "checkbox",
+    "name": "",
+    "id": "cat_PREHISTORIC",
+    "placeholder": "",
+    "value": "on",
+    "visible": false
+  },
+  {
+    "type": "text",
+    "name": "",
+    "id": "variantInput",
+    "placeholder": "변형 명칭 입력 (예: 강아지, 멍멍이)",
+    "value": "",
+    "visible": false
+  },
+  {
+    "type": "text",
+    "name": "",
+    "id": "searchAnimalForVariant",
+    "placeholder": "동물 이름 입력 (예: 하이에나)",
+    "value": "",
+    "visible": false
+  },
+  {
+    "type": "text",
+    "name": "",
+    "id": "searchVariant",
+    "placeholder": "동물 명칭 검색...",
+    "value": "",
+    "visible": false
+  },
+  {
+    "type": "text",
+    "name": "",
+    "id": "newVariantInput",
+    "placeholder": "새 변형 명칭 입력 (예: 하이애나, 강아지)",
+    "value": "",
+    "visible": false
+  },
+  {
+    "type": "file",
+    "name": "",
+    "id": "csvFile",
+    "placeholder": "",
+    "value": "",
+    "visible": false
+  }
+]

@@ -1,0 +1,38 @@
+[
+  {
+    "index": 0,
+    "className": "score-table",
+    "id": "",
+    "isVisible": false,
+    "position": {
+      "top": 261,
+      "left": 0,
+      "width": 0,
+      "height": 0
+    },
+    "rowCount": 6,
+    "firstCells": [
+      {
+        "text": "60초 반응",
+        "tagName": "TH"
+      },
+      {
+        "text": "총점",
+        "tagName": "TH"
+      },
+      {
+        "text": "Z점수",
+        "tagName": "TH"
+      },
+      {
+        "text": "퍼센타일",
+        "tagName": "TH"
+      },
+      {
+        "text": "전반점수",
+        "tagName": "TH"
+      }
+    ],
+    "containsScore": true
+  }
+]

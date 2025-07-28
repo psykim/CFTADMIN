@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Table Styling Test</title>
+    <style>
+        body {
+            background-color: #f0f0f0;
+            padding: 20px;
+            font-family: Arial, sans-serif;
+        }
+        
+        .score-table {
+            border-collapse: collapse;
+            margin: 20px auto;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .score-table th, .score-table td {
+            border: 1px solid #ddd;
+            padding: 12px;
+            text-align: center;
+        }
+        
+        .score-table th {
+            background-color: #f0f0f0;
+            font-weight: bold;
+        }
+        
+        .data-cell {
+            background-color: white;
+        }
+        
+        /* Test case: explicit white background */
+        .test-white {
+            background-color: white !important;
+        }
+        
+        /* Debug styling to make it obvious */
+        .debug-red {
+            background-color: red !important;
+        }
+    </style>
+</head>
+<body>
+    <h1>Score Table CSS Test</h1>
+    
+    <h2>Test 1: Original Styling</h2>
+    <table class="score-table">
+        <tr>
+            <th>Header 1</th>
+            <th>Header 2</th>
+            <th>Header 3</th>
+        </tr>
+        <tr>
+            <td class="data-cell">Data 1</td>
+            <td class="data-cell">Data 2</td>
+            <td class="data-cell">Data 3</td>
+        </tr>
+        <tr>
+            <td class="data-cell">Data 4</td>
+            <td class="data-cell">Data 5</td>
+            <td class="data-cell">Data 6</td>
+        </tr>
+    </table>
+    
+    <h2>Test 2: With !important</h2>
+    <table class="score-table">
+        <tr>
+            <th>Header 1</th>
+            <th>Header 2</th>
+            <th>Header 3</th>
+        </tr>
+        <tr>
+            <td class="test-white">Data 1</td>
+            <td class="test-white">Data 2</td>
+            <td class="test-white">Data 3</td>
+        </tr>
+    </table>
+    
+    <h2>Test 3: Debug Red Background</h2>
+    <table class="score-table">
+        <tr>
+            <th>Header 1</th>
+            <th>Header 2</th>
+            <th>Header 3</th>
+        </tr>
+        <tr>
+            <td class="debug-red">Data 1</td>
+            <td class="debug-red">Data 2</td>
+            <td class="debug-red">Data 3</td>
+        </tr>
+    </table>
+    
+    <h2>Test 4: Inline Style</h2>
+    <table class="score-table">
+        <tr>
+            <th>Header 1</th>
+            <th>Header 2</th>
+            <th>Header 3</th>
+        </tr>
+        <tr>
+            <td style="background-color: white;">Inline White</td>
+            <td style="background-color: white;">Inline White</td>
+            <td style="background-color: white;">Inline White</td>
+        </tr>
+    </table>
+    
+    <div style="margin-top: 40px; padding: 20px; background-color: #333; color: white;">
+        <p>Background colors should be:</p>
+        <ul>
+            <li>Test 1: White (using .data-cell class)</li>
+            <li>Test 2: White (using !important)</li>
+            <li>Test 3: Red (debug test)</li>
+            <li>Test 4: White (inline style)</li>
+        </ul>
+    </div>
+</body>
+</html>

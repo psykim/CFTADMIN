@@ -1,0 +1,105 @@
+<div id="results" class="results" style="display: block; visibility: visible;">
+            <h2 style="text-align: center; color: #1565c0; font-size: 32px; margin-bottom: 30px; padding: 20px; background: linear-gradient(135deg, #e3f2fd 0%, #f3f4f6 100%); border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.1);">판독 결과</h2>
+            
+            <!-- 돌아가기 버튼 -->
+            <div style="text-align: right; margin-bottom: 30px;">
+                <button onclick="backToInput()" class="btn-primary" style="padding: 10px 25px; font-size: 14px; background: #1976d2; color: white; border: none; border-radius: 8px; cursor: pointer; transition: all 0.3s ease; box-shadow: 0 2px 5px rgba(0,0,0,0.2);">
+                    입력 화면으로 돌아가기
+                </button>
+            </div>
+            
+            
+            <!-- 통합 결과 테이블 -->
+            <table class="score-table" style="width: 100%; max-width: 1200px; margin: 0px auto; table-layout: fixed; display: table; visibility: visible;">
+                <colgroup>
+                    <col style="width: 15%;">
+                    <col style="width: 12.14%;">
+                    <col style="width: 12.14%;">
+                    <col style="width: 12.14%;">
+                    <col style="width: 12.14%;">
+                    <col style="width: 12.14%;">
+                    <col style="width: 12.14%;">
+                    <col style="width: 12.14%;">
+                </colgroup>
+                <tbody>
+                    <!-- 60초 반응 첫번째 행 -->
+                    <tr class="header-row">
+                        <th rowspan="4" style="vertical-align: middle; font-weight: bold; background-color: #e8f4f8;">60초 반응</th>
+                        <th>총점</th>
+                        <th>Z점수</th>
+                        <th>퍼센타일</th>
+                        <th>전반점수</th>
+                        <th>후반점수</th>
+                        <th>보속오류</th>
+                        <th>침투오류</th>
+                    </tr>
+                    <tr>
+                        <td id="totalScore" class="data-cell">0</td>
+                        <td id="totalZScore" class="data-cell">-</td>
+                        <td id="totalPercentile" class="data-cell">-</td>
+                        <td id="firstHalfScore" class="data-cell">0</td>
+                        <td id="secondHalfScore" class="data-cell">0</td>
+                        <td id="perseverationScore" class="data-cell">0</td>
+                        <td id="intrusionScore" class="data-cell">0</td>
+                    </tr>
+                    
+                    <!-- 60초 반응 두번째 행 -->
+                    <tr class="header-row">
+                        <th>범주수</th>
+                        <th>평균크기</th>
+                        <th>최대크기</th>
+                        <th>전환</th>
+                        <th>비효율전환</th>
+                        <th colspan="2">-</th>
+                    </tr>
+                    <tr>
+                        <td id="categoryScore" class="data-cell">0</td>
+                        <td id="avgClusterSize" class="data-cell">0</td>
+                        <td id="maxClusterSize" class="data-cell">0</td>
+                        <td id="switchingScore" class="data-cell">0</td>
+                        <td id="inefficientSwitchingScore" class="data-cell">0</td>
+                        <td colspan="2" class="data-cell">-</td>
+                    </tr>
+                    
+                    <!-- 전반 30초 결과 -->
+                    <tr class="header-row" style="border-top: 2px solid #ddd;">
+                        <th rowspan="2" style="vertical-align: middle; font-weight: bold; background-color: #e8f4f8;">전반 30초 반응</th>
+                        <th>범주수</th>
+                        <th>평균크기</th>
+                        <th>최대크기</th>
+                        <th>전환</th>
+                        <th>비효율전환</th>
+                        <th>보속오류</th>
+                        <th>침투오류</th>
+                    </tr>
+                    <tr>
+                        <td id="first30SecCategoryScore" class="data-cell">0</td>
+                        <td id="first30SecAvgClusterSize" class="data-cell">0</td>
+                        <td id="first30SecMaxClusterSize" class="data-cell">0</td>
+                        <td id="first30SecSwitchingScore" class="data-cell">0</td>
+                        <td id="first30SecInefficient" class="data-cell">0</td>
+                        <td id="first30SecPerseverationScore" class="data-cell">0</td>
+                        <td id="first30SecIntrusionScore" class="data-cell">0</td>
+                    </tr>
+                </tbody>
+            </table>
+            
+            <div id="normInfo" style="display: none;"></div>
+            
+            <div class="analysis-section" id="clusterAnalysisSection">
+                <div id="clusterAnalysis">
+                    <p style="color: #666; text-align: center; padding: 20px;">
+                        점수 계산을 실행하면 분석 결과가 여기에 표시됩니다.
+                    </p>
+                </div>
+            </div>
+            
+            <!-- 임상적 해석 (표 아래 위치) -->
+            <div id="patternAnalysis" style="margin-top: 30px; padding: 20px; background: #f8f9fa; border-radius: 10px; border-left: 4px solid #1976d2;">
+                <p style="color: #666; text-align: center;">
+                    점수 계산을 실행하면 임상적 해석이 여기에 표시됩니다.
+                </p>
+            </div>
+            
+            
+        </div>

@@ -1,0 +1,90 @@
+{
+  "scoreTableRows": [
+    [
+      "60초 반응",
+      "총점",
+      "Z점수",
+      "퍼센타일",
+      "전반점수",
+      "후반점수",
+      "보속오류",
+      "침투오류"
+    ],
+    [
+      "0",
+      "-",
+      "-",
+      "0",
+      "0",
+      "0",
+      "0"
+    ],
+    [
+      "범주수",
+      "평균크기",
+      "최대크기",
+      "전환",
+      "비효율전환",
+      "-"
+    ],
+    [
+      "0",
+      "0",
+      "0",
+      "0",
+      "0",
+      "-"
+    ],
+    [
+      "전반 30초 반응",
+      "범주수",
+      "평균크기",
+      "최대크기",
+      "전환",
+      "비효율전환",
+      "보속오류",
+      "침투오류"
+    ],
+    [
+      "0",
+      "0",
+      "0",
+      "0",
+      "0",
+      "0",
+      "0"
+    ]
+  ],
+  "scoreElements": [
+    {
+      "tag": "TABLE",
+      "class": "score-table",
+      "id": "",
+      "text": "60초 반응\n                        총점\n                        Z점수\n                        퍼센타일\n                        전반점수\n                        후반점수\n                        보속오류\n                        침투오류\n                    \n                    \n                        0\n                        -\n                        -\n                        0\n                        0\n                        0\n                        0\n                    \n                    \n                    \n                    \n                        범주수\n                        평균크기\n                        최대크기\n                        전환\n                        비효율전환\n                        -\n                    \n                    \n                        0\n                        0\n                        0\n                        0\n                        0\n                        -\n                    \n                    \n                    \n                    \n                        전반 30초 반응\n                        범주수\n                        평균크기\n                        최대크기\n                        전환\n                        비효율전환\n                        보속오류\n                        침투오류\n                    \n                    \n                        0\n                        0\n                        0\n                        0\n                        0\n                        0\n                        0"
+    }
+  ],
+  "resultsContent": "\n            <h2 style=\"text-align: center; color: #1565c0; font-size: 32px; margin-bottom: 30px; padding: 20px; background: linear-gradient(135deg, #e3f2fd 0%, #f3f4f6 100%); border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.1);\">판독 결과</h2>\n            \n            <!-- 돌아가기 버튼 -->\n            <div style=\"text-align: right; margin-bottom: 30px;\">\n                <button onclick=\"backToInput()\" class=\"btn-primary\" style=\"padding: 10px 25px; font-size: 14px; background: #1976d2; color: white; border: none; border-radius: 8px; cursor: pointer; transition: all 0.3s ease; box-shadow: 0 2px 5px rgba(0,0,0,0.2);\">\n                    입력 화면으로 돌아가기\n                </button>\n            </div>\n            \n            \n            <!-- 통합 결과 테이블 -->\n            <table class=\"score-table\" style=\"width: 100%; max-width: 1200px; margin: 0px auto; table-layout: fixed; display: table; visibility: visible;\">\n                <colgroup>\n                    <col style=\"width: 15%;\">\n                    <col style=\"width: 12.14%;\">\n                    <col style=\"width: 12.14%;\">\n                    <col style=\"width: 12.14%;\">\n                    <col style=\"width: 12.14%;\">\n                    <col style=\"width: 12.14%;\">\n                    <col style=\"width: 12.14%;\">\n                    <col style=\"width: 12.14%;\">\n                </colgroup>\n                <tbody>\n                    <!-- 60초 반응 첫번째 행 -->\n                    <tr class=\"header-row\">\n                        <th rowspan=\"4\" style=\"vertical-align: middle; font-weight: bold; background-color: #e8f4f8;\">60초 반응</th>\n                        <th>총점</th>\n                        <th>Z점수</th>\n                        <th>퍼센타일</th>\n                        <th>전반점수</th>\n                        <th>후반점수</th>\n                        <th>보속오류</th>\n                        <th>침투오류</th>\n                    </tr>\n                    <tr>\n                        <td id=\"totalScore\" class=\"data-cell\">0</td>\n                        <td id=\"totalZScore\" class=\"data-cell\">-</td>\n                        <td id=\"totalPercentile\" class=\"data-cell\">-</td>\n                        <td id=\"firstHalfScore\" class=\"data-cell\">0</td>\n                        <td id=\"secondHalfScore\" class=\"data-cell\">0</td>\n                        <td id=\"perseverationScore\" class=\"data-cell\">0</td>\n                        <td id=\"intrusionScore\" class=\"data-cell\">0</td>\n                    </tr>\n                    \n                    <!-- 60초 반응 두번째 행 -->\n                    <tr class=\"header-row\">\n                        <th>범주수</th>\n                        <th>평균크기</th>\n                        <th>최대크기</th>\n                        <th>전환</th>\n                        <th>비효율전환</th>\n                        <th colspan=\"2\">-</th>\n                    </tr>\n                    <tr>\n                        <td id=\"categoryScore\" class=\"data-cell\">0</td>\n                        <td id=\"avgClusterSize\" class=\"data-cell\">0</td>\n                        <td id=\"maxClusterSize\" class=\"data-cell\">0</td>\n                        <td id=\"switchingScore\" class=\"data-cell\">0</td>\n                        <td id=\"inefficientSwitchingScore\" class=\"data-cell\">0</td>\n                        <td colspan=\"2\" class=\"data-cell\">-</td>\n                    </tr>\n                    \n                    <!-- 전반 30초 결과 -->\n                    <tr class=\"header-row\" style=\"border-top: 2px solid #ddd;\">\n                        <th rowspan=\"2\" style=\"vertical-align: middle; font-weight: bold; background-color: #e8f4f8;\">전반 30초 반응</th>\n                        <th>범주수</th>\n                        <th>평균크기</th>\n                        <th>최대크기</th>\n                        <th>전환</th>\n                        <th>비효율전환</th>\n                        <th>보속오류</th>\n                        <th>침투오류</th>\n                    </tr>\n                    <tr>\n                        <td id=\"first30SecCategoryScore\" class=\"data-cell\">0</td>\n                        <td id=\"first30SecAvgClusterSize\" class=\"data-cell\">0</td>\n                        <td id=\"first30SecMaxClusterSize\" class=\"data-cell\">0</td>\n                        <td id=\"first30SecSwitchingScore\" class=\"data-cell\">0</td>\n                        <td id=\"first30SecInefficient\" class=\"data-cell\">0</td>\n                        <td id=\"first30SecPerseverationScore\" class=\"data-cell\">0</td>\n                        <td id=\"first30SecIntrusionScore\" class=\"data-cell\">0</td>\n                    </tr>\n                </tbody>\n            </table>\n            \n            <div id=\"normInfo\" style=\"display: none;\"></div>\n            \n            <div class=\"analysis-section\" id=\"clusterAnalysisSection\">\n                <div id=\"clusterAnalysis\">\n                    <p style=\"color: #666; text-align: center; padding: 20px;\">\n                        점수 계산을 실행하면 분석 결과가 여기에 표시됩니다.\n                    </p>\n                </div>\n            </div>\n            \n            <!-- 임상적 해석 (표 아래 위치) -->\n            <div id=\"patternAnalysis\" style=\"margin-top: 30px; padding: 20px; background: #f8f9fa; border-radius: 10px; border-left: 4px solid #1976d2;\">\n                <p style=\"color: #666; text-align: center;\">\n                    점수 계산을 실행하면 임상적 해석이 여기에 표시됩니다.\n                </p>\n            </div>\n            \n            \n        ",
+  "resultsText": "판독 결과\n            \n            \n            \n                \n                    입력 화면으로 돌아가기\n                \n            \n            \n            \n            \n            \n                \n                    \n                    \n                    \n                    \n                    \n                    \n                    \n                    \n                \n                \n                    \n                    \n                        60초 반응\n                        총점\n                        Z점수\n                        퍼센타일\n                        전반점수\n                        후반점수\n                        보속오류\n                        침투오류\n                    \n                    \n                        0\n                        -\n                        -\n                        0\n                        0\n                        0\n                        0\n                    \n                    \n                    \n                    \n                        범주수\n                        평균크기\n                        최대크기\n                        전환\n                        비효율전환\n                        -\n                    \n                    \n                        0\n                        0\n                        0\n                        0\n                        0\n                        -\n                    \n                    \n                    \n                    \n                        전반 30초 반응\n                        범주수\n                        평균크기\n                        최대크기\n                        전환\n                        비효율전환\n                        보속오류\n                        침투오류\n                    \n                    \n                        0\n                        0\n                        0\n                        0\n                        0\n                        0\n                        0\n                    \n                \n            \n            \n            \n            \n            \n                \n                    \n                        점수 계산을 실행하면 분석 결과가 여기에 표시됩니다.\n                    \n                \n            \n            \n            \n            \n                \n                    점수 계산을 실행하면 임상적 해석이 여기에 표시됩니다.",
+  "numbersFound": [
+    "60",
+    "0",
+    "0",
+    "0",
+    "0",
+    "0",
+    "0",
+    "0",
+    "0",
+    "0",
+    "0",
+    "30",
+    "0",
+    "0",
+    "0",
+    "0",
+    "0",
+    "0",
+    "0"
+  ],
+  "interpretations": []
+}

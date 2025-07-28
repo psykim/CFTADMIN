@@ -940,15 +940,17 @@
                         speak("예를 들어, 제가, '옷 종류'라고 말하면, 셔츠, 넥타이, 모자 등의 이름을, 말씀하시면 됩니다.", () => {
                             speak("옷 종류에 속하는 것 중에, 또 다른 것들도 있죠.", () => {
                                 speak("삐 소리가 나고 마이크에 불이 들어오면, 옷종류에 속하는 다른 것들을 제가 그만할 때까지 최대한 많이 말씀해 보세요.", () => {
+                                    console.log('연습 안내 완료 - 삐 소리 준비');
                                     setTimeout(() => {
+                                        console.log('연습 모드 시작');
                                         isPracticePhase = true;
                                         practiceItems = [];
-                                        responseList.innerHTML = '';
+                                        if (responseList) responseList.innerHTML = '';
                                         
                                         // 1초 삐 소리
                                         playBeep(880, 1000).then(async () => {
                                             // 마이크 활성화 표시
-                                            testMicIcon.classList.add('active');
+                                            if (testMicIcon) testMicIcon.classList.add('active');
                                             
                                             // 오디오 시각화 시작 (이미 권한이 있으면 재사용)
                                             await startAudioVisualization();
@@ -998,7 +1000,7 @@
                                                                     responseList.innerHTML = '';
                                                                     
                                                                     playBeep(880, 1000).then(async () => {
-                                                                        testMicIcon.classList.add('active');
+                                                                        if (testMicIcon) testMicIcon.classList.add('active');
                                                                         await startAudioVisualization();
                                                                         
                                                                         setTimeout(() => {
@@ -1311,7 +1313,11 @@
             // 음성 안내 중에는 음성인식 일시 중지
             if (recognition && isRecognizing) {
                 console.log('음성 안내 중 음성인식 일시 중지');
-                recognition.stop();
+                try {
+                    recognition.stop();
+                } catch (e) {
+                    console.log('음성인식 중지 중 오류:', e);
+                }
                 isRecognizing = false;
             }
 

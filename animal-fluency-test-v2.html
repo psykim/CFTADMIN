@@ -1037,8 +1037,8 @@
                                     console.log('모든 안내 완료');
                                     
                                     // 자동으로 카운트다운 시작
-                                    setTimeout(() => {
-                                        startBtn.click(); // 시작 버튼 자동 클릭
+                                    setTimeout(async () => {
+                                        await startTest(); // 시작 함수 직접 호출
                                     }, 1000);
                                 });
                             }, 800);
@@ -1481,6 +1481,11 @@
 
         // 검사 시작 시각적 효과와 신호음
         async function startTestCountdown(callback) {
+            // 마이크 권한 및 음성인식 준비 (이미 준비되지 않은 경우)
+            if (!audioContext || !recognition) {
+                await prepareMicrophoneAndRecognition();
+            }
+            
             // 테스트 화면 표시
             document.querySelector('.test-content').style.display = 'none';
             testScreen.classList.add('active');
@@ -1566,18 +1571,41 @@
         // 음성인식 시작 (권한은 이미 hardware-setup에서 획득)
         function startSpeechRecognition() {
             if (!recognition) {
-                console.error('음성인식이 초기화되지 않았습니다.');
+                console.log('음성인식 초기화 시도');
+                initializeSpeechRecognition();
+            }
+            
+            if (!recognition) {
+                console.error('음성인식을 초기화할 수 없습니다.');
                 return;
             }
             
-            // 음성인식은 이미 실행 중이므로 플래그만 설정
-            console.log('본검사용 음성인식 활성화');
-            isRecognizing = true;
-            recordingIndicator.classList.add('active');
+            // 음성인식이 실행 중이 아니면 시작
+            try {
+                if (!isRecognizing) {
+                    recognition.start();
+                    console.log('음성인식 시작');
+                }
+                isRecognizing = true;
+                recordingIndicator.classList.add('active');
+                
+                // 마이크 아이콘 활성화
+                if (testMicIcon) {
+                    testMicIcon.classList.add('active');
+                }
+            } catch (e) {
+                console.error('음성인식 시작 오류:', e);
+                // 이미 실행 중인 경우에도 플래그 설정
+                isRecognizing = true;
+                recordingIndicator.classList.add('active');
+                if (testMicIcon) {
+                    testMicIcon.classList.add('active');
+                }
+            }
         }
 
         // 검사 시작
-        function startTest() {
+        async function startTest() {
             readyBox.style.display = 'none';
             animals = [];
             uniqueAnimals.clear();
@@ -1595,7 +1623,7 @@
             updateAnimalList();
             
             // 신호음과 시각적 효과로 카운트다운
-            startTestCountdown(() => {
+            await startTestCountdown(() => {
                 startTimer();
                 // 삐 소리 후 음성인식 시작을 위해 약간의 대기 시간 추가
                 setTimeout(() => {
@@ -2331,7 +2359,7 @@
         }
         // testPrevBtn.addEventListener('click', () => showPage('instructions')); // 제거됨
         
-        startBtn.addEventListener('click', startTest);
+        startBtn.addEventListener('click', async () => await startTest());
         stopBtn.addEventListener('click', stopTest);
         resetBtn.addEventListener('click', resetTest);
         downloadBtn.addEventListener('click', downloadResults);
@@ -2376,7 +2404,7 @@
         }
         // testPrevBtn.addEventListener('click', () => showPage('instructions')); // 제거됨
         
-        startBtn.addEventListener('click', startTest);
+        startBtn.addEventListener('click', async () => await startTest());
         stopBtn.addEventListener('click', stopTest);
         resetBtn.addEventListener('click', resetTest);
         downloadBtn.addEventListener('click', downloadResults);
@@ -2403,10 +2431,39 @@
         }
 
         // 마이크 권한 및 음성인식 준비 (권한 요청 없이)
-        function prepareMicrophoneAndRecognition() {
-            console.log('음성인식은 검사 시작 시 초기화됩니다.');
-            // 페이지 로드 시에는 아무것도 하지 않음
-            return true;
+        async function prepareMicrophoneAndRecognition() {
+            console.log('마이크 권한 및 음성인식 준비');
+            
+            // 음성인식 초기화
+            if (!recognition) {
+                initializeSpeechRecognition();
+            }
+            
+            // 마이크 권한 요청
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                console.log('마이크 권한 획득 성공');
+                
+                // 오디오 시각화를 위한 스트림 저장
+                audioStream = stream;
+                if (!audioContext) {
+                    audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                    analyser = audioContext.createAnalyser();
+                    analyser.fftSize = 256;
+                    
+                    const source = audioContext.createMediaStreamSource(stream);
+                    source.connect(analyser);
+                    
+                    // 스트림 저장
+                    audioStream = stream;
+                }
+                
+                return true;
+            } catch (error) {
+                console.error('마이크 권한 획득 실패:', error);
+                alert('마이크 권한이 필요합니다. 브라우저 설정에서 마이크 권한을 허용해주세요.');
+                return false;
+            }
         }
 
         // 자동 음성 시작 시도 함수

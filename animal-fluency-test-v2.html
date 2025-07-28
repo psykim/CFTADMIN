@@ -851,17 +851,10 @@
                         await startAudioVisualization();
                         console.log('마이크 권한 사전 획득 완료');
                         
-                        // 음성인식도 미리 초기화하고 시작
+                        // 음성인식은 초기화만 하고 시작하지 않음
                         if (!recognition) {
                             initializeSpeechRecognition();
-                        }
-                        if (recognition) {
-                            try {
-                                recognition.start();
-                                console.log('음성인식 미리 시작 (권한 획득용)');
-                            } catch (e) {
-                                console.log('음성인식 시작 실패:', e);
-                            }
+                            console.log('음성인식 초기화 완료');
                         }
                     } catch (error) {
                         console.error('마이크 권한 획득 실패:', error);
@@ -945,13 +938,6 @@
                 setTimeout(() => {
                     speak("제가, 어떤 종류를 말씀드리면, 되도록, 빨리, 그 종류에 속하는 사물들의 이름을, 모두 말씀해주세요.", () => {
                         speak("예를 들어, 제가, '옷 종류'라고 말하면, 셔츠, 넥타이, 모자 등의 이름을, 말씀하시면 됩니다.", () => {
-                            // 연습 모드를 간소화하고 바로 본시행으로
-                            console.log('연습 모드 건너뛰고 본시행으로 진행');
-                            setTimeout(() => {
-                                proceedToMainTest();
-                            }, 2000);
-                            return;
-                            
                             speak("옷 종류에 속하는 것 중에, 또 다른 것들도 있죠.", () => {
                                 speak("삐 소리가 나고 마이크에 불이 들어오면, 옷종류에 속하는 다른 것들을 제가 그만할 때까지 최대한 많이 말씀해 보세요.", () => {
                                     setTimeout(() => {
@@ -983,6 +969,10 @@
                                             
                                             // 10초 연습 시간
                                             setTimeout(() => {
+                                                console.log('10초 연습 시간 종료');
+                                                console.log('연습 항목 개수:', practiceItems.length);
+                                                console.log('연습 항목:', practiceItems);
+                                                
                                                 // 연습 모드 종료
                                                 isPracticePhase = false;
                                                 // 음성인식 비활성화 (안내 음성이 인식되지 않도록)
@@ -990,7 +980,7 @@
                                                 console.log('연습 종료 - 음성인식 일시 비활성화');
                                                 
                                                 // 마이크 비활성화 표시
-                                                testMicIcon.classList.remove('active');
+                                                if (testMicIcon) testMicIcon.classList.remove('active');
                                                 
                                                 // 오디오 시각화 중지
                                                 stopAudioVisualization();
@@ -1210,14 +1200,8 @@
                         URL.revokeObjectURL(audioUrl);
                         hideVoiceGuide();
                         
-                        // 음성 안내가 끝난 후 음성인식 재시작 (연습 중인 경우만)
-                        if (isPracticePhase && recognition && !isRecognizing) {
-                            setTimeout(() => {
-                                console.log('음성 안내 후 음성인식 재시작');
-                                recognition.start();
-                                isRecognizing = true;
-                            }, 500);
-                        }
+                        // 음성 안내가 끝난 후에도 음성인식을 자동으로 재시작하지 않음
+                        // 삐 소리 후에만 시작하도록 함
                         
                         if (callback) callback();
                         playNextInQueue();
@@ -1289,14 +1273,8 @@
                 console.log('음성 출력 완료');
                 hideVoiceGuide();
                 
-                // 음성 안내가 끝난 후 음성인식 재시작 (연습 중인 경우만)
-                if (isPracticePhase && recognition && !isRecognizing) {
-                    setTimeout(() => {
-                        console.log('음성 안내 후 음성인식 재시작');
-                        recognition.start();
-                        isRecognizing = true;
-                    }, 500);
-                }
+                // 음성 안내가 끝난 후에도 음성인식을 자동으로 재시작하지 않음
+                // 삐 소리 후에만 시작하도록 함
                 
                 if (callback) callback();
             };
@@ -1406,8 +1384,14 @@
                     
                     recognition.onresult = (event) => {
                         // 연습 모드이거나 본 검사가 진행 중일 때만 처리
-                        if (!isPracticePhase && !isRecognizing) return;
-                        if (!isPracticePhase && timeRemaining <= 0) return;
+                        if (!isPracticePhase && !isRecognizing) {
+                            console.log('음성인식 결과 무시 - 연습/본시행 중이 아님');
+                            return;
+                        }
+                        if (!isPracticePhase && timeRemaining <= 0) {
+                            console.log('음성인식 결과 무시 - 시간 종료');
+                            return;
+                        }
                         
                         for (let i = event.resultIndex; i < event.results.length; i++) {
                             const result = event.results[i];

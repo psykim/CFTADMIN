@@ -754,34 +754,54 @@
         let audioQueue = [];
         let isPlaying = false;
 
-        // DOM 요소
-        const pages = {
-            instructions: document.getElementById('instructionsPage'),
-            test: document.getElementById('testPage')
-        };
-
-        const instructionsNextBtn = document.getElementById('instructionsNextBtn');
-        const instructionsVoiceGuideBtn = document.getElementById('instructionsVoiceGuideBtn');
-        // const testPrevBtn = document.getElementById('testPrevBtn'); // 제거됨
-        const timer = document.getElementById('timer');
-        const startBtn = document.getElementById('startBtn');
-        const stopBtn = document.getElementById('stopBtn');
-        const resetBtn = document.getElementById('resetBtn');
-        // const manualInput = document.getElementById('manualInput');  // 제거됨
-        // const addBtn = document.getElementById('addBtn');  // 제거됨
-        const animalList = document.getElementById('animalList');
-        const stats = document.getElementById('stats');
-        const recordingIndicator = document.getElementById('recordingIndicator');
-        const downloadBtn = document.getElementById('downloadBtn');
-        const voiceGuideBox = document.getElementById('voiceGuideBox');
-        const voiceGuideText = document.getElementById('voiceGuideText');
-        const readyBox = document.getElementById('readyBox');
-        const setupWarning = document.getElementById('setupWarning');
-        const testStartOverlay = document.getElementById('testStartOverlay');
-        const testScreen = document.getElementById('testScreen');
-        const responseList = document.getElementById('responseList');
-        const resultsSection = document.getElementById('resultsSection');
-        const testMicIcon = document.getElementById('testMicIcon');
+        // DOM 요소 (초기에는 null로 설정)
+        let pages = null;
+        let instructionsNextBtn = null;
+        let instructionsVoiceGuideBtn = null;
+        let timer = null;
+        let startBtn = null;
+        let stopBtn = null;
+        let resetBtn = null;
+        let animalList = null;
+        let stats = null;
+        let recordingIndicator = null;
+        let downloadBtn = null;
+        let voiceGuideBox = null;
+        let voiceGuideText = null;
+        let readyBox = null;
+        let setupWarning = null;
+        let testStartOverlay = null;
+        let testScreen = null;
+        let responseList = null;
+        let resultsSection = null;
+        let testMicIcon = null;
+        
+        // DOM 요소 초기화 함수
+        function initializeDOMElements() {
+            pages = {
+                instructions: document.getElementById('instructionsPage'),
+                test: document.getElementById('testPage')
+            };
+            instructionsNextBtn = document.getElementById('instructionsNextBtn');
+            instructionsVoiceGuideBtn = document.getElementById('instructionsVoiceGuideBtn');
+            timer = document.getElementById('timer');
+            startBtn = document.getElementById('startBtn');
+            stopBtn = document.getElementById('stopBtn');
+            resetBtn = document.getElementById('resetBtn');
+            animalList = document.getElementById('animalList');
+            stats = document.getElementById('stats');
+            recordingIndicator = document.getElementById('recordingIndicator');
+            downloadBtn = document.getElementById('downloadBtn');
+            voiceGuideBox = document.getElementById('voiceGuideBox');
+            voiceGuideText = document.getElementById('voiceGuideText');
+            readyBox = document.getElementById('readyBox');
+            setupWarning = document.getElementById('setupWarning');
+            testStartOverlay = document.getElementById('testStartOverlay');
+            testScreen = document.getElementById('testScreen');
+            responseList = document.getElementById('responseList');
+            resultsSection = document.getElementById('resultsSection');
+            testMicIcon = document.getElementById('testMicIcon');
+        }
 
         // 하드웨어 설정 페이지로 이동
         function goToSetup() {
@@ -1669,9 +1689,9 @@
             timer.textContent = timeRemaining;
             timer.style.display = 'block'; // 검사 시작 시 타이머 표시
             
-            startBtn.style.display = 'none';
-            stopBtn.style.display = 'inline-block';
-            resetBtn.style.display = 'none';
+            if (startBtn) startBtn.style.display = 'none';
+            if (stopBtn) stopBtn.style.display = 'inline-block';
+            if (resetBtn) resetBtn.style.display = 'none';
             stats.style.display = 'none';
             resultsSection.style.display = 'block'; // 결과 섹션 표시
             
@@ -1717,9 +1737,9 @@
             // 오디오 시각화 중지
             stopAudioVisualization();
             
-            startBtn.style.display = 'none';
-            stopBtn.style.display = 'none';
-            resetBtn.style.display = 'inline-block';
+            if (startBtn) startBtn.style.display = 'none';
+            if (stopBtn) stopBtn.style.display = 'none';
+            if (resetBtn) resetBtn.style.display = 'inline-block';
             
             showResults();
             
@@ -1741,9 +1761,9 @@
             timer.style.display = 'none'; // 리셋 시 타이머 숨기기
             resultsSection.style.display = 'none'; // 결과 섹션 숨기기
             
-            startBtn.style.display = 'inline-block';
-            stopBtn.style.display = 'none';
-            resetBtn.style.display = 'none';
+            if (startBtn) startBtn.style.display = 'inline-block';
+            if (stopBtn) stopBtn.style.display = 'none';
+            if (resetBtn) resetBtn.style.display = 'none';
             stats.style.display = 'none';
             
             updateAnimalList();
@@ -2552,7 +2572,8 @@
 
         // 페이지 로드 시 초기화
         window.addEventListener('load', async () => {
-            
+            // DOM 요소 초기화
+            initializeDOMElements();
             
             // 음성 목록 먼저 로드
             const voices = await loadVoices();

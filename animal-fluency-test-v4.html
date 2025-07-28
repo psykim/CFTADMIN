@@ -749,9 +749,9 @@
         let mediaStream = null; // 마이크 스트림 유지
 
         // ElevenLabs 관련 변수
-        let elevenLabsApiKey = 'sk_191de859c1c1dbd4601051930c5952b467ac46716aa97057'; // 기본값
-        let elevenLabsVoiceId = 'XrExE9yKIg1WjnnlVkGX'; // 마틸다 (여성) 기본값
-        let elevenLabsConnected = true; // 기본값
+        let elevenLabsApiKey = null; // 기본값 제거 (하드웨어 설정에서만 로드)
+        let elevenLabsVoiceId = null; // 기본값 제거
+        let elevenLabsConnected = false; // 기본값 false로 변경
         let audioQueue = [];
         let isPlaying = false;
 

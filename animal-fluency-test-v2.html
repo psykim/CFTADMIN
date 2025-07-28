@@ -1798,14 +1798,6 @@
             
             const fullCsvData = csvHeader + '\n' + csvData;
             
-            // CSV 데이터를 클립보드에 복사
-            navigator.clipboard.writeText(fullCsvData).then(() => {
-                console.log('CSV 데이터가 클립보드에 복사되었습니다.');
-                alert('검사 결과가 클립보드에 복사되었습니다.\n\nCFTSCORING 페이지가 열리면:\n1. CSV 데이터 입력란에 붙여넣기(Ctrl+V)\n2. "분석 시작" 버튼 클릭');
-            }).catch(err => {
-                console.error('클립보드 복사 실패:', err);
-            });
-            
             // 새 창에서 CFTSCORING 열기
             const newWindow = window.open('https://psykim.github.io/CFTSCORING/CFTSCORING.html', '_blank', 'width=1200,height=800');
             if (!newWindow) {
@@ -1813,8 +1805,51 @@
                 return;
             }
             
-            // 내부 분석도 함께 실행
-            performInternalAnalysis(intervalStats);
+            // 메시지 이벤트 리스너 설정 (CFTSCORING에서 결과 받기)
+            const messageHandler = function(event) {
+                // CFTSCORING 도메인에서 온 메시지인지 확인
+                if (event.origin !== 'https://psykim.github.io') {
+                    return;
+                }
+                
+                // CFTSCORING 결과인지 확인
+                if (event.data && event.data.type === 'CFTSCORING_RESULT') {
+                    console.log('CFTSCORING 결과 수신:', event.data);
+                    
+                    // 결과 HTML 표시
+                    displayCFTSCORINGResult(event.data.html);
+                    
+                    // 리스너 제거
+                    window.removeEventListener('message', messageHandler);
+                }
+            };
+            
+            window.addEventListener('message', messageHandler);
+            
+            // CFTSCORING 페이지가 로드되면 CSV 데이터 전송
+            newWindow.onload = function() {
+                setTimeout(() => {
+                    // CSV 데이터를 CFTSCORING으로 전송
+                    newWindow.postMessage({
+                        type: 'CSV_DATA',
+                        data: fullCsvData,
+                        source: 'CFTADMIN'
+                    }, 'https://psykim.github.io');
+                    
+                    console.log('CSV 데이터 전송 완료');
+                }, 1000); // 페이지 완전 로드를 위한 대기
+            };
+            
+            // 타임아웃 설정 (30초 후에도 응답이 없으면 내부 분석 실행)
+            setTimeout(() => {
+                window.removeEventListener('message', messageHandler);
+                // 응답이 없으면 내부 분석 실행
+                const resultsSection = document.getElementById('resultsSection');
+                if (resultsSection && !resultsSection.innerHTML.includes('CFTSCORING')) {
+                    console.log('CFTSCORING 응답 시간 초과, 내부 분석 실행');
+                    performInternalAnalysis(intervalStats);
+                }
+            }, 30000);
         }
         
         // 내부 분석 함수
@@ -2162,7 +2197,36 @@
             analysisDiv.scrollIntoView({ behavior: 'smooth' });
         }
         
-        // CFTSCORING 결과 표시
+        // CFTSCORING에서 받은 HTML 결과 표시
+        function displayCFTSCORINGResult(htmlContent) {
+            console.log('CFTSCORING 결과 HTML 표시');
+            
+            // 결과 섹션 초기화 및 HTML 표시
+            const resultsSection = document.getElementById('resultsSection');
+            resultsSection.innerHTML = '';
+            
+            // CFTSCORING 결과 컨테이너 생성
+            const containerDiv = document.createElement('div');
+            containerDiv.style.cssText = 'margin: 20px auto; max-width: 1200px; padding: 20px;';
+            containerDiv.innerHTML = htmlContent;
+            
+            // 다시 검사하기 버튼 추가
+            const buttonDiv = document.createElement('div');
+            buttonDiv.style.cssText = 'text-align: center; margin-top: 30px; padding: 20px;';
+            buttonDiv.innerHTML = '<button onclick="window.location.href = window.location.pathname" style="background-color: #007bff; color: white; border: none; padding: 12px 30px; font-size: 16px; border-radius: 5px; cursor: pointer;">다시 검사하기</button>';
+            
+            resultsSection.appendChild(containerDiv);
+            resultsSection.appendChild(buttonDiv);
+            resultsSection.style.display = 'block';
+            
+            // 스크롤
+            containerDiv.scrollIntoView({ behavior: 'smooth' });
+            
+            // 음성 안내
+            speak("분석이 완료되었습니다. 결과를 확인해 주세요.");
+        }
+        
+        // CFTSCORING 결과 표시 (기존 함수 유지)
         function displayCFTSCORINGResults(result) {
             if (!result) {
                 console.error('분석 결과가 없습니다.');

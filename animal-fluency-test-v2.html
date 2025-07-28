@@ -1019,7 +1019,7 @@
                                                                         setTimeout(() => {
                                                                             isPracticePhase = false;
                                                                             isRecognizing = false;
-                                                                            testMicIcon.classList.remove('active');
+                                                                            if (testMicIcon) testMicIcon.classList.remove('active');
                                                                             stopAudioVisualization();
                                                                             
                                                                             // 두 번째 시도에서도 응답이 없으면 그냥 진행

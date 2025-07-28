@@ -1062,10 +1062,12 @@
                         speak("1분의 시간을 드리겠습니다. 1분 동안, 생각나는 동물의 이름을, 마이크가 꺼질 때까지 포기하지 마시고, 최대한 많이 말씀해 보세요.", () => {
                             setTimeout(() => {
                                 speak("준비되셨습니까? 삐 소리가 나고 마이크에 불이 들어오면, 바로 시작해 주세요.", () => {
-                                    console.log('모든 안내 완료');
+                                    console.log('모든 안내 완료 - 현재 시각:', new Date().toLocaleTimeString());
                                     
-                                    // 자동으로 카운트다운 시작
+                                    // 안내 종료 후 1초 대기
+                                    console.log('1초 대기 시작');
                                     setTimeout(async () => {
+                                        console.log('1초 대기 완료 - 본시행 시작:', new Date().toLocaleTimeString());
                                         await startTest(); // 시작 함수 직접 호출
                                     }, 1000);
                                 });

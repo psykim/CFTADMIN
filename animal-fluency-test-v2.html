@@ -1064,7 +1064,9 @@
         
         // 본 검사 진행 함수
         function proceedToMainTest() {
+            console.log('proceedToMainTest 함수 호출됨');
             setTimeout(() => {
+                console.log('본시행 안내 시작');
                 speak("지금부터는, 다른 종류, 즉 '동물' 종류에 속하는 것들의 이름을, 모두 말씀해보십시오.", () => {
                     setTimeout(() => {
                         speak("1분의 시간을 드리겠습니다. 1분 동안, 생각나는 동물의 이름을, 마이크가 꺼질 때까지 포기하지 마시고, 최대한 많이 말씀해 보세요.", () => {

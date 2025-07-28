@@ -1958,26 +1958,32 @@
             
             const csvContent = csvHeader + '\n' + csvRows.join('\n');
             
-            // CSV 파일 생성 및 다운로드
-            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-            const fileName = `animal_fluency_${testDate.getFullYear()}${(testDate.getMonth()+1).toString().padStart(2,'0')}${testDate.getDate().toString().padStart(2,'0')}_${testDate.getHours().toString().padStart(2,'0')}${testDate.getMinutes().toString().padStart(2,'0')}.csv`;
+            // CFTSCORING을 숨겨진 iframe으로 열기
+            const iframe = document.createElement('iframe');
+            iframe.style.display = 'none';
+            iframe.style.width = '0';
+            iframe.style.height = '0';
+            iframe.style.position = 'absolute';
+            iframe.style.left = '-9999px';
+            iframe.src = 'https://psykim.github.io/CFTSCORING/CFTSCORING.html';
             
-            // CFTSCORING 페이지를 새 창에서 열기
-            const cftWindow = window.open('https://psykim.github.io/CFTSCORING/CFTSCORING.html', '_blank');
+            // iframe이 로드되면 데이터 전송
+            iframe.onload = function() {
+                setTimeout(() => {
+                    // CSV 데이터를 CFTSCORING으로 전송
+                    iframe.contentWindow.postMessage({
+                        type: 'FLUENCY_DATA',
+                        test: 'animal',
+                        csvData: csvContent,
+                        source: 'animal-fluency-test-v4'
+                    }, 'https://psykim.github.io');
+                    
+                    console.log('CFTSCORING으로 데이터 전송 완료');
+                }, 2000);
+            };
             
-            // CFTSCORING이 로드될 때까지 대기
-            setTimeout(() => {
-                // CSV 데이터를 CFTSCORING으로 전송
-                cftWindow.postMessage({
-                    type: 'FLUENCY_DATA',
-                    test: 'animal',
-                    csvData: csvContent,
-                    fileName: fileName,
-                    source: 'animal-fluency-test-v4'
-                }, 'https://psykim.github.io');
-                
-                console.log('CFTSCORING으로 데이터 전송 완료');
-            }, 3000);
+            // iframe을 body에 추가
+            document.body.appendChild(iframe);
             
             // 결과를 받기 위한 메시지 리스너 설정
             window.addEventListener('message', function messageHandler(event) {
@@ -2005,6 +2011,11 @@
                     buttonDiv.innerHTML = '<button onclick="window.location.href = window.location.pathname" style="background-color: #007bff; color: white; border: none; padding: 12px 30px; font-size: 16px; border-radius: 5px; cursor: pointer;">다시 검사하기</button>';
                     resultsSection.appendChild(buttonDiv);
                     
+                    // iframe 제거
+                    if (iframe.parentNode) {
+                        document.body.removeChild(iframe);
+                    }
+                    
                     // 음성 안내
                     speak("분석이 완료되었습니다. 결과를 확인해 주세요.");
                 }
@@ -2020,19 +2031,34 @@
                     </div>
                     <p style="color: #666;">잠시만 기다려 주세요.</p>
                     <p style="color: #999; font-size: 14px; margin-top: 20px;">
-                        CFTSCORING 창이 열렸습니다. 분석이 완료되면 자동으로 결과가 표시됩니다.
+                        백그라운드에서 분석이 진행 중입니다.
                     </p>
                 </div>
             `;
             resultsSection.style.display = 'block';
             
-            // CSV 파일도 자동 다운로드 (백업용)
-            const link = document.createElement('a');
-            link.href = URL.createObjectURL(blob);
-            link.download = fileName;
-            link.click();
-            
-            console.log('CSV 파일 다운로드:', fileName);
+            // 타임아웃 설정 (30초 후에도 응답이 없으면 오류 처리)
+            setTimeout(() => {
+                window.removeEventListener('message', messageHandler);
+                const resultsSection = document.getElementById('resultsSection');
+                if (resultsSection && !resultsSection.innerHTML.includes('검사 결과')) {
+                    console.error('CFTSCORING 응답 시간 초과');
+                    resultsSection.innerHTML = `
+                        <div style="text-align: center; padding: 50px;">
+                            <div style="font-size: 24px; color: #dc3545; margin-bottom: 20px;">
+                                <i class="fas fa-exclamation-triangle"></i>
+                                분석 중 오류가 발생했습니다
+                            </div>
+                            <p style="color: #666;">잠시 후 다시 시도해주세요.</p>
+                            <button onclick="window.location.href = window.location.pathname" style="background-color: #007bff; color: white; border: none; padding: 12px 30px; font-size: 16px; border-radius: 5px; cursor: pointer; margin-top: 20px;">다시 검사하기</button>
+                        </div>
+                    `;
+                    // iframe 제거
+                    if (iframe.parentNode) {
+                        document.body.removeChild(iframe);
+                    }
+                }
+            }, 30000);
         }
         
         // 내부 분석 함수들은 모두 제거

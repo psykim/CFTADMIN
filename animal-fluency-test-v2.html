@@ -1658,7 +1658,9 @@
             }
             
             // 타이머 표시
+            console.log('타이머 표시 전 display:', timer.style.display);
             timer.style.display = 'block';
+            console.log('타이머 표시 후 display:', timer.style.display);
             
             timerInterval = setInterval(() => {
                 timeRemaining--;
@@ -1750,7 +1752,7 @@
             
             console.log('startTestCountdown 호출 전');
             // 신호음과 시각적 효과로 카운트다운
-            await startTestCountdown(() => {
+            await startTestCountdown(async () => {
                 console.log('startTestCountdown 콜백 실행');
                 startTimer();
                 // 삐 소리 후 음성인식 시작을 위해 약간의 대기 시간 추가

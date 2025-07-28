@@ -921,13 +921,14 @@
             }
             
             // 즉시 시작 화면 숨기고 테스트 화면 표시
-            readyBox.style.display = 'none';
-            document.querySelector('.test-content').style.display = 'none';
-            testScreen.classList.add('active');
+            if (readyBox) readyBox.style.display = 'none';
+            const testContent = document.querySelector('.test-content');
+            if (testContent) testContent.style.display = 'none';
+            if (testScreen) testScreen.classList.add('active');
             
             // 마이크 아이콘은 비활성 상태로 표시
-            const testMicIcon = document.getElementById('testMicIcon');
-            testMicIcon.classList.remove('active');
+            const localTestMicIcon = document.getElementById('testMicIcon');
+            if (localTestMicIcon) localTestMicIcon.classList.remove('active');
             
             // 바로 음성 안내 시작 (무음 오디오 재생 없이)
             speak("이제 검사를 시작하겠습니다.", () => {
@@ -2440,10 +2441,7 @@
         }
         // testPrevBtn.addEventListener('click', () => showPage('instructions')); // 제거됨
         
-        startBtn.addEventListener('click', async () => await startTest());
-        stopBtn.addEventListener('click', stopTest);
-        resetBtn.addEventListener('click', resetTest);
-        downloadBtn.addEventListener('click', downloadResults);
+        // 이벤트 리스너는 DOM 요소 초기화 후에 추가됨
 
         // 키보드 입력 관련 이벤트 리스너 제거됨
 
@@ -2485,10 +2483,7 @@
         }
         // testPrevBtn.addEventListener('click', () => showPage('instructions')); // 제거됨
         
-        startBtn.addEventListener('click', async () => await startTest());
-        stopBtn.addEventListener('click', stopTest);
-        resetBtn.addEventListener('click', resetTest);
-        downloadBtn.addEventListener('click', downloadResults);
+        // 이벤트 리스너는 DOM 요소 초기화 후에 추가됨
 
         // 키보드 입력 관련 이벤트 리스너 제거됨
 
@@ -2574,6 +2569,12 @@
         window.addEventListener('load', async () => {
             // DOM 요소 초기화
             initializeDOMElements();
+            
+            // 이벤트 리스너 추가
+            if (startBtn) startBtn.addEventListener('click', async () => await startTest());
+            if (stopBtn) stopBtn.addEventListener('click', stopTest);
+            if (resetBtn) resetBtn.addEventListener('click', resetTest);
+            if (downloadBtn) downloadBtn.addEventListener('click', downloadResults);
             
             // 음성 목록 먼저 로드
             const voices = await loadVoices();

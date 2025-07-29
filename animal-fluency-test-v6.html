@@ -3033,6 +3033,22 @@
             const manualStartBtn = document.getElementById('manualStartBtn');
             if (manualStartBtn) {
                 console.log('시작 버튼에 이벤트 리스너 추가');
+                console.log('시작 버튼 스타일:', {
+                    display: window.getComputedStyle(manualStartBtn).display,
+                    visibility: window.getComputedStyle(manualStartBtn).visibility,
+                    opacity: window.getComputedStyle(manualStartBtn).opacity,
+                    zIndex: window.getComputedStyle(manualStartBtn).zIndex
+                });
+                
+                // 강제로 버튼을 보이도록 설정
+                manualStartBtn.style.display = 'inline-block';
+                manualStartBtn.style.visibility = 'visible';
+                manualStartBtn.style.opacity = '1';
+                manualStartBtn.style.position = 'relative';
+                manualStartBtn.style.zIndex = '99999';
+                
+                console.log('시작 버튼 강제 표시 완료');
+                
                 manualStartBtn.addEventListener('click', function() {
                     console.log('시작 버튼 클릭됨!');
                     window.handleStartClick();

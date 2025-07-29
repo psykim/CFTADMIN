@@ -912,6 +912,7 @@
                                                                 
                                                                 // 음성인식 시작
                                                                 console.log('연습 모드에서 음성인식 시작 준비');
+                                                                isPracticePhase = true;  // 연습 모드 플래그 설정
                                                                 startSpeechRecognition();
                                                                 console.log('연습 음성인식 시작 함수 호출됨');
                                                             }, 500)  // 0.5초 대기
@@ -1166,14 +1167,17 @@
                                             // 삐 소리 후 짧은 대기 시간을 두고 음성인식 시작
                                             setTimeout(() => {
                                                 // 음성인식 시작 (연습용)
-                                                if (recognition && !isRecognizing) {
-                                                    try {
-                                                        recognition.start();
-                                                        isRecognizing = true;
-                                                        console.log('연습용 음성인식 시작');
-                                                    } catch (e) {
-                                                        console.log('음성인식 시작 실패:', e);
-                                                    }
+                                                if (!recognition) {
+                                                    console.log('연습용 음성인식 초기화');
+                                                    initializeSpeechRecognition();
+                                                }
+                                                
+                                                if (recognition) {
+                                                    isPracticePhase = true;  // 연습 모드 플래그 설정
+                                                    startSpeechRecognition();
+                                                    console.log('연습용 음성인식 시작 함수 호출');
+                                                } else {
+                                                    console.error('음성인식 초기화 실패');
                                                 }
                                             }, 500)  // 0.5초 대기
                                             
@@ -3102,6 +3106,10 @@
         // 자동 음성 시작 시도 함수
         async function tryAutoVoiceStart() {
             console.log('tryAutoVoiceStart 호출됨');
+            
+            // DOM 요소 초기화
+            initializeDOMElements();
+            
             // 음성인식 초기화만 하고 권한은 나중에 요청
             if (!recognition) {
                 console.log('음성인식 초기화 시도');

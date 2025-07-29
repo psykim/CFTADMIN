@@ -2347,7 +2347,8 @@
             // CSV 다운로드 없이 바로 CFTSCORING 분석 수행
             setTimeout(() => {
                 // CFTSCORING iframe을 통한 분석
-                performCFTSCORINGAnalysisWithIframe(csvData);
+                // iframe 방식 대신 직접 분석 수행 (404 오류 회피)
+                performCFTSCORINGAnalysis(csvData);
             }, 100);
         }
         
@@ -2395,7 +2396,7 @@
             const iframe = document.createElement('iframe');
             iframe.id = 'cftscoring-iframe';
             iframe.style.display = 'none';
-            iframe.src = 'CFTSCORING/CFTSCORING.html';
+            iframe.src = './CFTSCORING/CFTSCORING.html';
             
             // iframe 로드 후 CSV 데이터 전송
             iframe.onload = function() {

@@ -3222,41 +3222,6 @@
             speak("분석이 완료되었습니다. 결과를 확인해 주세요.");
         }
         
-        // CFTSCORING 결과 표시 (기존 함수 유지)
-        function displayCFTSCORINGResults(result) {
-            if (!result) {
-                console.error('분석 결과가 없습니다.');
-                return;
-            }
-            
-            // 결과를 보기 좋게 표시
-            let resultHTML = '<div class="cft-analysis-result" style="margin-top: 30px; padding: 20px; background: #f5f5f5; border-radius: 10px;">';
-            resultHTML += '<h3 style="color: #333; margin-bottom: 20px;">🔍 전문가 분석 결과</h3>';
-            
-            resultHTML += '<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 20px;">';
-            resultHTML += `<div class="result-item" style="background: white; padding: 15px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
-                <h5 style="color: #666; margin-bottom: 5px;">총점</h5>
-                <div style="font-size: 24px; font-weight: bold; color: #2196F3;">${result.totalScore || uniqueAnimals.size}</div>
-            </div>`;
-            
-            if (result.interpretation) {
-                resultHTML += '</div>';
-                resultHTML += '<div style="background: white; padding: 20px; border-radius: 8px; margin-top: 20px;">';
-                resultHTML += '<h4 style="color: #333; margin-bottom: 10px;">해석</h4>';
-                resultHTML += `<p style="line-height: 1.8; color: #555;">${result.interpretation}</p>`;
-                resultHTML += '</div>';
-            }
-            
-            resultHTML += '</div>';
-            
-            // 결과 섹션에 추가
-            const analysisDiv = document.createElement('div');
-            analysisDiv.innerHTML = resultHTML;
-            resultsSection.appendChild(analysisDiv);
-            
-            // 스크롤
-            analysisDiv.scrollIntoView({ behavior: 'smooth' });
-        }
 
         // 이벤트 리스너 (설명 페이지 관련 이벤트는 사용하지 않지만 에러 방지를 위해 유지)
         if (instructionsNextBtn) {

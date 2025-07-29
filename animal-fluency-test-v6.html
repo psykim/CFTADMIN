@@ -2758,35 +2758,12 @@
             };
         */
         
-        // 이벤트 리스너 (설명 페이지 관련 이벤트는 사용하지 않지만 에러 방지를 위해 유지)
-        if (instructionsNextBtn) {
-            console.log('전체 결과 표시');
-            
-            // 결과를 담을 컨테이너 생성
-            let containerHTML = '<div class="cft-analysis-container" style="margin-top: 30px; padding: 20px; background: #f5f5f5; border-radius: 10px;">';
-            containerHTML += '<h3 style="color: #333; margin-bottom: 20px; text-align: center; font-size: 24px; font-weight: bold;">🔍 동물범주형유창성검사 전문 분석 결과</h3>';
-            
-            // CFTSCORING의 원본 HTML과 스타일을 그대로 사용
-            containerHTML += '<div class="cft-results-wrapper">';
-            // containerHTML += resultHTML; // resultHTML이 정의되지 않음
-            containerHTML += '</div>';
-            containerHTML += '</div>';
-            
-            // 결과 섹션에 추가
-            const analysisDiv = document.createElement('div');
-            analysisDiv.innerHTML = containerHTML;
-            resultsSection.appendChild(analysisDiv);
-            
-            // 스크롤
-            analysisDiv.scrollIntoView({ behavior: 'smooth' });
-        }
         
         // CFTSCORING에서 받은 HTML 결과 표시
         function displayCFTSCORINGResult(htmlContent) {
             console.log('CFTSCORING 결과 HTML 표시');
             
             // 결과 섹션 초기화 및 HTML 표시
-            const resultsSection = document.getElementById('resultsSection');
             resultsSection.innerHTML = '';
             
             // CFTSCORING 결과 컨테이너 생성

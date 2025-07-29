@@ -2093,16 +2093,43 @@
         
         // CSV 데이터 생성
         function generateCSVData() {
-            let csv = 'Response,RT\n';
+            // 15초 간격으로 동물 분류
+            const intervals = {
+                '0-15초': [],
+                '15-30초': [],
+                '30-45초': [],
+                '45-60초': []
+            };
             
-            animals.forEach((animal, index) => {
-                // RT는 이전 응답과의 시간 차이 (첫 응답은 시작부터의 시간)
-                const rt = index === 0 ? 
-                    animal.elapsedTime : 
-                    animal.elapsedTime - animals[index - 1].elapsedTime;
-                
-                csv += `"${animal.name}",${rt}\n`;
+            animals.forEach(animal => {
+                const seconds = animal.elapsedTime / 1000;
+                if (seconds <= 15) {
+                    intervals['0-15초'].push(animal.name);
+                } else if (seconds <= 30) {
+                    intervals['15-30초'].push(animal.name);
+                } else if (seconds <= 45) {
+                    intervals['30-45초'].push(animal.name);
+                } else {
+                    intervals['45-60초'].push(animal.name);
+                }
             });
+            
+            // CSV 헤더와 데이터 생성
+            let csv = 'ID,성별,연령,학력,0-15초,15-30초,30-45초,45-60초\n';
+            
+            // 사용자 정보는 기본값으로 설정 (실제 구현시 입력받아야 함)
+            const id = 'TEST001';
+            const gender = '미입력';
+            const age = '미입력';
+            const education = '미입력';
+            
+            // 각 구간의 동물들을 쉼표로 연결
+            const interval0_15 = intervals['0-15초'].join(',');
+            const interval15_30 = intervals['15-30초'].join(',');
+            const interval30_45 = intervals['30-45초'].join(',');
+            const interval45_60 = intervals['45-60초'].join(',');
+            
+            csv += `${id},${gender},${age},${education},"${interval0_15}","${interval15_30}","${interval30_45}","${interval45_60}"`;
             
             return csv;
         }

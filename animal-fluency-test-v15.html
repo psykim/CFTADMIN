@@ -1423,6 +1423,11 @@
             const { text, callback } = audioQueue.shift();
 
             try {
+                // API 키가 없으면 바로 실패 처리
+                if (!elevenLabsApiKey || !elevenLabsVoiceId) {
+                    throw new Error('ElevenLabs API 키 또는 Voice ID가 설정되지 않았습니다.');
+                }
+                
                 console.log('ElevenLabs API 호출 시작:', {
                     url: `https://api.elevenlabs.io/v1/text-to-speech/${elevenLabsVoiceId}/stream`,
                     text: text
@@ -2352,77 +2357,10 @@
             }, 100);
         }
         
-        // CFTSCORING iframe을 통한 분석
+        // CFTSCORING iframe을 통한 분석 (사용하지 않음 - 404 오류 방지)
         function performCFTSCORINGAnalysisWithIframe(csvData) {
-            console.log('CFTSCORING iframe 분석 시작...');
-            
-            // 메시지 이벤트 리스너 설정
-            function handleMessage(event) {
-                // 보안을 위해 origin 확인
-                if (event.origin !== window.location.origin) {
-                    return;
-                }
-                
-                if (event.data && event.data.type === 'CFTSCORING_RESULT') {
-                    console.log('CFTSCORING 결과 수신:', event.data);
-                    
-                    // 메시지 리스너 제거
-                    window.removeEventListener('message', handleMessage);
-                    
-                    // iframe 제거
-                    const iframe = document.getElementById('cftscoring-iframe');
-                    if (iframe) {
-                        document.body.removeChild(iframe);
-                    }
-                    
-                    // 분석 중 오버레이 숨기기
-                    document.getElementById('analyzing-overlay').style.display = 'none';
-                    
-                    // 결과 표시
-                    if (event.data.result) {
-                        const resultHTML = generateCFTSCORINGResultFromData(event.data.result);
-                        displayCFTSCORINGResults(resultHTML);
-                    } else {
-                        // 오류 발생 시 내부 분석 사용
-                        performCFTSCORINGAnalysis(csvData);
-                    }
-                }
-            }
-            
-            // 메시지 리스너 등록
-            window.addEventListener('message', handleMessage);
-            
-            // 숨겨진 iframe 생성
-            const iframe = document.createElement('iframe');
-            iframe.id = 'cftscoring-iframe';
-            iframe.style.display = 'none';
-            iframe.src = './CFTSCORING/CFTSCORING.html';
-            
-            // iframe 로드 후 CSV 데이터 전송
-            iframe.onload = function() {
-                console.log('CFTSCORING iframe 로드 완료');
-                
-                // CSV 데이터를 iframe으로 전송
-                iframe.contentWindow.postMessage({
-                    type: 'PROCESS_CSV',
-                    csvData: csvData
-                }, window.location.origin);
-                
-                // 타임아웃 설정 (10초)
-                setTimeout(() => {
-                    if (document.getElementById('cftscoring-iframe')) {
-                        console.log('CFTSCORING 응답 타임아웃');
-                        window.removeEventListener('message', handleMessage);
-                        document.body.removeChild(iframe);
-                        document.getElementById('analyzing-overlay').style.display = 'none';
-                        // 폴백: 내부 분석 사용
-                        performCFTSCORINGAnalysis(csvData);
-                    }
-                }, 10000);
-            };
-            
-            // iframe을 body에 추가
-            document.body.appendChild(iframe);
+            console.log('iframe 방식 대신 직접 분석을 사용합니다.');
+            performCFTSCORINGAnalysis(csvData);
         }
         
         // CFTSCORING 결과로부터 HTML 생성

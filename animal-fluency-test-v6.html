@@ -759,6 +759,18 @@
         // 시작 버튼 클릭 핸들러
         function handleStartClick() {
             console.log('handleStartClick 호출됨');
+            console.log('DOM 요소 상태:', {
+                voiceGuideBox: voiceGuideBox,
+                voiceGuideText: voiceGuideText,
+                readyBox: readyBox
+            });
+            
+            // DOM 요소가 초기화되지 않았다면 초기화
+            if (!voiceGuideBox || !voiceGuideText) {
+                console.log('DOM 요소가 null입니다. 초기화 시도...');
+                initializeDOMElements();
+            }
+            
             const manualStartBtn = document.getElementById('manualStartBtn');
             const audioPermissionNotice = document.getElementById('audioPermissionNotice');
             
@@ -1202,6 +1214,17 @@
 
         // 음성 안내 표시
         function showVoiceGuide(text) {
+            console.log('showVoiceGuide 호출:', {
+                text: text,
+                voiceGuideBox: voiceGuideBox,
+                voiceGuideText: voiceGuideText
+            });
+            
+            if (!voiceGuideBox || !voiceGuideText) {
+                console.error('voiceGuideBox 또는 voiceGuideText가 null입니다');
+                return;
+            }
+            
             voiceGuideText.textContent = text;
             voiceGuideBox.classList.add('active');
         }

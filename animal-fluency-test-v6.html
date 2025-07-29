@@ -2266,6 +2266,10 @@
         }
         
         // 클러스터 분석 함수 (내부 분석용)
+        function analyzeInternalClusters() {
+            const testDate = new Date();
+            const totalCount = animals.length;
+            const intervalStats = calculateIntervalStats();
             const intervalCounts = {
                 '0-15초': intervalStats['0-15초'].length,
                 '15-30초': intervalStats['15-30초'].length,

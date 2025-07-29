@@ -235,6 +235,8 @@
         .ready-box {
             text-align: center;
             color: white;
+            position: relative;
+            z-index: 9999;
         }
         .ready-check {
             font-size: 18px;
@@ -273,6 +275,7 @@
             text-shadow: 
                 0 2px 4px rgba(0, 0, 0, 0.5),
                 0 -1px 0 rgba(255, 255, 255, 0.1);
+            z-index: 10000;
         }
         .start-button::before {
             content: '';
@@ -724,6 +727,10 @@
             console.log('버튼 클릭 테스트 성공!');
             alert('버튼이 정상적으로 작동합니다!');
         }
+        
+        // 페이지 로드 즉시 콘솔에 메시지 출력
+        console.log('V6 페이지 로드됨 - 시간:', new Date().toLocaleTimeString());
+        console.log('testClick 함수 존재 여부:', typeof testClick);
         
         // 페이지 로드 즉시 실행 - 디버깅 완료됨
         

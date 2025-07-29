@@ -2330,11 +2330,11 @@
             let csv = '\ufeff';  // UTF-8 BOM 추가
             csv += 'ID,성별,연령,학력,0-15초,15-30초,30-45초,45-60초\n';
             
-            // 사용자 정보는 기본값으로 설정 (실제 구현시 입력받아야 함)
+            // V23: 테스트용 사용자 정보 설정 (CFTSCORING이 처리할 수 있도록)
             const id = 'TEST001';
-            const gender = '미입력';
-            const age = '미입력';
-            const education = '미입력';
+            const gender = '남';  // 남 또는 여
+            const age = '65';     // 연령 (숫자)
+            const education = '12'; // 교육년수 (숫자)
             
             // 각 구간의 동물들을 쉼표로 연결
             const interval0_15 = intervals['0-15초'].join(',');
@@ -2409,56 +2409,64 @@
                     const iframeDoc = iframe.contentDocument || iframe.contentWindow.document;
                     const iframeWin = iframe.contentWindow;
                     
-                    // CSV 데이터를 직접 입력하고 처리
+                    // CSV 데이터를 직접 처리하도록 함수 호출
                     setTimeout(() => {
-                        // CSV 데이터를 클립보드에 복사
-                        navigator.clipboard.writeText(csvData).then(() => {
-                            console.log('CSV 데이터를 클립보드에 복사했습니다.');
+                        try {
+                            // CSV 데이터를 직접 파싱하여 전달
+                            const rows = csvData.split('\n');
+                            const dataRow = rows[1]; // 헤더 다음 줄
                             
-                            // CFTSCORING의 처리 결과를 기다림
-                            let checkCount = 0;
-                            const checkInterval = setInterval(() => {
-                                checkCount++;
-                                
-                                // 결과 테이블 확인
-                                const resultTable = iframeDoc.querySelector('.score-table');
-                                const categoryTable = iframeDoc.querySelector('.category-table');
-                                
-                                if (resultTable && categoryTable) {
-                                    console.log('CFTSCORING 결과 발견!');
+                            if (dataRow) {
+                                // CFTSCORING의 processRow 함수 직접 호출
+                                if (iframeWin.processRow && typeof iframeWin.processRow === 'function') {
+                                    const fields = dataRow.split(',');
+                                    const result = iframeWin.processRow(fields, 1);
                                     
-                                    // 결과 HTML 추출
-                                    const resultContainer = iframeDoc.querySelector('.container');
-                                    if (resultContainer) {
-                                        const resultHTML = resultContainer.innerHTML;
-                                        
-                                        // iframe 제거
-                                        document.body.removeChild(iframe);
-                                        clearInterval(checkInterval);
-                                        
-                                        // 분석 중 오버레이 숨기기
-                                        document.getElementById('analyzing-overlay').style.display = 'none';
-                                        
-                                        // 결과 표시
-                                        displayCFTSCORINGResults(resultHTML);
+                                    console.log('CFTSCORING 처리 결과:', result);
+                                    
+                                    // 결과를 HTML로 변환
+                                    if (result) {
+                                        // CFTSCORING의 displayResults 함수 호출
+                                        if (iframeWin.displayResults && typeof iframeWin.displayResults === 'function') {
+                                            iframeWin.displayResults([result]);
+                                            
+                                            // 결과가 렌더링될 때까지 대기
+                                            setTimeout(() => {
+                                                const resultContainer = iframeDoc.querySelector('#results');
+                                                if (resultContainer) {
+                                                    const resultHTML = resultContainer.innerHTML;
+                                                    
+                                                    // iframe 제거
+                                                    document.body.removeChild(iframe);
+                                                    
+                                                    // 분석 중 오버레이 숨기기
+                                                    document.getElementById('analyzing-overlay').style.display = 'none';
+                                                    
+                                                    // 결과 표시
+                                                    displayCFTSCORINGResults(resultHTML);
+                                                } else {
+                                                    throw new Error('결과 컨테이너를 찾을 수 없습니다.');
+                                                }
+                                            }, 1000);
+                                        } else {
+                                            throw new Error('displayResults 함수를 찾을 수 없습니다.');
+                                        }
+                                    } else {
+                                        throw new Error('처리 결과가 없습니다.');
                                     }
-                                } else if (checkCount > 30) { // 15초 타임아웃
-                                    console.log('CFTSCORING 결과 대기 타임아웃');
-                                    clearInterval(checkInterval);
-                                    document.body.removeChild(iframe);
-                                    
-                                    // 폴백: 내부 분석 사용
-                                    performCFTSCORINGAnalysis(csvData);
+                                } else {
+                                    throw new Error('processRow 함수를 찾을 수 없습니다.');
                                 }
-                            }, 500);
-                            
-                        }).catch(err => {
-                            console.error('클립보드 복사 실패:', err);
+                            } else {
+                                throw new Error('CSV 데이터가 비어있습니다.');
+                            }
+                        } catch (error) {
+                            console.error('CFTSCORING 직접 호출 실패:', error);
                             document.body.removeChild(iframe);
                             // 폴백: 내부 분석 사용
                             performCFTSCORINGAnalysis(csvData);
-                        });
-                    }, 1000);
+                        }
+                    }, 2000); // CFTSCORING.html이 완전히 로드될 때까지 대기
                     
                 } catch (error) {
                     console.error('iframe 접근 오류:', error);

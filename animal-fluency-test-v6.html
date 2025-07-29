@@ -634,7 +634,7 @@
                 <div class="timer-display" id="timer" style="display: none;">60</div>
                 
                 <div class="ready-box" id="readyBox">
-                    <button class="start-button" id="manualStartBtn" onclick="window.handleStartClick()" style="display: block !important; visibility: visible !important; opacity: 1 !important; position: relative !important; z-index: 99999 !important;"><span>시작하기</span></button>
+                    <button class="start-button" id="manualStartBtn" style="display: block !important; visibility: visible !important; opacity: 1 !important; position: relative !important; z-index: 99999 !important;"><span>시작하기</span></button>
                     <div class="ready-check">
                         <p>조용한 장소에서 검사를 시작하세요</p>
                     </div>
@@ -791,7 +791,15 @@
         let isPlaying = false;
 
         // 시작 버튼 클릭 핸들러
+        let isStartClicked = false;
+        
         window.handleStartClick = function() {
+            if (isStartClicked) {
+                console.log('이미 시작됨 - 중복 호출 방지');
+                return;
+            }
+            isStartClicked = true;
+            
             console.log('handleStartClick 호출됨');
             console.log('DOM 요소 상태:', {
                 voiceGuideBox: voiceGuideBox,
@@ -809,7 +817,10 @@
             const audioPermissionNotice = document.getElementById('audioPermissionNotice');
             
             if (manualStartBtn) {
-                manualStartBtn.style.display = 'none';
+                // 버튼을 숨기는 대신 비활성화
+                manualStartBtn.disabled = true;
+                manualStartBtn.style.opacity = '0.5';
+                manualStartBtn.innerHTML = '<span>진행 중...</span>';
             }
             
             try {
@@ -1443,6 +1454,12 @@
 
         // 음성 합성 (통합 함수)
         function speak(text, callback) {
+            // 이미 같은 텍스트가 재생 중이면 중복 방지
+            if (window.speechSynthesis && window.speechSynthesis.speaking) {
+                console.log('음성이 이미 재생 중입니다. 중복 호출 방지:', text);
+                return;
+            }
+            
             console.log('speak 함수 호출:', {
                 text: text,
                 hardwareSettings: hardwareSettings,
@@ -3063,7 +3080,9 @@
                 
                 manualStartBtn.addEventListener('click', function() {
                     console.log('시작 버튼 클릭됨!');
-                    window.handleStartClick();
+                    if (!isStartClicked) {
+                        window.handleStartClick();
+                    }
                 });
             } else {
                 console.error('manualStartBtn을 찾을 수 없습니다');

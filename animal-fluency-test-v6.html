@@ -623,7 +623,7 @@
                 <div class="timer-display" id="timer" style="display: none;">60</div>
                 
                 <div class="ready-box" id="readyBox">
-                    <button class="start-button" id="manualStartBtn" onclick="window.handleStartClick()"><span>시작하기</span></button>
+                    <button class="start-button" id="manualStartBtn"><span>시작하기</span></button>
                     <div class="ready-check">
                         <p>조용한 장소에서 검사를 시작하세요</p>
                     </div>
@@ -3019,6 +3019,18 @@
                 readyBox: document.getElementById('readyBox'),
                 testPage: document.getElementById('testPage')
             });
+            
+            // 시작 버튼에 이벤트 리스너 추가
+            const manualStartBtn = document.getElementById('manualStartBtn');
+            if (manualStartBtn) {
+                console.log('시작 버튼에 이벤트 리스너 추가');
+                manualStartBtn.addEventListener('click', function() {
+                    console.log('시작 버튼 클릭됨!');
+                    window.handleStartClick();
+                });
+            } else {
+                console.error('manualStartBtn을 찾을 수 없습니다');
+            }
             
             // 중복 제거됨 - 위에서 이미 처리
             

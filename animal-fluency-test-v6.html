@@ -3112,7 +3112,7 @@
             if (downloadBtn) downloadBtn.addEventListener('click', downloadResults);
             
             // 음성 목록 먼저 로드
-            loadVoices();
+            const voices = loadVoices();
             console.log('로드된 음성 목록:', voices.length, '개');
             
             // 하드웨어 설정 확인

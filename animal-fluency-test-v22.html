@@ -2778,7 +2778,21 @@
             
             if (timerElement) timerElement.style.display = 'none';
             if (stopButton) stopButton.style.display = 'none';
-            if (testPage) testPage.style.display = 'none';  // 검사 페이지 숨기기
+            // Don't hide testPage since resultsSection is inside it
+            // if (testPage) testPage.style.display = 'none';  // 검사 페이지 숨기기
+            
+            // Instead, hide specific elements inside testPage
+            const readyBox = document.getElementById('readyBox');
+            const testScreen = document.getElementById('testScreen');
+            const voiceGuideBox = document.getElementById('voiceGuideBox');
+            const recordingIndicator = document.getElementById('recordingIndicator');
+            const controlButtons = document.querySelector('.control-buttons');
+            
+            if (readyBox) readyBox.style.display = 'none';
+            if (testScreen) testScreen.style.display = 'none';
+            if (voiceGuideBox) voiceGuideBox.style.display = 'none';
+            if (recordingIndicator) recordingIndicator.style.display = 'none';
+            if (controlButtons) controlButtons.style.display = 'none';
             
             // 결과 영역으로 스크롤
             setTimeout(() => {

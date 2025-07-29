@@ -1,0 +1,14 @@
+{
+  "timestamp": "2025-07-29T05:54:28.583Z",
+  "totalRequests": 1,
+  "failedRequests": 0,
+  "allRequests": [
+    {
+      "url": "file:///Users/kwk/development/CFTADMIN/animal-fluency-test-v16.html",
+      "method": "GET",
+      "resourceType": "document",
+      "timestamp": 1753768459949
+    }
+  ],
+  "failures": []
+}

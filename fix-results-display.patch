@@ -1,0 +1,31 @@
+## Issue Found:
+The resultsSection is a child element inside testPage div. When displayCFTSCORINGResults() hides the testPage, it also hides the resultsSection that's inside it.
+
+## Solution:
+Instead of hiding the entire testPage, we should only hide the specific elements we want to hide (timer, buttons, etc.) while keeping the testPage visible so that resultsSection can be shown.
+
+## Code Changes Needed:
+
+1. In the displayCFTSCORINGResults function (around line 2781), change:
+```javascript
+if (testPage) testPage.style.display = 'none';  // 검사 페이지 숨기기
+```
+
+To:
+```javascript
+// Don't hide testPage since resultsSection is inside it
+// if (testPage) testPage.style.display = 'none';  // 검사 페이지 숨기기
+
+// Instead, hide specific elements inside testPage
+const readyBox = document.getElementById('readyBox');
+const testScreen = document.getElementById('testScreen');
+const voiceGuideBox = document.getElementById('voiceGuideBox');
+const recordingIndicator = document.getElementById('recordingIndicator');
+
+if (readyBox) readyBox.style.display = 'none';
+if (testScreen) testScreen.style.display = 'none';
+if (voiceGuideBox) voiceGuideBox.style.display = 'none';
+if (recordingIndicator) recordingIndicator.style.display = 'none';
+```
+
+This will ensure that the testPage remains visible so the resultsSection inside it can be displayed properly.

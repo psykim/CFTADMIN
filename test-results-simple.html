@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>Test Results Display</title>
+</head>
+<body>
+    <h1>Testing Results Display Issue</h1>
+    
+    <script>
+        // Open the animal fluency test in an iframe to test
+        const iframe = document.createElement('iframe');
+        iframe.src = 'animal-fluency-test-v22.html';
+        iframe.style.width = '100%';
+        iframe.style.height = '800px';
+        iframe.style.border = '1px solid #ccc';
+        document.body.appendChild(iframe);
+        
+        // Wait for iframe to load
+        iframe.onload = function() {
+            console.log('Iframe loaded');
+            
+            // Access the iframe's window
+            const iframeWindow = iframe.contentWindow;
+            const iframeDoc = iframe.contentDocument;
+            
+            // Simulate test completion after a delay
+            setTimeout(() => {
+                console.log('Checking results section...');
+                
+                // Check if resultsSection exists
+                const resultsSection = iframeDoc.getElementById('resultsSection');
+                console.log('resultsSection found:', !!resultsSection);
+                
+                if (resultsSection) {
+                    console.log('resultsSection display:', resultsSection.style.display);
+                    console.log('resultsSection innerHTML length:', resultsSection.innerHTML.length);
+                    console.log('resultsSection innerHTML preview:', resultsSection.innerHTML.substring(0, 200));
+                    
+                    // Check computed styles
+                    const computedStyle = iframeWindow.getComputedStyle(resultsSection);
+                    console.log('Computed display:', computedStyle.display);
+                    console.log('Computed visibility:', computedStyle.visibility);
+                    console.log('Computed opacity:', computedStyle.opacity);
+                    console.log('Computed height:', computedStyle.height);
+                    
+                    // Check parent visibility
+                    let parent = resultsSection.parentElement;
+                    while (parent) {
+                        const parentStyle = iframeWindow.getComputedStyle(parent);
+                        if (parentStyle.display === 'none') {
+                            console.log('Parent element hidden:', parent.id || parent.className);
+                        }
+                        parent = parent.parentElement;
+                    }
+                }
+                
+                // Check for overlays
+                const allElements = iframeDoc.querySelectorAll('*');
+                const overlays = [];
+                allElements.forEach(elem => {
+                    const style = iframeWindow.getComputedStyle(elem);
+                    if ((style.position === 'fixed' || style.position === 'absolute') && 
+                        style.zIndex && parseInt(style.zIndex) > 1000) {
+                        overlays.push({
+                            element: elem.id || elem.className,
+                            zIndex: style.zIndex,
+                            display: style.display
+                        });
+                    }
+                });
+                console.log('High z-index overlays:', overlays);
+                
+            }, 5000);
+        };
+    </script>
+</body>
+</html>

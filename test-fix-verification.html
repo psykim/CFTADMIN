@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>Test Fix Verification</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; }
+        .test-btn { 
+            padding: 10px 20px; 
+            margin: 5px; 
+            background: #007bff; 
+            color: white; 
+            border: none; 
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .test-btn:hover { background: #0056b3; }
+        .log { 
+            background: #f0f0f0; 
+            padding: 10px; 
+            margin-top: 20px; 
+            border-radius: 5px;
+            font-family: monospace;
+            white-space: pre-wrap;
+        }
+    </style>
+</head>
+<body>
+    <h1>Testing Results Display Fix</h1>
+    
+    <p>Open animal-fluency-test-v22.html in a new tab and use the buttons below to test:</p>
+    
+    <button class="test-btn" onclick="simulateTestCompletion()">Simulate Test Completion</button>
+    <button class="test-btn" onclick="checkResultsVisibility()">Check Results Visibility</button>
+    <button class="test-btn" onclick="forceShowResults()">Force Show Results</button>
+    
+    <div class="log" id="log"></div>
+    
+    <script>
+        let testWindow = null;
+        
+        function log(message) {
+            const logDiv = document.getElementById('log');
+            logDiv.textContent += message + '\n';
+        }
+        
+        function openTestPage() {
+            if (!testWindow || testWindow.closed) {
+                testWindow = window.open('animal-fluency-test-v22.html', 'testWindow');
+                log('Opened test page in new window');
+            }
+            return testWindow;
+        }
+        
+        function simulateTestCompletion() {
+            const win = openTestPage();
+            if (!win) return;
+            
+            setTimeout(() => {
+                // Add some test animals
+                win.animals = ['개', '고양이', '호랑이', '사자', '코끼리'];
+                log('Added test animals: ' + win.animals.join(', '));
+                
+                // Call analyzeWithCFTSCORING
+                if (win.analyzeWithCFTSCORING) {
+                    win.analyzeWithCFTSCORING();
+                    log('Called analyzeWithCFTSCORING()');
+                } else {
+                    log('ERROR: analyzeWithCFTSCORING not found');
+                }
+            }, 2000);
+        }
+        
+        function checkResultsVisibility() {
+            const win = openTestPage();
+            if (!win) return;
+            
+            const doc = win.document;
+            
+            // Check testPage
+            const testPage = doc.getElementById('testPage');
+            if (testPage) {
+                const testPageStyle = win.getComputedStyle(testPage);
+                log('testPage display: ' + testPageStyle.display);
+                log('testPage visibility: ' + testPageStyle.visibility);
+            } else {
+                log('ERROR: testPage not found');
+            }
+            
+            // Check resultsSection
+            const resultsSection = doc.getElementById('resultsSection');
+            if (resultsSection) {
+                const resultsStyle = win.getComputedStyle(resultsSection);
+                log('resultsSection display: ' + resultsStyle.display);
+                log('resultsSection visibility: ' + resultsStyle.visibility);
+                log('resultsSection opacity: ' + resultsStyle.opacity);
+                log('resultsSection innerHTML length: ' + resultsSection.innerHTML.length);
+                
+                // Check if it's visible in viewport
+                const rect = resultsSection.getBoundingClientRect();
+                log('resultsSection position: top=' + rect.top + ', height=' + rect.height);
+            } else {
+                log('ERROR: resultsSection not found');
+            }
+            
+            // Check other elements
+            const elements = ['readyBox', 'testScreen', 'voiceGuideBox', 'recordingIndicator'];
+            elements.forEach(id => {
+                const elem = doc.getElementById(id);
+                if (elem) {
+                    const style = win.getComputedStyle(elem);
+                    log(id + ' display: ' + style.display);
+                }
+            });
+        }
+        
+        function forceShowResults() {
+            const win = openTestPage();
+            if (!win) return;
+            
+            const doc = win.document;
+            const resultsSection = doc.getElementById('resultsSection');
+            
+            if (resultsSection) {
+                resultsSection.style.display = 'block';
+                resultsSection.style.visibility = 'visible';
+                resultsSection.style.opacity = '1';
+                
+                // Also ensure testPage is visible
+                const testPage = doc.getElementById('testPage');
+                if (testPage) {
+                    testPage.style.display = 'block';
+                }
+                
+                log('Forced resultsSection and testPage to be visible');
+                
+                // Scroll to results
+                resultsSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                log('Scrolled to results section');
+            } else {
+                log('ERROR: Could not find resultsSection');
+            }
+        }
+        
+        // Auto-open test page
+        window.onload = () => {
+            log('Test verification page loaded. Click "Simulate Test Completion" to test the fix.');
+        };
+    </script>
+</body>
+</html>

@@ -832,8 +832,16 @@
             }
         }
 
+        let isInstructionsStarted = false;
+        
         // 음성 안내 시작 함수
         function startInstructions() {
+            if (isInstructionsStarted) {
+                console.log('startInstructions 이미 시작됨 - 중복 호출 방지');
+                return;
+            }
+            isInstructionsStarted = true;
+            
             console.log('startInstructions 호출됨');
             
             // 시작 버튼과 ready box 숨기기
@@ -1053,8 +1061,8 @@
             // 즉시 시작 화면 숨기고 테스트 화면 표시
             if (readyBox) readyBox.style.display = 'none';
             
-            // startInstructions 함수 호출로 연결
-            startInstructions();
+            // startInstructions 함수 호출로 연결 - 제거 (중복 방지)
+            // startInstructions();
             
             // 마이크 아이콘은 비활성 상태로 표시
             const localTestMicIcon = document.getElementById('testMicIcon');
@@ -3015,7 +3023,8 @@
                 // 버튼 숨기고 바로 시작
                 document.getElementById('manualStartBtn').style.display = 'none';
                 setTimeout(() => {
-                    startInstructions();
+                    // 중복 호출 방지 - handleStartClick에서 이미 실행됨
+                    // startInstructions();
                 }, 1000);
             }).catch(error => {
                 console.log('자동재생 차단됨 - 시작 버튼 표시');

@@ -626,7 +626,7 @@
                 <div class="timer-display" id="timer" style="display: none;">60</div>
                 
                 <div class="ready-box" id="readyBox">
-                    <button class="start-button" id="manualStartBtn" onclick="testClick()"><span>시작하기</span></button>
+                    <button class="start-button" id="manualStartBtn" onclick="window.handleStartClick()"><span>시작하기</span></button>
                     <div class="ready-check">
                         <p>조용한 장소에서 검사를 시작하세요</p>
                     </div>
@@ -2220,7 +2220,6 @@
         // CFTSCORING 결과 표시
         function displayCFTSCORINGResults(resultHTML) {
             // 결과 섹션 표시
-            const resultsSection = document.getElementById('resultsSection');
             resultsSection.style.display = 'block';
             resultsSection.innerHTML = resultHTML;
             
@@ -2309,7 +2308,6 @@
             }
             
             // CFTSCORING 스타일의 상세 보고서 생성
-            const resultsSection = document.getElementById('resultsSection');
             resultsSection.innerHTML = `
                 <div style="max-width: 1200px; margin: 0 auto; padding: 20px;">
                     <!-- 헤더 -->
@@ -2775,7 +2773,6 @@
             containerHTML += '</div>';
             
             // 결과 섹션에 추가
-            const resultsSection = document.getElementById('resultsSection');
             const analysisDiv = document.createElement('div');
             analysisDiv.innerHTML = containerHTML;
             resultsSection.appendChild(analysisDiv);
@@ -2841,7 +2838,6 @@
             resultHTML += '</div>';
             
             // 결과 섹션에 추가
-            const resultsSection = document.getElementById('resultsSection');
             const analysisDiv = document.createElement('div');
             analysisDiv.innerHTML = resultHTML;
             resultsSection.appendChild(analysisDiv);

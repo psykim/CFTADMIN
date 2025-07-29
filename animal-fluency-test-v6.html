@@ -867,7 +867,7 @@
                                                         if (responseList) responseList.innerHTML = '';
                                                         
                                                         // 1초 삐 소리
-                                                        playBeep(880, 1000).then(async () => {
+                                                        playBeep(880, 1000).then(() => {
                                                             console.log('삐 소리 완료 - 마이크 활성화');
                                                             
                                                             // 마이크 아이콘 활성화
@@ -882,11 +882,11 @@
                                                             }
                                                             
                                                             // 오디오 시각화 시작
-                                                            await startAudioVisualization();
+                                                            startAudioVisualization();
                                                             
                                                             // 마이크 권한 요청 및 음성인식 시작
-                                                            setTimeout(async () => {
-                                                                await getMicrophonePermission();
+                                                            setTimeout(() => {
+                                                                getMicrophonePermission();
                                                                 isRecognizing = true;
                                                                 startSpeechRecognition();
                                                                 console.log('연습 음성인식 시작됨');
@@ -924,7 +924,7 @@
                                                                                     if (responseList) responseList.innerHTML = '';
                                                                                     
                                                                                     // 1초 삐 소리
-                                                                                    playBeep(880, 1000).then(async () => {
+                                                                                    playBeep(880, 1000).then(() => {
                                                                                         // 마이크 활성화 표시
                                                                                         if (testMicIcon) testMicIcon.classList.add('active');
                                                                                         
@@ -936,7 +936,7 @@
                                                                                         }
                                                                                         
                                                                                         // 오디오 시각화 시작
-                                                                                        await startAudioVisualization();
+                                                                                        startAudioVisualization();
                                                                                         
                                                                                         console.log('연습 재시도 시작 - 10초 대기');
                                                                                         setTimeout(() => {
@@ -1198,9 +1198,9 @@
                                                                     practiceItems = [];
                                                                     responseList.innerHTML = '';
                                                                     
-                                                                    playBeep(880, 1000).then(async () => {
+                                                                    playBeep(880, 1000).then(() => {
                                                                         if (testMicIcon) testMicIcon.classList.add('active');
-                                                                        await startAudioVisualization();
+                                                                        startAudioVisualization();
                                                                         
                                                                         setTimeout(() => {
                                                                             if (recognition && !isRecognizing) {
@@ -1273,9 +1273,9 @@
                                     
                                     // 안내 종료 후 1초 대기
                                     console.log('1초 대기 시작');
-                                    setTimeout(async () => {
+                                    setTimeout(() => {
                                         console.log('1초 대기 완료 - 본시행 시작:', new Date().toLocaleTimeString());
-                                        await startTest(); // 시작 함수 직접 호출
+                                        startTest(); // 시작 함수 직접 호출
                                     }, 1000);
                                 });
                             }, 800);
@@ -1775,13 +1775,13 @@
         }
 
         // 검사 시작 시각적 효과와 신호음
-        async function startTestCountdown(callback) {
+        function startTestCountdown(callback) {
             console.log('startTestCountdown 시작');
             
             // 마이크 권한 및 음성인식 준비 (이미 준비되지 않은 경우)
             if (!audioContext || !recognition) {
                 console.log('마이크/음성인식 준비 필요');
-                await prepareMicrophoneAndRecognition();
+                prepareMicrophoneAndRecognition();
             }
             
             // 테스트 화면 표시
@@ -1824,7 +1824,7 @@
             
             // 오디오 시각화 시작
             console.log('오디오 시각화 시작');
-            await startAudioVisualization();
+            startAudioVisualization();
             
             // 콜백 실행
             if (callback) {
@@ -1946,7 +1946,7 @@
         }
 
         // 검사 시작
-        async function startTest() {
+        function startTest() {
             console.log('startTest 함수 호출됨');
             if (readyBox) readyBox.style.display = 'none';
             animals = [];
@@ -1987,7 +1987,7 @@
             
             console.log('startTestCountdown 호출 전');
             // 신호음과 시각적 효과로 카운트다운
-            await startTestCountdown(async () => {
+            startTestCountdown(() => {
                 console.log('startTestCountdown 콜백 실행');
                 startTimer();
                 // 삐 소리 후 음성인식 시작을 위해 약간의 대기 시간 추가
@@ -3107,7 +3107,7 @@
             initializeDOMElements();
             
             // 이벤트 리스너 추가
-            if (startBtn) startBtn.addEventListener('click', async () => await startTest());
+            if (startBtn) startBtn.addEventListener('click', () => startTest());
             if (stopBtn) stopBtn.addEventListener('click', stopTest);
             if (resetBtn) resetBtn.addEventListener('click', resetTest);
             if (downloadBtn) downloadBtn.addEventListener('click', downloadResults);

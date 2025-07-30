@@ -845,6 +845,395 @@
         
         // 페이지 로드 즉시 실행 - 디버깅 완료됨
         
+        // 동물 데이터베이스 - CFTSCORING에서 가져옴
+        const ANIMAL_DATABASE = {
+            // 포유류
+            '개': true, '강아지': true, '멍멍이': true, '개새끼': true, '암캐': true, '수캐': true, '견': true, '똥개': true, '누렁이': true, '바둑이': true, '백구': true,
+            '고양이': true, '냥이': true, '야옹이': true, '고냥이': true, '암고양이': true, '수고양이': true, '새끼고양이': true, '아기고양이': true, '냥냥이': true,
+            '소': true, '송아지': true, '암소': true, '수소': true, '황소': true, '소새끼': true, '암쇠': true, '수쇠': true, '멍에소': true, '누렁소': true, '얼룩소': true, '한우': true, '젖소': true,
+            '돼지': true, '새끼돼지': true, '아기돼지': true, '암퇘지': true, '수퇘지': true, '멧돼지': true, '돝': true, '저': true, '꿀꿀이': true, '돼지새끼': true,
+            '말': true, '망아지': true, '암말': true, '수말': true, '조랑말': true, '말새끼': true, '준마': true, '마': true, '천리마': true, '경주마': true,
+            '양': true, '새끼양': true, '암양': true, '수양': true, '양새끼': true, '어린양': true, '면양': true,
+            '염소': true, '새끼염소': true, '암염소': true, '수염소': true, '염소새끼': true, '산양': true,
+            '원숭이': true, '새끼원숭이': true, '암원숭이': true, '수원숭이': true, '원숭이새끼': true, '잔나비': true,
+            '호랑이': true, '새끼호랑이': true, '암호랑이': true, '수호랑이': true, '호랑이새끼': true, '범': true, '백호': true,
+            '사자': true, '새끼사자': true, '암사자': true, '수사자': true, '사자새끼': true, '라이온': true,
+            '코끼리': true, '새끼코끼리': true, '암코끼리': true, '수코끼리': true, '코끼리새끼': true,
+            '기린': true, '새끼기린': true, '암기린': true, '수기린': true, '기린새끼': true,
+            '토끼': true, '산토끼': true, '집토끼': true, '새끼토끼': true, '아기토끼': true, '암토끼': true, '수토끼': true, '토끼새끼': true, '토깽이': true,
+            '쥐': true, '생쥐': true, '집쥐': true, '들쥐': true, '새끼쥐': true, '아기쥐': true, '암쥐': true, '수쥐': true, '쥐새끼': true, '찍찍이': true, '시궁쥐': true,
+            '곰': true, '새끼곰': true, '암곰': true, '수곰': true, '곰새끼': true, '반달곰': true, '불곰': true, '북극곰': true,
+            '여우': true, '새끼여우': true, '암여우': true, '수여우': true, '여우새끼': true,
+            '늑대': true, '새끼늑대': true, '암늑대': true, '수늑대': true, '늑대새끼': true, '이리': true,
+            '사슴': true, '새끼사슴': true, '암사슴': true, '수사슴': true, '사슴새끼': true, '꽃사슴': true, '순록': true,
+            '노루': true, '새끼노루': true, '암노루': true, '수노루': true, '노루새끼': true,
+            '낙타': true, '새끼낙타': true, '암낙타': true, '수낙타': true, '낙타새끼': true, '단봉낙타': true, '쌍봉낙타': true,
+            '하마': true, '새끼하마': true, '암하마': true, '수하마': true, '하마새끼': true,
+            '코뿔소': true, '새끼코뿔소': true, '암코뿔소': true, '수코뿔소': true, '코뿔소새끼': true,
+            '표범': true, '새끼표범': true, '암표범': true, '수표범': true, '표범새끼': true, '레오파드': true,
+            '치타': true, '새끼치타': true, '암치타': true, '수치타': true, '치타새끼': true,
+            '하이에나': true, '새끼하이에나': true, '암하이에나': true, '수하이에나': true, '하이에나새끼': true,
+            '오소리': true, '새끼오소리': true, '암오소리': true, '수오소리': true, '오소리새끼': true,
+            '너구리': true, '새끼너구리': true, '암너구리': true, '수너구리': true, '너구리새끼': true,
+            '두더지': true, '새끼두더지': true, '암두더지': true, '수두더지': true, '두더지새끼': true,
+            '고슴도치': true, '새끼고슴도치': true, '암고슴도치': true, '수고슴도치': true, '고슴도치새끼': true,
+            '다람쥐': true, '새끼다람쥐': true, '암다람쥐': true, '수다람쥐': true, '다람쥐새끼': true, '날다람쥐': true,
+            '청설모': true, '새끼청설모': true, '암청설모': true, '수청설모': true, '청설모새끼': true,
+            '캥거루': true, '새끼캥거루': true, '암캥거루': true, '수캥거루': true, '캥거루새끼': true,
+            '코알라': true, '새끼코알라': true, '암코알라': true, '수코알라': true, '코알라새끼': true,
+            '판다': true, '새끼판다': true, '암판다': true, '수판다': true, '판다새끼': true, '팬더': true,
+            '얼룩말': true, '새끼얼룩말': true, '암얼룩말': true, '수얼룩말': true, '얼룩말새끼': true, '지브라': true,
+            '당나귀': true, '새끼당나귀': true, '암당나귀': true, '수당나귀': true, '당나귀새끼': true, '나귀': true,
+            '노새': true,
+            // 조류
+            '닭': true, '병아리': true, '암탉': true, '수탉': true, '장닭': true, '씨암탉': true, '씨수탉': true, '닭새끼': true, '꼬꼬': true, '꼬끼오': true,
+            '오리': true, '새끼오리': true, '암오리': true, '수오리': true, '오리새끼': true, '청둥오리': true,
+            '거위': true, '새끼거위': true, '암거위': true, '수거위': true, '거위새끼': true,
+            '백조': true, '새끼백조': true, '암백조': true, '수백조': true, '백조새끼': true, '고니': true,
+            '독수리': true, '새끼독수리': true, '암독수리': true, '수독수리': true, '독수리새끼': true, '대머리독수리': true,
+            '매': true, '새끼매': true, '암매': true, '수매': true, '매새끼': true, '참매': true,
+            '올빼미': true, '새끼올빼미': true, '암올빼미': true, '수올빼미': true, '올빼미새끼': true, '부엉이': true,
+            '까마귀': true, '새끼까마귀': true, '암까마귀': true, '수까마귀': true, '까마귀새끼': true,
+            '까치': true, '새끼까치': true, '암까치': true, '수까치': true, '까치새끼': true,
+            '참새': true, '새끼참새': true, '암참새': true, '수참새': true, '참새새끼': true,
+            '제비': true, '새끼제비': true, '암제비': true, '수제비': true, '제비새끼': true,
+            '비둘기': true, '새끼비둘기': true, '암비둘기': true, '수비둘기': true, '비둘기새끼': true, '집비둘기': true, '산비둘기': true,
+            '갈매기': true, '새끼갈매기': true, '암갈매기': true, '수갈매기': true, '갈매기새끼': true,
+            '펠리컨': true, '새끼펠리컨': true, '암펠리컨': true, '수펠리컨': true, '펠리컨새끼': true,
+            '학': true, '새끼학': true, '암학': true, '수학': true, '학새끼': true, '두루미': true, '단정학': true, '재두루미': true,
+            '황새': true, '새끼황새': true, '암황새': true, '수황새': true, '황새새끼': true,
+            '공작': true, '새끼공작': true, '암공작': true, '수공작': true, '공작새끼': true, '공작새': true,
+            '앵무새': true, '새끼앵무새': true, '암앵무새': true, '수앵무새': true, '앵무새새끼': true, '잉꼬': true,
+            '타조': true, '새끼타조': true, '암타조': true, '수타조': true, '타조새끼': true,
+            '펭귄': true, '새끼펭귄': true, '암펭귄': true, '수펭귄': true, '펭귄새끼': true, '황제펭귄': true,
+            '플라밍고': true, '새끼플라밍고': true, '암플라밍고': true, '수플라밍고': true, '플라밍고새끼': true, '홍학': true,
+            '칠면조': true, '새끼칠면조': true, '암칠면조': true, '수칠면조': true, '칠면조새끼': true,
+            '꿩': true, '새끼꿩': true, '암꿩': true, '수꿩': true, '꿩새끼': true, '장끼': true, '까투리': true,
+            '메추리': true, '새끼메추리': true, '암메추리': true, '수메추리': true, '메추리새끼': true, '메추라기': true,
+            '종달새': true, '새끼종달새': true, '암종달새': true, '수종달새': true, '종달새새끼': true,
+            '꾀꼬리': true, '새끼꾀꼬리': true, '암꾀꼬리': true, '수꾀꼬리': true, '꾀꼬리새끼': true,
+            '딱따구리': true, '새끼딱따구리': true, '암딱따구리': true, '수딱따구리': true, '딱따구리새끼': true,
+            '부리새': true, '투칸': true, '큰부리새': true,
+            '벌새': true,
+            '물총새': true,
+            '뻐꾸기': true, '뻐꾹이': true,
+            '찌르레기': true,
+            '지빠귀': true,
+            '휘파람새': true,
+            '솔개': true,
+            '수리': true,
+            '콘도르': true,
+            '알바트로스': true, '신천옹': true,
+            '가마우지': true,
+            '왜가리': true, '백로': true,
+            '홍따오기': true, '따오기': true,
+            '저어새': true,
+            '느시': true,
+            '도요새': true,
+            '물떼새': true,
+            '논병아리': true,
+            '오목눈이': true,
+            '뱁새': true,
+            '굴뚝새': true,
+            '박새': true,
+            '동고비': true,
+            '때까치': true,
+            '어치': true,
+            '멧비둘기': true,
+            '검은머리물떼새': true,
+            '노랑부리백로': true,
+            '쇠백로': true,
+            '중대백로': true,
+            '왕관앵무': true,
+            '모란앵무': true,
+            '금강앵무': true,
+            '카나리아': true,
+            '십자매': true,
+            '금화조': true,
+            // 파충류
+            '뱀': true, '새끼뱀': true, '암뱀': true, '수뱀': true, '뱀새끼': true, '구렁이': true, '독사': true, '살모사': true, '코브라': true, '비단뱀': true, '보아뱀': true, '방울뱀': true,
+            '도마뱀': true, '새끼도마뱀': true, '암도마뱀': true, '수도마뱀': true, '도마뱀새끼': true, '도마뱀붙이': true, '게코': true,
+            '악어': true, '새끼악어': true, '암악어': true, '수악어': true, '악어새끼': true, '크로커다일': true, '앨리게이터': true,
+            '거북': true, '거북이': true, '새끼거북': true, '암거북': true, '수거북': true, '거북새끼': true, '바다거북': true, '육지거북': true, '자라': true,
+            '이구아나': true, '새끼이구아나': true, '암이구아나': true, '수이구아나': true, '이구아나새끼': true,
+            '카멜레온': true, '새끼카멜레온': true, '암카멜레온': true, '수카멜레온': true, '카멜레온새끼': true,
+            // 양서류
+            '개구리': true, '새끼개구리': true, '암개구리': true, '수개구리': true, '개구리새끼': true, '청개구리': true, '황소개구리': true, '무당개구리': true, '올챙이': true,
+            '두꺼비': true, '새끼두꺼비': true, '암두꺼비': true, '수두꺼비': true, '두꺼비새끼': true,
+            '도롱뇽': true, '새끼도롱뇽': true, '암도롱뇽': true, '수도롱뇽': true, '도롱뇽새끼': true,
+            '맹꽁이': true,
+            // 어류
+            '물고기': true, '고기': true, '생선': true, '어류': true,
+            '참치': true, '다랑어': true, '마구로': true,
+            '연어': true, '사케': true, '샤케': true,
+            '고등어': true, '사바': true,
+            '꽁치': true, '산마': true,
+            '갈치': true, '타치우오': true,
+            '장어': true, '뱀장어': true, '우나기': true, '민물장어': true, '바다장어': true, '붕장어': true, '아나고': true,
+            '미꾸라지': true, '미꾸리': true, '추어': true,
+            '메기': true, '메기새끼': true,
+            '가물치': true,
+            '잉어': true, '코이': true,
+            '붕어': true,
+            '송사리': true,
+            '피라미': true,
+            '상어': true, '새끼상어': true, '암상어': true, '수상어': true, '상어새끼': true, '백상어': true, '고래상어': true, '귀상어': true,
+            '가오리': true, '홍어': true, '쥐가오리': true,
+            '광어': true, '넙치': true, '가자미': true, '도다리': true,
+            '우럭': true, '볼락': true,
+            '농어': true, '시바스': true,
+            '도미': true, '타이': true,
+            '방어': true, '부리': true,
+            '삼치': true, '사와라': true,
+            '청어': true,
+            '명태': true, '동태': true, '황태': true, '북어': true,
+            '대구': true,
+            '조기': true, '굴비': true,
+            '멸치': true,
+            '정어리': true,
+            '고래': true, '새끼고래': true, '암고래': true, '수고래': true, '고래새끼': true, '향유고래': true, '흰긴수염고래': true, '대왕고래': true, '범고래': true, '돌고래': true,
+            '복어': true, '복어새끼': true,
+            '금붕어': true,
+            '열대어': true,
+            '베타': true,
+            '구피': true,
+            '엔젤피시': true,
+            '디스커스': true,
+            '네온테트라': true,
+            '해마': true,
+            '날치': true,
+            '개복치': true,
+            '돔': true,
+            '숭어': true,
+            '바라쿠다': true,
+            '투어': true,
+            '민어': true,
+            '병어': true,
+            '쏨뱅이': true,
+            '노래미': true,
+            '망둥이': true,
+            '까나리': true,
+            '빙어': true,
+            '은어': true,
+            '산천어': true,
+            '무지개송어': true,
+            '곤들매기': true,
+            '버들치': true,
+            '갈겨니': true,
+            '누치': true,
+            '강준치': true,
+            '꺽지': true,
+            '쏘가리': true,
+            '배스': true,
+            '블루길': true,
+            '틸라피아': true,
+            '아귀': true,
+            '먹장어': true, '꼼장어': true,
+            '칠성장어': true,
+            '전기뱀장어': true,
+            '전기가오리': true,
+            '철갑상어': true,
+            '날새기': true,
+            '실러캔스': true,
+            // 갑각류
+            '새우': true, '새우새끼': true, '대하': true, '보리새우': true, '꽃새우': true, '도화새우': true, '닭새우': true,
+            '랍스터': true, '랍스타': true, '바닷가재': true, '가재': true, '민물가재': true,
+            '게': true, '새끼게': true, '암게': true, '수게': true, '게새끼': true, '꽃게': true, '대게': true, '털게': true, '킹크랩': true,
+            // 연체동물
+            '문어': true, '새끼문어': true, '암문어': true, '수문어': true, '문어새끼': true, '대왕문어': true, '낙지': true, '타코': true,
+            '오징어': true, '새끼오징어': true, '암오징어': true, '수오징어': true, '오징어새끼': true, '한치': true, '꼴뚜기': true,
+            '조개': true, '바지락': true, '모시조개': true, '백합': true, '가리비': true, '홍합': true, '굴': true, '전복': true,
+            '소라': true, '고둥': true,
+            '달팽이': true, '새끼달팽이': true, '달팽이새끼': true, '우렁이': true, '다슬기': true,
+            '해파리': true, '새끼해파리': true, '해파리새끼': true,
+            // 곤충류
+            '나비': true, '배추흰나비': true, '호랑나비': true, '네발나비': true,
+            '나방': true, '누에나방': true,
+            '벌': true, '꿀벌': true, '말벌': true, '땅벌': true, '호박벌': true,
+            '개미': true, '일개미': true, '병정개미': true, '여왕개미': true,
+            '파리': true, '집파리': true, '초파리': true,
+            '모기': true,
+            '잠자리': true, '고추잠자리': true, '된장잠자리': true,
+            '메뚜기': true, '방아깨비': true, '여치': true,
+            '귀뚜라미': true,
+            '매미': true, '참매미': true, '애매미': true, '쓰름매미': true,
+            '딱정벌레': true, '사슴벌레': true, '장수풍뎅이': true, '무당벌레': true,
+            '거미': true, '새끼거미': true, '암거미': true, '수거미': true, '거미새끼': true, '왕거미': true, '타란튤라': true,
+            '지네': true, '노래기': true,
+            '전갈': true,
+            '바퀴벌레': true, '바퀴': true,
+            '사마귀': true,
+            '하루살이': true,
+            '반딧불이': true, '반디': true,
+            '꽃등에': true,
+            '등에': true,
+            '쇠똥구리': true,
+            '똥구리': true,
+            '송장벌레': true,
+            '물방개': true,
+            '소금쟁이': true,
+            '깍지벌레': true,
+            '진드기': true,
+            '벼룩': true,
+            '이': true, '머릿니': true,
+            '좀': true,
+            '노린재': true,
+            '진딧물': true,
+            '매미충': true,
+            '꽃매미': true,
+            '빈대': true,
+            '좀벌레': true,
+            '집게벌레': true,
+            '쥐며느리': true,
+            '공벌레': true,
+            '달팽이벌레': true,
+            '민달팽이': true,
+            '풍뎅이': true,
+            '꽃무지': true,
+            '비단벌레': true,
+            '길앞잡이': true,
+            '먼지벌레': true,
+            '방귀벌레': true,
+            '잎벌레': true,
+            '가뢰': true,
+            '거위벌레': true,
+            '바구미': true,
+            '나무좀': true,
+            '하늘소': true,
+            '물땡땡이': true,
+            '물맴이': true,
+            '게아재비': true,
+            '장구애비': true,
+            '날도래': true,
+            '강도래': true,
+            '부채벌레': true,
+            '약대벌레': true,
+            '선충': true,
+            '회충': true,
+            '요충': true,
+            '십이지장충': true,
+            '촌충': true,
+            // 기타 동물
+            '불가사리': true, '성게': true, '말미잘': true, '산호': true,
+            '스펀지': true, '해면': true,
+            '플랑크톤': true,
+            '아메바': true,
+            '짚신벌레': true,
+            '히드라': true,
+            // 특수 동물 (신화/상상)
+            '용': true, '용왕': true, '이무기': true,
+            '봉황': true, '불사조': true, '피닉스': true,
+            '유니콘': true, '일각수': true,
+            '페가수스': true, '천마': true,
+            '기린': true, // 상상의 동물 기린과 실제 기린 둘 다 포함
+            '해태': true,
+            '삼족오': true,
+            '구미호': true,
+            '도깨비': true,
+            '케르베로스': true,
+            '켄타우로스': true,
+            '미노타우로스': true,
+            '그리핀': true,
+            '와이번': true,
+            '드래곤': true,
+            '히포그리프': true,
+            '키메라': true,
+            '스핑크스': true,
+            '하피': true,
+            '세이렌': true,
+            '크라켄': true,
+            '리바이어던': true,
+            '베헤모스': true,
+            '바실리스크': true,
+            '코카트리스': true,
+            '맨티코어': true,
+            '라미아': true,
+            '고르곤': true,
+            '메두사': true,
+            '님프': true,
+            '요정': true,
+            '픽시': true,
+            '엘프': true,
+            '드워프': true,
+            '오크': true,
+            '고블린': true,
+            '트롤': true,
+            '오우거': true,
+            '자이언트': true,
+            '타이탄': true,
+            // 공룡
+            '공룡': true,
+            '티라노사우루스': true, '티렉스': true,
+            '트리케라톱스': true,
+            '브라키오사우루스': true,
+            '스테고사우루스': true,
+            '벨로키랍토르': true, '랩터': true,
+            '프테라노돈': true, '익룡': true,
+            '모사사우루스': true,
+            '플레시오사우루스': true,
+            '안킬로사우루스': true,
+            '파키케팔로사우루스': true,
+            '알로사우루스': true,
+            '디플로도쿠스': true,
+            '이구아노돈': true,
+            '스피노사우루스': true,
+            '카르노타우루스': true,
+            '파라사우롤로푸스': true,
+            '케찰코아틀루스': true,
+            '아르켈론': true,
+            '메갈로돈': true,
+            '매머드': true, '맘모스': true,
+            '검치호': true, '스밀로돈': true
+        };
+        
+        // 동물 변형 사전 (CFTSCORING에서 가져옴)
+        const ANIMAL_VARIANTS = {
+            '개': ['개', '강아지', '멍멍이', '개새끼', '암캐', '수캐', '견', '똥개', '누렁이', '바둑이', '백구'],
+            '고양이': ['고양이', '냥이', '야옹이', '고냥이', '암고양이', '수고양이', '새끼고양이', '아기고양이', '냥냥이'],
+            '소': ['소', '송아지', '암소', '수소', '황소', '소새끼', '암쇠', '수쇠', '멍에소', '누렁소', '얼룩소', '한우', '젖소'],
+            '돼지': ['돼지', '새끼돼지', '아기돼지', '암퇘지', '수퇘지', '멧돼지', '돝', '저', '꿀꿀이', '돼지새끼'],
+            '닭': ['닭', '병아리', '암탉', '수탉', '장닭', '씨암탉', '씨수탉', '닭새끼', '꼬꼬', '꼬끼오'],
+            '말': ['말', '망아지', '암말', '수말', '조랑말', '말새끼', '준마', '마', '천리마', '경주마'],
+            '토끼': ['토끼', '산토끼', '집토끼', '새끼토끼', '아기토끼', '암토끼', '수토끼', '토끼새끼', '토깽이'],
+            '쥐': ['쥐', '생쥐', '집쥐', '들쥐', '새끼쥐', '아기쥐', '암쥐', '수쥐', '쥐새끼', '찍찍이', '시궁쥐'],
+            '호랑이': ['호랑이', '새끼호랑이', '암호랑이', '수호랑이', '호랑이새끼', '범', '백호'],
+            '사자': ['사자', '새끼사자', '암사자', '수사자', '사자새끼', '라이온']
+        };
+        
+        // 동물 이름인지 확인하는 함수
+        function isAnimalName(word) {
+            if (!word || typeof word !== 'string') return false;
+            
+            // 직접 매칭
+            if (ANIMAL_DATABASE[word]) return true;
+            
+            // 변형 확인
+            for (const [base, variants] of Object.entries(ANIMAL_VARIANTS)) {
+                if (variants.includes(word)) return true;
+            }
+            
+            return false;
+        }
+        
+        // 기본 동물 이름 가져오기 (변형을 기본형으로 변환)
+        function getBaseAnimalName(word) {
+            // 직접 매칭되면 그대로 반환
+            if (ANIMAL_DATABASE[word]) {
+                // 변형 사전에서 기본형 찾기
+                for (const [base, variants] of Object.entries(ANIMAL_VARIANTS)) {
+                    if (variants.includes(word)) return base;
+                }
+                return word;
+            }
+            
+            // 변형 사전에서 찾기
+            for (const [base, variants] of Object.entries(ANIMAL_VARIANTS)) {
+                if (variants.includes(word)) return base;
+            }
+            
+            return word;
+        }
+        
         // 전역 변수
         let animals = [];
         let uniqueAnimals = new Set();
@@ -2001,12 +2390,18 @@
             // speechTimestamp가 전달되면 사용하고, 없으면 현재 시간 사용
             const timestamp = speechTimestamp !== undefined ? speechTimestamp : (Date.now() - startTime);
             
-            console.log(`명사 추가: ${trimmedAnimal}, 시간: ${timestamp}ms (${Math.floor(timestamp/1000)}초)`);
+            // 동물 여부 확인
+            const isValidAnimal = isAnimalName(trimmedAnimal);
+            const baseAnimal = getBaseAnimalName(trimmedAnimal);
+            
+            console.log(`단어 추가: ${trimmedAnimal}, 동물여부: ${isValidAnimal}, 기본형: ${baseAnimal}, 시간: ${timestamp}ms (${Math.floor(timestamp/1000)}초)`);
             
             animals.push({
                 name: trimmedAnimal,
                 timestamp: timestamp,
-                isDuplicate: uniqueAnimals.has(trimmedAnimal.toLowerCase())
+                isDuplicate: uniqueAnimals.has(trimmedAnimal.toLowerCase()),
+                isAnimal: isValidAnimal,
+                baseAnimal: baseAnimal
             });
             
             uniqueAnimals.add(trimmedAnimal.toLowerCase());
@@ -2686,8 +3081,8 @@
                     perseverationScore++;
                 } else {
                     uniqueAnimals.add(animal);
-                    // 동물 이름 유효성 검사 (간단한 버전)
-                    if (!isValidAnimalName(animal)) {
+                    // 동물 이름 유효성 검사
+                    if (!isAnimalName(animal)) {
                         intrusionScore++;
                     }
                 }
@@ -3073,10 +3468,21 @@
             const firstHalfCount = intervalCounts['0-15초'] + intervalCounts['15-30초'];
             const secondHalfCount = intervalCounts['30-45초'] + intervalCounts['45-60초'];
             
-            // 중복 계산
+            // 중복 및 침투 계산
             const animalFrequency = {};
+            let intrusionCount = 0;
+            let validAnimalCount = 0;
+            
             animals.forEach(animal => {
-                animalFrequency[animal.name] = (animalFrequency[animal.name] || 0) + 1;
+                if (animal.isAnimal) {
+                    // 동물인 경우 기본형으로 중복 체크
+                    const baseAnimal = animal.baseAnimal || animal.name;
+                    animalFrequency[baseAnimal] = (animalFrequency[baseAnimal] || 0) + 1;
+                    validAnimalCount++;
+                } else {
+                    // 동물이 아닌 경우 침투로 계산
+                    intrusionCount++;
+                }
             });
             const duplicates = Object.values(animalFrequency).filter(count => count > 1).reduce((sum, count) => sum + (count - 1), 0);
             
@@ -3556,10 +3962,16 @@
                 '45-60초': intervalStats['45-60초'].length
             };
             
-            // 전체 동물 리스트
+            // 전체 동물 리스트 (유효한 동물만)
             const allAnimals = [];
+            const allValidAnimals = [];
             Object.values(intervalStats).forEach(interval => {
-                allAnimals.push(...interval);
+                interval.forEach(animal => {
+                    allAnimals.push(animal.name);
+                    if (animal.isAnimal) {
+                        allValidAnimals.push(animal.name);
+                    }
+                });
             });
             
             // 전반부/후반부 계산
@@ -3575,8 +3987,8 @@
             });
             const perseverationScore = Object.values(animalCounts).filter(count => count > 1).reduce((sum, count) => sum + (count - 1), 0);
             
-            // 침투 계산 (동물이 아닌 것 - 여기서는 0으로 표시)
-            const intrusionScore = 0;
+            // 침투 계산은 이미 위에서 intrusionCount로 계산됨
+            const intrusionScore = intrusionCount;
             
             // 범주 분석 (간단한 버전)
             const categoryAnalysis = analyzeClusters(allAnimals);
@@ -3588,8 +4000,8 @@
                 counts['30-45초'] * 0.5 + 
                 counts['45-60초'] * 0.25;
             
-            // 총점
-            const totalScore = uniqueAnimals.size;
+            // 총점 (유효한 동물만 계산)
+            const totalScore = validAnimalCount - duplicates;
             
             // 결과 해석
             let interpretation = '';
@@ -4192,7 +4604,8 @@
                         </div>
                     </div>
                 `;
-                document.body.appendChild(section);
+                // 최상단에 배치
+                document.body.insertBefore(section, document.body.firstChild);
             } else {
                 analysisSection.style.display = 'block';
                 // 분석 내용 업데이트
@@ -4265,12 +4678,18 @@
                 // 반응유형 판정
                 let responseType = '정반응';
                 let rowColor = '#ffffff';
+                let category = '동물';
                 
-                if (seenAnimals[animal.name]) {
+                // 동물 여부 확인
+                if (!animal.isAnimal) {
+                    responseType = '<span style="color: #f44336;">침투</span>';
+                    rowColor = '#ffebee';
+                    category = '비동물';
+                } else if (seenAnimals[animal.baseAnimal || animal.name]) {
                     responseType = '<span style="color: #ff9800;">보속</span>';
                     rowColor = '#fff3e0';
                 } else {
-                    seenAnimals[animal.name] = true;
+                    seenAnimals[animal.baseAnimal || animal.name] = true;
                 }
                 
                 // 클러스터 찾기
@@ -4287,7 +4706,7 @@
                         <td style="padding: 10px; border: 1px solid #e0e0e0; text-align: center;">${timeRange}</td>
                         <td style="padding: 10px; border: 1px solid #e0e0e0;">${animal.name}</td>
                         <td style="padding: 10px; border: 1px solid #e0e0e0; text-align: center;">${responseType}</td>
-                        <td style="padding: 10px; border: 1px solid #e0e0e0;">동물</td>
+                        <td style="padding: 10px; border: 1px solid #e0e0e0;">${category}</td>
                         <td style="padding: 10px; border: 1px solid #e0e0e0;">${animalCluster}</td>
                     </tr>`;
             });

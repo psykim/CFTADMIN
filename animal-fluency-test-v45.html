@@ -2934,8 +2934,20 @@
                 }
             });
             
-            // 클러스터 분석 (간단한 버전)
-            const clusterData = analyzeSimpleClusters(allAnimals);
+            // 전환 및 클러스터 분석 (CFTSCORING 알고리즘 사용)
+            const validResponses = [];
+            Object.entries(intervalAnimals).forEach(([timeRange, animals]) => {
+                animals.forEach((animal, index) => {
+                    validResponses.push({
+                        response: animal,
+                        normalizedResponse: animal,
+                        timeRange: timeRange,
+                        order: validResponses.length + 1
+                    });
+                });
+            });
+            
+            const { transitions, clusters, switchingScore, inefficientSwitchingScore } = analyzeTransitionsAndClusters(validResponses);
             
             return {
                 id: data.id,
@@ -2947,10 +2959,13 @@
                 secondHalfScore: secondHalfScore,
                 perseverationScore: perseverationScore,
                 intrusionScore: intrusionScore,
-                switchingScore: clusterData.switchingScore,
-                clusterCount: clusterData.clusterCount,
-                avgClusterSize: clusterData.avgClusterSize,
-                maxClusterSize: clusterData.maxClusterSize,
+                switchingScore: switchingScore,
+                inefficientSwitchingScore: inefficientSwitchingScore,
+                clusterCount: clusters.length,
+                avgClusterSize: clusters.length > 0 ? 
+                    (clusters.reduce((sum, c) => sum + c.size, 0) / clusters.length).toFixed(1) : '0.0',
+                maxClusterSize: Math.max(...clusters.map(c => c.size), 0),
+                clusterSizes: clusters.map(c => c.size),
                 intervalAnimals: intervalAnimals,
                 allAnimals: allAnimals,
                 interval1Count: (data.responses['0-15'] || []).length,
@@ -2967,24 +2982,6 @@
             return commonAnimals.some(animal => name.includes(animal)) || name.length >= 2;
         }
         
-        // 간단한 클러스터 분석
-        function analyzeSimpleClusters(animals) {
-            // 간단한 클러스터 분석 로직
-            const clusters = [];
-            let currentCluster = [];
-            
-            animals.forEach((animal, index) => {
-                if (currentCluster.length === 0) {
-                    currentCluster.push(animal);
-                } else {
-                    // 간단한 카테고리 판단
-                    const isSameCategory = checkSimpleCategory(currentCluster[currentCluster.length - 1], animal);
-                    if (isSameCategory) {
-                        currentCluster.push(animal);
-                    } else {
-                        if (currentCluster.length > 1) {
-                            clusters.push(currentCluster);
-                        }
                         currentCluster = [animal];
                     }
                 }
@@ -3007,24 +3004,6 @@
             };
         }
         
-        // 간단한 카테고리 판단
-        function checkSimpleCategory(animal1, animal2) {
-            // 간단한 카테고리 판단 로직
-            const categories = {
-                '육상': ['개', '고양이', '소', '말', '돼지', '호랑이', '사자', '토끼'],
-                '조류': ['닭', '오리', '거위', '비둘기', '참새', '독수리'],
-                '수생': ['물고기', '고래', '상어', '가오리', '오징어'],
-                '파충류': ['빀', '거북이', '악어', '도마뱀']
-            };
-            
-            for (let category in categories) {
-                const animals = categories[category];
-                if (animals.some(a => animal1.includes(a)) && animals.some(a => animal2.includes(a))) {
-                    return true;
-                }
-            }
-            return false;
-        }
         
         // CFTSCORING 결과 HTML 생성 - CFTSCORING.html과 완전히 동일한 디자인
         function generateCFTSCORINGResultHTML(scores) {
@@ -3163,7 +3142,7 @@
                             </tr>
                             <tr class="data-row">
                                 <td class="data-cell">${scores.switchingScore}</td>
-                                <td class="data-cell">${scores.hardSwitching || 0}</td>
+                                <td class="data-cell">${scores.inefficientSwitchingScore || 0}</td>
                                 <td class="data-cell">${scores.clusterCount}</td>
                                 <td class="data-cell">${scores.avgClusterSize}</td>
                                 <td class="data-cell">${scores.maxClusterSize}</td>
@@ -3836,8 +3815,43 @@
             // 침투 계산은 이미 위에서 intrusionCount로 계산됨
             const intrusionScore = intrusionCount;
             
-            // 범주 분석 (간단한 버전)
-            const categoryAnalysis = analyzeClusters(allAnimals);
+            // 범주 분석 - 시간대별 응답 생성
+            const allResponses = [];
+            animals.forEach((animal, index) => {
+                const timestamp = animal.timestamp;
+                const timeSeconds = Math.floor(timestamp / 1000);
+                const timeRange = timeSeconds < 15 ? '0-15' : 
+                                timeSeconds < 30 ? '15-30' : 
+                                timeSeconds < 45 ? '30-45' : '45-60';
+                
+                const isValidAnimal = isAnimalName(animal.name);
+                if (isValidAnimal) {
+                    allResponses.push({
+                        response: animal.name,
+                        normalizedResponse: normalizeAnimalName(animal.name) || animal.name,
+                        timeRange: timeRange,
+                        order: index + 1
+                    });
+                }
+            });
+            
+            // CFTSCORING 알고리즘으로 분석
+            const { transitions, clusters, switchingScore, inefficientSwitchingScore } = analyzeTransitionsAndClusters(allResponses);
+            
+            // 클러스터 통계 계산
+            const numberOfClusters = clusters.length;
+            const clusterSizes = clusters.map(c => c.size);
+            const meanClusterSize = numberOfClusters > 0 ? 
+                (clusterSizes.reduce((sum, size) => sum + size, 0) / numberOfClusters).toFixed(1) : '0.0';
+            const maxClusterSize = Math.max(...clusterSizes, 0);
+            
+            const categoryAnalysis = {
+                numberOfClusters,
+                meanClusterSize,
+                maxClusterSize,
+                switching: switchingScore,
+                hardSwitching: inefficientSwitchingScore
+            };
             
             // 가중치 점수 계산 (CFTSCORING 로직 참조)
             const weightedScore = 

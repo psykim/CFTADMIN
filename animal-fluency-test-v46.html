@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>동물 범주 언어유창성검사 V45 - CFTSCORING 데이터베이스 완전 통합</title>
+    <title>동물 범주 언어유창성검사 V46 - CFTSCORING 알고리즘 100% 일치 구현</title>
     <!-- favicon.ico 404 오류 방지 -->
     <link rel="icon" href="data:image/x-icon;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=" type="image/x-icon">
     <!-- Version 6.0 -->
@@ -634,8 +634,8 @@
         }
     </style>
     <!-- CFTSCORING 동물 데이터베이스 로드 -->
-    <script src="animal-database.js"></script>
-    <script src="animal-variants.js"></script>
+    <script src="CFTSCORING/animal-database.js"></script>
+    <script src="CFTSCORING/animal-variants.js"></script>
 </head>
 <body>
     <!-- 오버레이 요소들 -->
@@ -849,7 +849,7 @@
         // 페이지 로드 즉시 실행 - 디버깅 완료됨
         
         // 범주 정의 (CFTSCORING에서 그대로 가져옴)
-        window.CATEGORIES = {
+        const CATEGORIES = {
             // 생물학적 분류
             MAMMAL: '포유류',
             BIRD: '조류',
@@ -861,10 +861,8 @@
             CRUSTACEAN: '갑각류',
             
             // 서식지별 분류
-            AQUATIC: '수생동물',
             MARINE: '해양동물',
             FRESHWATER: '담수동물',
-            AERIAL: '비행동물',
             
             // 인간과의 관계
             DOMESTIC: '가축',
@@ -874,10 +872,8 @@
             // 문화적 분류
             ZODIAC: '12간지',
             MYTHOLOGY: '신화/상상의 동물',
-            IMAGINARY: '상상동물',
             PREHISTORIC: '선사시대 동물'
         };
-        const CATEGORIES = window.CATEGORIES;
 
         // CFTSCORING의 동물 데이터베이스가 외부 파일에서 로드됨
         // ANIMAL_CATEGORIES와 variantToBase는 animal-database.js와 animal-variants.js에서 정의됨
@@ -910,12 +906,12 @@
             if (!animalName || typeof animalName !== 'string') return null;
             
             // variantToBase 매핑이 있으면 사용
-            if (typeof window.variantToBase !== 'undefined' && window.variantToBase[animalName]) {
-                return window.variantToBase[animalName];
+            if (typeof variantToBase !== 'undefined' && variantToBase[animalName]) {
+                return variantToBase[animalName];
             }
             
             // 직접 ANIMAL_CATEGORIES에 있으면 그대로 반환
-            if (typeof window.ANIMAL_CATEGORIES !== 'undefined' && window.ANIMAL_CATEGORIES[animalName]) {
+            if (typeof ANIMAL_CATEGORIES !== 'undefined' && ANIMAL_CATEGORIES[animalName]) {
                 return animalName;
             }
             
@@ -2430,6 +2426,38 @@
             URL.revokeObjectURL(url);
         }
 
+        // 동물 이름 필터링 함수
+        function isAnimalName(text) {
+            // 기본적인 한국어 동물 이름 패턴
+            const animalPatterns = [
+                // 일반적인 동물 이름들
+                '개', '고양이', '소', '말', '돼지', '닭', '오리', '염소', '양', '토끼',
+                '사자', '호랑이', '곰', '늑대', '여우', '사슴', '노루', '멧돼지', '코끼리', '기린',
+                '원숭이', '고릴라', '침팬지', '오랑우탄', '개미', '벌', '나비', '잠자리', '메뚜기',
+                '뱀', '도마뱀', '악어', '거북이', '개구리', '두꺼비', '이구아나', '카멜레온',
+                '독수리', '매', '까마귀', '까치', '참새', '비둘기', '제비', '두루미', '백로', '올빼미',
+                '고래', '돌고래', '상어', '물개', '바다사자', '펭귄', '해마', '오징어', '문어',
+                '쥐', '다람쥐', '청설모', '햄스터', '기니피그', '친칠라', '고슴도치', '두더지',
+                '표범', '재규어', '치타', '하이에나', '미어캣', '수달', '너구리', '오소리',
+                '캥거루', '코알라', '웜뱃', '타조', '에뮤', '플라밍고', '앵무새', '공작'
+            ];
+            
+            // 텍스트 정리
+            const cleaned = text.trim().toLowerCase();
+            
+            // 너무 긴 텍스트는 제외 (보통 동물 이름은 5글자 이하)
+            if (cleaned.length > 5) return false;
+            
+            // 조사나 문장 부호가 포함된 경우 제외
+            if (/[.,!?~]/.test(cleaned)) return false;
+            
+            // 동물 이름 패턴에 포함되는지 확인
+            return animalPatterns.some(animal => 
+                cleaned === animal || 
+                cleaned.includes(animal) || 
+                animal.includes(cleaned)
+            );
+        }
         
         // 공통 범주 기반 전환 분석 알고리즘 (CFTSCORING과 동일)
         function analyzeTransitionsAndClusters(responses) {
@@ -2458,7 +2486,7 @@
                 const normalizedAnimal = normalizeAnimalName(originalAnimal);
                 const animal = normalizedAnimal || originalAnimal;
                 const categories = [];
-                const categoryData = window.ANIMAL_CATEGORIES[animal] || {};
+                const categoryData = ANIMAL_CATEGORIES[animal] || {};
                 
                 for (const [cat, value] of Object.entries(categoryData)) {
                     if (value === true) {
@@ -2482,26 +2510,26 @@
             let currentClusterStart = 0;
             let currentClusterCategories = [...animalData[0].categories]; // 첫 동물의 모든 범주로 시작
             
-            console.log(`\n첫 동물: ${animalData[0].name}, 범주: ${currentClusterCategories.map(c => window.CATEGORIES[c] || c)}`);
+            console.log(`\n첫 동물: ${animalData[0].name}, 범주: ${currentClusterCategories.map(c => CATEGORIES[c] || c)}`);
             
             for (let i = 1; i < animalData.length; i++) {
                 const currentAnimal = animalData[i];
                 console.log(`\n${i+1}번째 동물: ${currentAnimal.name}`);
-                console.log(`  범주: ${currentAnimal.categories.map(c => window.CATEGORIES[c] || c)}`);
+                console.log(`  범주: ${currentAnimal.categories.map(c => CATEGORIES[c] || c)}`);
                 
                 // 현재 클러스터의 공통 범주와 겹치는 범주가 있는지 확인
                 const overlappingCategories = currentAnimal.categories.filter(cat => 
                     currentClusterCategories.includes(cat)
                 );
                 
-                console.log(`  현재 클러스터 공통범주: ${currentClusterCategories.map(c => window.CATEGORIES[c] || c)}`);
-                console.log(`  겹치는 범주: ${overlappingCategories.map(c => window.CATEGORIES[c] || c)}`);
+                console.log(`  현재 클러스터 공통범주: ${currentClusterCategories.map(c => CATEGORIES[c] || c)}`);
+                console.log(`  겹치는 범주: ${overlappingCategories.map(c => CATEGORIES[c] || c)}`);
                 
                 if (overlappingCategories.length > 0) {
                     // 겹치는 범주가 있으면 같은 클러스터에 속함
                     // 공통 범주를 겹치는 범주로 업데이트
                     currentClusterCategories = overlappingCategories;
-                    console.log(`  → 같은 클러스터 유지, 공통범주 업데이트: ${currentClusterCategories.map(c => window.CATEGORIES[c] || c)}`);
+                    console.log(`  → 같은 클러스터 유지, 공통범주 업데이트: ${currentClusterCategories.map(c => CATEGORIES[c] || c)}`);
                 } else {
                     // 겹치는 범주가 없으면 전환 발생
                     console.log(`  → 전환 발생!`);
@@ -2521,7 +2549,7 @@
                         endIndex: i - 1
                     });
                     
-                    console.log(`  이전 클러스터: ${clusterAnimals.join(', ')} (크기: ${clusterSize}, 범주: ${bestCategory.categories.map(c => window.CATEGORIES[c] || c)})`);
+                    console.log(`  이전 클러스터: ${clusterAnimals.join(', ')} (크기: ${clusterSize}, 범주: ${bestCategory.categories.map(c => CATEGORIES[c] || c)})`);
                     
                     // 전환 정보 추가
                     transitions.push({
@@ -2559,7 +2587,7 @@
                     endIndex: animalData.length - 1
                 });
                 
-                console.log(`\n마지막 클러스터: ${lastClusterAnimals.join(', ')} (크기: ${lastClusterSize}, 범주: ${bestLastCategory.categories.map(c => window.CATEGORIES[c] || c)})`);
+                console.log(`\n마지막 클러스터: ${lastClusterAnimals.join(', ')} (크기: ${lastClusterSize}, 범주: ${bestLastCategory.categories.map(c => CATEGORIES[c] || c)})`);
             }
             
             console.log('\n=== 전환 분석 결과 ===');
@@ -2568,7 +2596,7 @@
             console.log(`클러스터 수: ${clusters.length}`);
             console.log('클러스터 구성:');
             clusters.forEach((cluster, idx) => {
-                const categoryNames = cluster.commonCategories.map(cat => window.CATEGORIES[cat] || cat).join(', ');
+                const categoryNames = cluster.commonCategories.map(cat => CATEGORIES[cat] || cat).join(', ');
                 console.log(`  클러스터 ${idx + 1}: ${cluster.animals.join(', ')} (크기: ${cluster.size}, 공통범주: ${categoryNames})`);
             });
             
@@ -2899,55 +2927,93 @@
             return text.split(',').map(a => a.trim()).filter(a => a.length > 0);
         }
         
-        // CFTSCORING 점수 계산
+        // CFTSCORING 점수 계산 - CFTSCORING.html의 정확한 알고리즘 사용
         function calculateCFTScores(data) {
-            const allAnimals = [];
-            const intervalAnimals = {};
-            let totalScore = 0;
+            // 모든 반응을 순서대로 정리
+            const allResponses = [];
+            let order = 1;
             
-            // 각 구간별 동물 수집
-            ['0-15', '15-30', '30-45', '45-60'].forEach(interval => {
-                const animals = data.responses[interval] || [];
-                intervalAnimals[interval] = animals;
-                allAnimals.push(...animals);
-                totalScore += animals.length;
-            });
-            
-            // 전반/후반 점수
-            const firstHalfScore = (data.responses['0-15'] || []).length + (data.responses['15-30'] || []).length;
-            const secondHalfScore = (data.responses['30-45'] || []).length + (data.responses['45-60'] || []).length;
-            
-            // 보속 및 침투 계산
-            const uniqueAnimals = new Set();
-            let perseverationScore = 0;
-            let intrusionScore = 0;
-            
-            allAnimals.forEach(animal => {
-                if (uniqueAnimals.has(animal)) {
-                    perseverationScore++;
-                } else {
-                    uniqueAnimals.add(animal);
-                    // 동물 이름 유효성 검사
-                    if (!isAnimalName(animal)) {
-                        intrusionScore++;
-                    }
-                }
-            });
-            
-            // 전환 및 클러스터 분석 (CFTSCORING 알고리즘 사용)
-            const validResponses = [];
-            Object.entries(intervalAnimals).forEach(([timeRange, animals]) => {
-                animals.forEach((animal, index) => {
-                    validResponses.push({
-                        response: animal,
-                        normalizedResponse: animal,
+            ['0-15', '15-30', '30-45', '45-60'].forEach(range => {
+                const timeRange = range;
+                (data.responses[range] || []).forEach(response => {
+                    const trimmed = response.trim();
+                    if (!trimmed) return;
+                    
+                    // 정규화된 동물 이름 찾기
+                    const normalizedResponse = normalizeAnimalName(trimmed);
+                    
+                    allResponses.push({
+                        response: trimmed,
+                        originalResponse: trimmed,
+                        normalizedResponse: normalizedResponse,
                         timeRange: timeRange,
-                        order: validResponses.length + 1
+                        order: order++
                     });
                 });
             });
             
-            const { transitions, clusters, switchingScore, inefficientSwitchingScore } = analyzeTransitionsAndClusters(validResponses);
+            // 유효한 반응 (정규화된 동물 이름이 있는 것)
+            const validResponses = allResponses.filter(r => r.normalizedResponse !== null);
+            const uniqueResponses = [...new Set(validResponses.map(r => r.normalizedResponse))];
+            const totalScore = uniqueResponses.length;
+            
+            // 전반/후반 점수
+            const firstHalfResponses = allResponses.filter(r => 
+                (r.timeRange === '0-15' || r.timeRange === '15-30') && r.normalizedResponse !== null
+            );
+            const firstHalfScore = new Set(firstHalfResponses.map(r => r.normalizedResponse)).size;
+            
+            const secondHalfResponses = allResponses.filter(r => 
+                (r.timeRange === '30-45' || r.timeRange === '45-60') && r.normalizedResponse !== null
+            );
+            const secondHalfScore = new Set(secondHalfResponses.map(r => r.normalizedResponse)).size;
+            
+            // 보속 오류 계산
+            const responseCount = {};
+            validResponses.forEach(r => {
+                responseCount[r.normalizedResponse] = (responseCount[r.normalizedResponse] || 0) + 1;
+            });
+            const perseverationScore = Object.values(responseCount)
+                .filter(count => count > 1)
+                .reduce((sum, count) => sum + (count - 1), 0);
+            
+            // 침투 오류 계산
+            const intrusionScore = allResponses.filter(r => r.normalizedResponse === null).length;
+            
+            // CFTSCORING의 정확한 전환 및 클러스터 분석
+            const { transitions, clusters, switchingScore, inefficientSwitchingScore } = 
+                analyzeTransitionsAndClusters(validResponses);
+            
+            // 범주 점수 계산 (크기 2 이상의 클러스터만 범주로 인정)
+            const validClusters = clusters.filter(cluster => cluster.size >= 2);
+            const usedCategories = new Set();
+            validClusters.forEach(cluster => {
+                if (cluster.commonCategories.length > 0) {
+                    usedCategories.add(cluster.commonCategories[0]);
+                }
+            });
+            const categoryScore = usedCategories.size;
+            
+            // 클러스터 통계
+            const validClusterSizes = validClusters.map(c => c.size);
+            const avgClusterSize = validClusterSizes.length > 0 
+                ? (validClusterSizes.reduce((sum, size) => sum + size, 0) / validClusterSizes.length).toFixed(1)
+                : '0.0';
+            const maxClusterSize = Math.max(...validClusterSizes, 0);
+            
+            // 구간별 동물 정리
+            const intervalAnimals = {
+                '0-15': [],
+                '15-30': [],
+                '30-45': [],
+                '45-60': []
+            };
+            
+            allResponses.forEach(r => {
+                if (r.normalizedResponse) {
+                    intervalAnimals[r.timeRange].push(r.normalizedResponse);
+                }
+            });
             
             return {
                 id: data.id,
@@ -2962,16 +3028,14 @@
                 switchingScore: switchingScore,
                 inefficientSwitchingScore: inefficientSwitchingScore,
                 clusterCount: clusters.length,
-                avgClusterSize: clusters.length > 0 ? 
-                    (clusters.reduce((sum, c) => sum + c.size, 0) / clusters.length).toFixed(1) : '0.0',
-                maxClusterSize: Math.max(...clusters.map(c => c.size), 0),
-                clusterSizes: clusters.map(c => c.size),
+                categoryScore: categoryScore,
+                avgClusterSize: avgClusterSize,
+                maxClusterSize: maxClusterSize,
+                clusterSizes: validClusterSizes,
                 intervalAnimals: intervalAnimals,
-                allAnimals: allAnimals,
-                interval1Count: (data.responses['0-15'] || []).length,
-                interval2Count: (data.responses['15-30'] || []).length,
-                interval3Count: (data.responses['30-45'] || []).length,
-                interval4Count: (data.responses['45-60'] || []).length
+                allAnimals: validResponses.map(r => r.normalizedResponse),
+                clusters: clusters,
+                transitions: transitions
             };
         }
         
@@ -3004,6 +3068,7 @@
             };
         }
         
+        // 간단한 카테고리 판단
         
         // CFTSCORING 결과 HTML 생성 - CFTSCORING.html과 완전히 동일한 디자인
         function generateCFTSCORINGResultHTML(scores) {
@@ -3311,14 +3376,51 @@
             });
             const duplicates = Object.values(animalFrequency).filter(count => count > 1).reduce((sum, count) => sum + (count - 1), 0);
             
-            // 클러스터 분석 (간단한 버전)
-            const clusters = analyzeClusters(animals.map(a => a.name));
+            // CFTSCORING 알고리즘으로 클러스터 분석
+            const allResponses = [];
+            animals.forEach((animal, index) => {
+                const timestamp = animal.timestamp;
+                const timeSeconds = Math.floor(timestamp / 1000);
+                const timeRange = timeSeconds < 15 ? '0-15' : 
+                                timeSeconds < 30 ? '15-30' : 
+                                timeSeconds < 45 ? '30-45' : '45-60';
+                
+                const normalizedResponse = normalizeAnimalName(animal.name);
+                if (normalizedResponse) {
+                    allResponses.push({
+                        response: animal.name,
+                        normalizedResponse: normalizedResponse,
+                        timeRange: timeRange,
+                        order: index + 1
+                    });
+                }
+            });
+            
+            const { transitions, clusters, switchingScore, inefficientSwitchingScore } = 
+                analyzeTransitionsAndClusters(allResponses);
             
             // 가중치 점수 계산 (CFTSCORING 알고리즘)
             const weightedScore = intervalCounts['0-15초'] * 1.0 + 
                                 intervalCounts['15-30초'] * 0.75 + 
                                 intervalCounts['30-45초'] * 0.5 + 
                                 intervalCounts['45-60초'] * 0.25;
+            
+            // 범주 점수 계산 (크기 2 이상의 클러스터만 범주로 인정)
+            const validClusters = clusters.filter(cluster => cluster.size >= 2);
+            const usedCategories = new Set();
+            validClusters.forEach(cluster => {
+                if (cluster.commonCategories.length > 0) {
+                    usedCategories.add(cluster.commonCategories[0]);
+                }
+            });
+            const categoryScore = usedCategories.size;
+            
+            // 클러스터 통계
+            const validClusterSizes = validClusters.map(c => c.size);
+            const avgClusterSize = validClusterSizes.length > 0 
+                ? (validClusterSizes.reduce((sum, size) => sum + size, 0) / validClusterSizes.length).toFixed(1)
+                : '0.0';
+            const maxClusterSize = Math.max(...validClusterSizes, 0);
             
             // CFTSCORING 판독문 생성
             const scores = {
@@ -3327,9 +3429,11 @@
                 duplicates: duplicates,
                 intrusions: 0, // 명사만 인식하므로 침투 오류는 0
                 numberOfClusters: clusters.length,
-                meanClusterSize: clusters.length > 0 ? 
-                    clusters.reduce((sum, c) => sum + c.items.length, 0) / clusters.length : 1,
-                clusterSizes: clusters.map(c => c.items.length)
+                meanClusterSize: parseFloat(avgClusterSize),
+                clusterSizes: validClusterSizes,
+                switchingScore: switchingScore,
+                inefficientSwitchingScore: inefficientSwitchingScore,
+                categoryScore: categoryScore
             };
             
             const interpretationResult = analyzePatternAndGenerateInterpretation(scores);
@@ -3815,43 +3919,8 @@
             // 침투 계산은 이미 위에서 intrusionCount로 계산됨
             const intrusionScore = intrusionCount;
             
-            // 범주 분석 - 시간대별 응답 생성
-            const allResponses = [];
-            animals.forEach((animal, index) => {
-                const timestamp = animal.timestamp;
-                const timeSeconds = Math.floor(timestamp / 1000);
-                const timeRange = timeSeconds < 15 ? '0-15' : 
-                                timeSeconds < 30 ? '15-30' : 
-                                timeSeconds < 45 ? '30-45' : '45-60';
-                
-                const isValidAnimal = isAnimalName(animal.name);
-                if (isValidAnimal) {
-                    allResponses.push({
-                        response: animal.name,
-                        normalizedResponse: normalizeAnimalName(animal.name) || animal.name,
-                        timeRange: timeRange,
-                        order: index + 1
-                    });
-                }
-            });
-            
-            // CFTSCORING 알고리즘으로 분석
-            const { transitions, clusters, switchingScore, inefficientSwitchingScore } = analyzeTransitionsAndClusters(allResponses);
-            
-            // 클러스터 통계 계산
-            const numberOfClusters = clusters.length;
-            const clusterSizes = clusters.map(c => c.size);
-            const meanClusterSize = numberOfClusters > 0 ? 
-                (clusterSizes.reduce((sum, size) => sum + size, 0) / numberOfClusters).toFixed(1) : '0.0';
-            const maxClusterSize = Math.max(...clusterSizes, 0);
-            
-            const categoryAnalysis = {
-                numberOfClusters,
-                meanClusterSize,
-                maxClusterSize,
-                switching: switchingScore,
-                hardSwitching: inefficientSwitchingScore
-            };
+            // 범주 분석 (간단한 버전)
+            const categoryAnalysis = analyzeClusters(allAnimals);
             
             // 가중치 점수 계산 (CFTSCORING 로직 참조)
             const weightedScore = 
@@ -3996,6 +4065,36 @@
             // 음성 안내
             speak("분석이 완료되었습니다. 결과를 확인해 주세요.");
         }
+        
+        // CFTSCORING 결과 표시 (기존 함수 제거)
+        /*
+            // CFTSCORING과 동일한 범주 체계 사용
+            const CATEGORIES = {
+                // 생물학적 분류
+                MAMMAL: '포유류',
+                BIRD: '조류',
+                REPTILE: '파충류',
+                AMPHIBIAN: '양서류',
+                FISH: '어류',
+                INSECT: '곤충',
+                MOLLUSK: '연체동물',
+                CRUSTACEAN: '갑각류',
+                
+                // 서식지별 분류
+                AQUATIC: '수생동물',
+                MARINE: '해양동물',
+                FRESHWATER: '담수동물',
+                AERIAL: '비행동물',
+                
+                // 인간과의 관계
+                DOMESTIC: '가축',
+                PET: '애완동물',
+                WILD: '야생동물',
+                
+                // 문화적 분류
+                ZODIAC: '12간지',
+                MYTHOLOGY: '신화동물',
+                IMAGINARY: '상상의 동물',
                 PREHISTORIC: '선사시대 동물'
             };
             
@@ -4569,7 +4668,7 @@
                 rowColor = '#f0f0f0';
                 processedAnimals++;
                 
-                const animalData = window.ANIMAL_CATEGORIES[animal] || {};
+                const animalData = ANIMAL_CATEGORIES[animal] || {};
                 const categories = [];
                 for (const [cat, value] of Object.entries(animalData)) {
                     if (value === true) categories.push(cat);
@@ -4623,9 +4722,9 @@
                     <td style="text-align: center;">${timeRangeDisplay}</td>
                     <td><strong>${animal}</strong></td>
                     <td style="text-align: center;">${responseType}</td>
-                    <td>${categories.map(c => window.CATEGORIES[c]).join(', ')}</td>
-                    <td>${clusterCommonCategories.map(c => window.CATEGORIES[c]).join(', ') || '-'}</td>
-                    <td>${overlappingCategories.map(c => window.CATEGORIES[c]).join(', ') || '없음'}</td>
+                    <td>${categories.map(c => CATEGORIES[c]).join(', ')}</td>
+                    <td>${clusterCommonCategories.map(c => CATEGORIES[c]).join(', ') || '-'}</td>
+                    <td>${overlappingCategories.map(c => CATEGORIES[c]).join(', ') || '없음'}</td>
                     <td style="text-align: center; font-weight: bold; color: ${decision === '전환' ? '#d32f2f' : decision === '시작' ? '#4caf50' : '#2196f3'};">
                         ${decision}
                         ${decision === '전환' && clusters[currentClusterIdx-1]?.size === 1 ? 

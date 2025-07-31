@@ -4472,13 +4472,18 @@
                     console.log('사용자 정보 저장됨:', userInfo);
                     
                     // 검사 페이지로 이동 후 바로 검사 시작
+                    console.log('testPage로 이동 시작');
                     showPage('testPage');
+                    console.log('testPage로 이동 완료');
                     
                     // 짧은 딜레이 후 자동으로 검사 시작
                     setTimeout(() => {
+                        console.log('타임아웃 실행됨');
                         if (window.handleStartClick) {
-                            console.log('자동으로 검사 시작');
+                            console.log('handleStartClick 함수 존재함, 자동으로 검사 시작');
                             window.handleStartClick();
+                        } else {
+                            console.error('handleStartClick 함수가 없습니다');
                         }
                     }, 500);
                 });

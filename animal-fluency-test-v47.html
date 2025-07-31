@@ -721,7 +721,7 @@
                 <div class="timer-display" id="timer" style="display: none;">60</div>
                 
                 <div class="ready-box" id="readyBox">
-                    <button class="start-button" id="manualStartBtn" style="display: block !important; visibility: visible !important; opacity: 1 !important; position: relative !important; z-index: 99999 !important;"><span>시작하기</span></button>
+                    <button class="start-button" id="manualStartBtn" onclick="console.log('버튼 클릭됨'); if(window.handleStartClick) { console.log('handleStartClick 호출'); window.handleStartClick(); } else { console.error('handleStartClick not found'); }" style="display: block !important; visibility: visible !important; opacity: 1 !important; position: relative !important; z-index: 99999 !important;"><span>시작하기</span></button>
                     <div class="ready-check" id="readyCheckMessage">
                         <p>조용한 장소에서 검사를 시작하세요</p>
                     </div>
@@ -4406,32 +4406,10 @@
                 testPage: document.getElementById('testPage')
             });
             
-            // 시작 버튼에 이벤트 리스너 추가
+            // 시작 버튼 확인 (onclick은 HTML에 직접 정의됨)
             const manualStartBtn = document.getElementById('manualStartBtn');
             if (manualStartBtn) {
-                console.log('시작 버튼에 이벤트 리스너 추가');
-                console.log('시작 버튼 스타일:', {
-                    display: window.getComputedStyle(manualStartBtn).display,
-                    visibility: window.getComputedStyle(manualStartBtn).visibility,
-                    opacity: window.getComputedStyle(manualStartBtn).opacity,
-                    zIndex: window.getComputedStyle(manualStartBtn).zIndex
-                });
-                
-                // 강제로 버튼을 보이도록 설정
-                manualStartBtn.style.display = 'inline-block';
-                manualStartBtn.style.visibility = 'visible';
-                manualStartBtn.style.opacity = '1';
-                manualStartBtn.style.position = 'relative';
-                manualStartBtn.style.zIndex = '99999';
-                
-                console.log('시작 버튼 강제 표시 완료');
-                
-                manualStartBtn.addEventListener('click', function() {
-                    console.log('시작 버튼 클릭됨!');
-                    if (!isStartClicked) {
-                        window.handleStartClick();
-                    }
-                });
+                console.log('시작 버튼 찾음, handleStartClick 함수 존재:', typeof window.handleStartClick);
             } else {
                 console.error('manualStartBtn을 찾을 수 없습니다');
             }
@@ -4509,16 +4487,7 @@
                         if (manualStartBtn) {
                             manualStartBtn.style.display = 'block';
                             console.log('시작 버튼 표시됨');
-                            
-                            // 시작 버튼 클릭 시 바로 검사 시작
-                            manualStartBtn.onclick = function() {
-                                console.log('시작 버튼 클릭됨 - 바로 검사 시작');
-                                if (window.handleStartClick) {
-                                    window.handleStartClick();
-                                } else {
-                                    console.error('handleStartClick 함수가 없습니다');
-                                }
-                            };
+                            console.log('handleStartClick 함수 존재 여부:', typeof window.handleStartClick);
                         }
                     }, 100);
                 });
